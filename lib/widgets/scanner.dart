@@ -10,23 +10,23 @@ class ScannerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     if (codeBeingProcessed == true) {
       return Scaffold(
-      appBar: AppBar(title: const Text('Mobile Scanner')),
-      body: MobileScanner(
-          allowDuplicates: false,
-          controller: MobileScannerController(
-            facing: CameraFacing.back, torchEnabled: true),
-          onDetect: (barcode, args) {
-            final String code = barcode.rawValue;
-            debugPrint(code);
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const DetailPage()));
-          }),
-    );
-    }
-    else {
-      
-    }
-    
+        appBar: AppBar(title: const Text('Mobile Scanner')),
+        body: MobileScanner(
+            allowDuplicates: false,
+            controller: MobileScannerController(
+                facing: CameraFacing.back, torchEnabled: false),
+            onDetect: (barcode, args) {
+              final String code = barcode.rawValue;
+              debugPrint(code);
+              debugPrint(barcode.rawValue);
+              debugPrint(barcode.toString());
+              codeBeingProcessed = false;
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DetailPage(barcode: code)));
+            }),
+      );
+    } else {}
   }
 }
-
-  
