@@ -193,14 +193,20 @@ class SlideTile extends StatelessWidget {
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+            style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 28,
+                fontFamily: "Poppins"),
           ),
           SizedBox(
             height: 20,
           ),
           Text(desc,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14))
+              style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
+                  fontFamily: "Poppins"))
         ],
       ),
     );

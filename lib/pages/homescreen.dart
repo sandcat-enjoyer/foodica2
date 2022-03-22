@@ -3,13 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:foodica/main.dart';
 import 'package:foodica/pages/history.dart';
 import 'package:foodica/pages/productdetail.dart';
 import 'package:foodica/pages/settings.dart';
 import 'package:foodica/pages/tips.dart';
-import 'package:foodica/widgets/scanner.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 
 class HomeScreenPage extends StatefulWidget {
   const HomeScreenPage({Key key}) : super(key: key);
@@ -394,7 +391,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
               Icons.menu,  // add custom icons also
           ),
   ), */
-          title: const Text("Home",
+          title: const Text("Foodica",
               style: TextStyle(
                 fontFamily: "Poppins",
                 fontWeight: FontWeight.bold,
