@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
@@ -9,15 +11,15 @@ import 'package:foodica/pages/settings.dart';
 import 'package:foodica/pages/tips.dart';
 
 class HomeScreenPage extends StatefulWidget {
-  const HomeScreenPage({Key key}) : super(key: key);
+  const HomeScreenPage({Key? key}) : super(key: key);
   @override
   _HomeScreenPageState createState() => _HomeScreenPageState();
 }
 
 class _HomeScreenPageState extends State<HomeScreenPage> {
-  Widget mainWidget;
+  Widget? mainWidget;
   bool codeIsScanned = false;
-  String barcode = "unknown";
+  Colors? navBackColor;
 
   void navigateToHistory() {
     Navigator.of(context)
@@ -34,7 +36,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
         .push(MaterialPageRoute(builder: (context) => const TipsPage()));
   }
 
-  Widget _buildHomeScreen() {
+  Widget? _buildHomeScreen() {
     if (mainWidget == null) {
       return SingleChildScrollView(
           child: Column(children: [
@@ -59,7 +61,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                       width: 350.0,
                       height: 200.0,
                       child: Card(
-                        color: const Color.fromARGB(255, 255, 255, 255),
                         elevation: 2.0,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0)),
@@ -67,7 +68,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                             child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
-                            children: <Widget>[
+                            children: const <Widget>[
                               SizedBox(
                                 height: 10.0,
                               ),
@@ -78,7 +79,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                               Text(
                                 "Weekly Calories ",
                                 style: TextStyle(
-                                    color: Colors.black,
                                     fontFamily: "Poppins",
                                     fontWeight: FontWeight.bold,
                                     fontSize: 30.0),
@@ -89,7 +89,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                               Text(
                                 "1900/2400 calories",
                                 style: TextStyle(
-                                  color: Colors.black,
                                   fontFamily: "Poppins",
                                   fontWeight: FontWeight.w600,
                                   fontSize: 20.0,
@@ -117,7 +116,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                       width: 350.0,
                       height: 200.0,
                       child: Card(
-                        color: Color.fromARGB(255, 18, 18, 18),
                         elevation: 2.0,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0)),
@@ -125,19 +123,17 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                             child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
-                            children: <Widget>[
+                            children: const <Widget>[
                               SizedBox(
                                 height: 10.0,
                               ),
                               Icon(
                                 Icons.food_bank_outlined,
                                 size: 60,
-                                color: Colors.white,
                               ),
                               Text(
                                 "Weekly Calories",
                                 style: TextStyle(
-                                    color: Colors.white,
                                     fontFamily: "Poppins",
                                     fontWeight: FontWeight.bold,
                                     fontSize: 30.0),
@@ -148,7 +144,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                               Text(
                                 "1900/2400 calories",
                                 style: TextStyle(
-                                  color: Colors.white,
                                   fontFamily: "Poppins",
                                   fontWeight: FontWeight.w600,
                                   fontSize: 20.0,
@@ -176,7 +171,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                       width: 350.0,
                       height: 200.0,
                       child: Card(
-                        color: Color.fromARGB(255, 255, 255, 255),
                         elevation: 2.0,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0)),
@@ -184,7 +178,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                             child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
-                            children: <Widget>[
+                            children: const <Widget>[
                               SizedBox(
                                 height: 10.0,
                               ),
@@ -195,7 +189,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                               Text(
                                 "Weekly Calories ",
                                 style: TextStyle(
-                                    color: Colors.black,
                                     fontFamily: "Poppins",
                                     fontWeight: FontWeight.bold,
                                     fontSize: 30.0),
@@ -206,7 +199,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                               Text(
                                 "1900/2400 calories",
                                 style: TextStyle(
-                                  color: Colors.black,
                                   fontFamily: "Poppins",
                                   fontWeight: FontWeight.w600,
                                   fontSize: 20.0,
@@ -231,32 +223,24 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   Widget build(BuildContext context) {
     Future<void> scanBarcode() async {
       String barcodeScan;
-
       try {
         barcodeScan = await FlutterBarcodeScanner.scanBarcode(
             "#ff6666", "Cancel", false, ScanMode.BARCODE);
-        if (barcodeScan != "") {
-          if (barcodeScan != '-1') {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => DetailPage(barcode: barcodeScan)));
-          }
+        if (barcodeScan != "" && barcodeScan != '-1') {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => DetailPage(barcode: barcodeScan)));
         }
       } on PlatformException {
         barcodeScan = "Failed to get platform version";
       }
 
       if (!mounted) return;
-
-      setState(() {
-        barcode = barcodeScan;
-      });
     }
 
     //to do: turn all of these views into actual pages
-    //this will save on resources since we're making entirely new views every time we navigate to a new page
-    //not very efficient you should be ashamed of this
+
     return Scaffold(
         drawer: Drawer(
           // Add a ListView to the drawer. This ensures the user can scroll
@@ -266,20 +250,20 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
             // Important: Remove any padding from the ListView.
             padding: EdgeInsets.zero,
             children: [
-              DrawerHeader(
+              const DrawerHeader(
                 decoration: BoxDecoration(
-                    image: new DecorationImage(
+                    image: DecorationImage(
                         image: AssetImage("assets/drawer-header.jpg"),
                         fit: BoxFit.cover)),
+                child: null,
               ),
               ListTile(
                 title: RichText(
-                  text: TextSpan(children: [
+                  text: const TextSpan(children: [
                     WidgetSpan(child: Icon(Icons.home, size: 22)),
                     TextSpan(
                         text: "Home",
                         style: TextStyle(
-                          color: Colors.black,
                           fontFamily: "Poppins",
                         ))
                   ]),
@@ -293,12 +277,11 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
               ),
               ListTile(
                 title: RichText(
-                  text: TextSpan(children: [
+                  text: const TextSpan(children: [
                     WidgetSpan(child: Icon(Icons.history, size: 22)),
                     TextSpan(
                         text: "History",
                         style: TextStyle(
-                          color: Colors.black,
                           fontFamily: "Poppins",
                         ))
                   ]),
@@ -312,31 +295,29 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
               ),
               ListTile(
                 title: RichText(
-                  text: TextSpan(children: [
+                  text: const TextSpan(children: [
                     WidgetSpan(child: Icon(Icons.lightbulb, size: 22)),
                     TextSpan(
                         text: "Tips",
                         style: TextStyle(
-                          color: Colors.black,
                           fontFamily: "Poppins",
                         ))
                   ]),
                 ),
                 onTap: () {
                   setState(() {
-                    mainWidget = TipsPage();
+                    mainWidget = const TipsPage();
                   });
                   Navigator.pop(context);
                 },
               ),
               ListTile(
                 title: RichText(
-                  text: TextSpan(children: [
+                  text: const TextSpan(children: [
                     WidgetSpan(child: Icon(Icons.account_box, size: 22)),
                     TextSpan(
                         text: "Extra",
                         style: TextStyle(
-                          color: Colors.black,
                           fontFamily: "Poppins",
                         ))
                   ]),
@@ -350,12 +331,11 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
               ),
               ListTile(
                 title: RichText(
-                  text: TextSpan(children: [
+                  text: const TextSpan(children: [
                     WidgetSpan(child: Icon(Icons.settings, size: 22)),
                     TextSpan(
                         text: "Settings",
                         style: TextStyle(
-                          color: Colors.black,
                           fontFamily: "Poppins",
                         ))
                   ]),
@@ -373,16 +353,13 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
         floatingActionButton: FloatingActionButton(
           onPressed: () => {scanBarcode()},
           child: const Icon(Icons.add_rounded, size: 40),
-          backgroundColor: Colors.red,
         ),
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
           leading: Builder(
             builder: (context) => IconButton(
                 onPressed: () => Scaffold.of(context).openDrawer(),
-                icon: new Icon(Icons.menu)),
+                icon: const Icon(Icons.menu)),
           ),
           /* GestureDetector(
           onTap: () { 

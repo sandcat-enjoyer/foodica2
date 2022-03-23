@@ -5,7 +5,7 @@ import 'dart:io';
 import 'homescreen.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({Key key}) : super(key: key);
+  const OnboardingScreen({Key? key}) : super(key: key);
 
   @override
   _OnboardingScreenState createState() => _OnboardingScreenState();
@@ -14,9 +14,9 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   int introViewed = 0;
   bool isIntroViewed = false;
-  List<SliderModel> mySLides = new List<SliderModel>();
+  List<SliderModel> mySLides = <SliderModel>[];
   int slideIndex = 0;
-  PageController controller;
+  PageController? controller;
 
   Widget _buildPageIndicator(bool isCurrentPage) {
     return Container(
@@ -24,7 +24,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       height: isCurrentPage ? 10.0 : 6.0,
       width: isCurrentPage ? 10.0 : 6.0,
       decoration: BoxDecoration(
-        color: isCurrentPage ? Colors.grey : Colors.grey[300],
         borderRadius: BorderRadius.circular(12),
       ),
     );
@@ -42,12 +41,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-            gradient:
-                LinearGradient(colors: [Color(0xff3C8CE7), Color(0xff00EAFF)])),
         child: Scaffold(
-          backgroundColor: Colors.white,
-          body: Container(
+          body: SizedBox(
             height: MediaQuery.of(context).size.height - 100,
             child: PageView(
               controller: controller,
@@ -77,20 +72,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           bottomSheet: slideIndex != 2
               ? Container(
-                  margin: EdgeInsets.symmetric(vertical: 16),
+                  margin: const EdgeInsets.symmetric(vertical: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       TextButton(
                         onPressed: () {
-                          controller.animateToPage(2,
-                              duration: Duration(milliseconds: 400),
+                          controller!.animateToPage(2,
+                              duration: const Duration(milliseconds: 100),
                               curve: Curves.linear);
                         },
-                        child: Text(
+                        child: const Text(
                           "Skip",
                           style: TextStyle(
-                              color: Color(0xFF0074E4),
                               fontWeight: FontWeight.w600,
                               fontFamily: "Poppins"),
                         ),
@@ -107,15 +101,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          print("this is slideIndex: $slideIndex");
-                          controller.animateToPage(slideIndex + 1,
-                              duration: Duration(milliseconds: 500),
+                          controller!.animateToPage(slideIndex + 1,
+                              duration: const Duration(milliseconds: 500),
                               curve: Curves.linear);
                         },
                         child: const Text(
                           "Next",
                           style: TextStyle(
-                              color: Color(0xFF0074E4),
                               fontWeight: FontWeight.w600,
                               fontFamily: "Poppins"),
                         ),
@@ -144,7 +136,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Route _createRoute() {
+  /* Route _createRoute() {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) =>
           const HomeScreenPage(),
@@ -165,7 +157,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         );
       },
     );
-  }
+  } */
 
   void navigateToHome() {
     Navigator.of(context)
@@ -176,29 +168,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 class SlideTile extends StatelessWidget {
   String imagePath, title, desc;
 
-  SlideTile({this.imagePath, this.title, this.desc});
+  SlideTile({required this.imagePath, required this.title, required this.desc});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       alignment: Alignment.center,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Image.asset(imagePath),
           const SizedBox(
-            height: 40,
+            height: 20,
           ),
           Text(
             title,
             textAlign: TextAlign.center,
             style: const TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 28,
+                fontSize: 30,
                 fontFamily: "Poppins"),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Text(desc,
