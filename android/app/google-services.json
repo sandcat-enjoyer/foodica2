@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "828152655111",
+    "project_id": "foodica-9743c",
+    "storage_bucket": "foodica-9743c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:828152655111:android:fa02625635905eb7a329a2",
+        "android_client_info": {
+          "package_name": "com.julesdebbaut.foodica"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "828152655111-c5f1h8eimmugohlmj3oihuq1s3s96aug.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.julesdebbaut.foodica",
+            "certificate_hash": "74a95c875838fb0d300bde16a20f55f3eb193ebd"
+          }
+        },
+        {
+          "client_id": "828152655111-1935rq5eft42fbne5lhp1ak864p0l6pb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAPQbuKyN3YNkW4gIgHPhK3eIc4qsWeJ4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "828152655111-1935rq5eft42fbne5lhp1ak864p0l6pb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

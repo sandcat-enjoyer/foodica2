@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foodica/data/data.dart';
+import 'package:foodica/pages/login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'homescreen.dart';
 
@@ -13,14 +15,28 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   int introViewed = 0;
-  bool isIntroViewed = false;
   List<SliderModel> mySLides = <SliderModel>[];
   int slideIndex = 0;
   PageController? controller;
 
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  late Future<bool> _isIntroViewed;
+
+  Future<void> _introWasViewed() async {
+    final SharedPreferences prefs = await _prefs;
+    final bool isIntroViewed = true;
+
+    setState(() {
+      _isIntroViewed =
+          prefs.setBool("isIntroViewed", isIntroViewed).then((bool success) {
+        return isIntroViewed;
+      });
+    });
+  }
+
   Widget _buildPageIndicator(bool isCurrentPage) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 2.0),
+      margin: const EdgeInsets.symmetric(horizontal: 2.0),
       height: isCurrentPage ? 10.0 : 6.0,
       width: isCurrentPage ? 10.0 : 6.0,
       decoration: BoxDecoration(
@@ -34,104 +50,101 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     // TODO: implement initState
     super.initState();
     mySLides = getSlides();
-    controller = new PageController();
+    controller = PageController();
+    _isIntroViewed = _prefs.then((SharedPreferences prefs) {
+      return prefs.getBool("isIntroViewed") ?? false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        child: Scaffold(
-          body: SizedBox(
-            height: MediaQuery.of(context).size.height - 100,
-            child: PageView(
-              controller: controller,
-              onPageChanged: (index) {
-                setState(() {
-                  slideIndex = index;
-                });
-              },
-              children: <Widget>[
-                SlideTile(
-                  imagePath: mySLides[0].getImageAssetPath(),
-                  title: mySLides[0].getTitle(),
-                  desc: mySLides[0].getDesc(),
-                ),
-                SlideTile(
-                  imagePath: mySLides[1].getImageAssetPath(),
-                  title: mySLides[1].getTitle(),
-                  desc: mySLides[1].getDesc(),
-                ),
-                SlideTile(
-                  imagePath: mySLides[2].getImageAssetPath(),
-                  title: mySLides[2].getTitle(),
-                  desc: mySLides[2].getDesc(),
-                )
-              ],
-            ),
+      body: Scaffold(
+        body: SizedBox(
+          height: MediaQuery.of(context).size.height - 100,
+          child: PageView(
+            controller: controller,
+            onPageChanged: (index) {
+              setState(() {
+                slideIndex = index;
+              });
+            },
+            children: <Widget>[
+              SlideTile(
+                imagePath: mySLides[0].getImageAssetPath(),
+                title: mySLides[0].getTitle(),
+                desc: mySLides[0].getDesc(),
+              ),
+              SlideTile(
+                imagePath: mySLides[1].getImageAssetPath(),
+                title: mySLides[1].getTitle(),
+                desc: mySLides[1].getDesc(),
+              ),
+              SlideTile(
+                imagePath: mySLides[2].getImageAssetPath(),
+                title: mySLides[2].getTitle(),
+                desc: mySLides[2].getDesc(),
+              )
+            ],
           ),
-          bottomSheet: slideIndex != 2
-              ? Container(
-                  margin: const EdgeInsets.symmetric(vertical: 16),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      TextButton(
-                        onPressed: () {
-                          controller!.animateToPage(2,
-                              duration: const Duration(milliseconds: 100),
-                              curve: Curves.linear);
-                        },
-                        child: const Text(
-                          "Skip",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontFamily: "Poppins"),
-                        ),
-                      ),
-                      Container(
-                        child: Row(
-                          children: [
-                            for (int i = 0; i < 3; i++)
-                              i == slideIndex
-                                  ? _buildPageIndicator(true)
-                                  : _buildPageIndicator(false),
-                          ],
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          controller!.animateToPage(slideIndex + 1,
-                              duration: const Duration(milliseconds: 500),
-                              curve: Curves.linear);
-                        },
-                        child: const Text(
-                          "Next",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontFamily: "Poppins"),
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              : InkWell(
-                  onTap: () {
-                    navigateToHome();
-                  },
-                  child: Container(
-                    height: Platform.isIOS ? 70 : 60,
-                    color: Colors.blue,
-                    alignment: Alignment.center,
-                    child: const Text("Get Started",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: "Poppins",
-                            fontSize: 18)),
-                  ),
-                ),
         ),
+        bottomSheet: slideIndex != 2
+            ? Container(
+                margin: const EdgeInsets.symmetric(vertical: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        controller!.animateToPage(2,
+                            duration: const Duration(milliseconds: 250),
+                            curve: Curves.easeInOut);
+                      },
+                      child: const Text(
+                        "Skip",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, fontFamily: "Poppins"),
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        for (int i = 0; i < 3; i++)
+                          i == slideIndex
+                              ? _buildPageIndicator(true)
+                              : _buildPageIndicator(false),
+                      ],
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        controller!.animateToPage(slideIndex + 1,
+                            duration: const Duration(milliseconds: 250),
+                            curve: Curves.easeInOut);
+                      },
+                      child: const Text(
+                        "Next",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, fontFamily: "Poppins"),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : InkWell(
+                onTap: () {
+                  navigateToLogin();
+                },
+                child: Container(
+                  height: Platform.isIOS ? 70 : 60,
+                  color: Colors.blue,
+                  alignment: Alignment.center,
+                  child: const Text("Get Started",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: "Poppins",
+                          fontSize: 18)),
+                ),
+              ),
       ),
     );
   }
@@ -163,12 +176,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => const HomeScreenPage()));
   }
+
+  navigateToLogin() {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => const LoginPage()));
+  }
 }
 
 class SlideTile extends StatelessWidget {
   String imagePath, title, desc;
 
-  SlideTile({required this.imagePath, required this.title, required this.desc});
+  SlideTile(
+      {Key? key,
+      required this.imagePath,
+      required this.title,
+      required this.desc})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

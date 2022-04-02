@@ -9,6 +9,7 @@ import 'package:foodica/pages/history.dart';
 import 'package:foodica/pages/productdetail.dart';
 import 'package:foodica/pages/settings.dart';
 import 'package:foodica/pages/tips.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreenPage extends StatefulWidget {
   const HomeScreenPage({Key? key}) : super(key: key);
@@ -17,9 +18,30 @@ class HomeScreenPage extends StatefulWidget {
 }
 
 class _HomeScreenPageState extends State<HomeScreenPage> {
+  late Future<int> _weeklyCalories;
+  late Future<int> _calorieGoal;
+
+  //i genuinely forgot how to easily concatenate strings in dart
+  //so for now i just append 2 numbers in a string and return the value of that
+  String? weeklyDisplayValue;
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   Widget? mainWidget;
   bool codeIsScanned = false;
   Colors? navBackColor;
+
+  int? _weeklyCaloriesInt;
+  int? _calorieGoalInt;
+
+  @override
+  void initState() {
+    super.initState();
+    _weeklyCalories = _prefs.then((SharedPreferences prefs) {
+      return prefs.getInt("weekly") ?? 0;
+    });
+    _calorieGoal = _prefs.then((SharedPreferences prefs) {
+      return prefs.getInt("goal") ?? 0;
+    });
+  }
 
   void navigateToHistory() {
     Navigator.of(context)
@@ -68,81 +90,81 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                             child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
-                            children: const <Widget>[
-                              SizedBox(
+                            children: <Widget>[
+                              const SizedBox(
                                 height: 10.0,
                               ),
-                              Icon(
+                              const Icon(
                                 Icons.food_bank_outlined,
                                 size: 60,
                               ),
-                              Text(
-                                "Weekly Calories ",
-                                style: TextStyle(
-                                    fontFamily: "Poppins",
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 30.0),
-                              ),
-                              SizedBox(
-                                height: 5.0,
-                              ),
-                              Text(
-                                "1900/2400 calories",
-                                style: TextStyle(
-                                  fontFamily: "Poppins",
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 20.0,
-                                ),
-                              )
-                            ],
-                          ),
-                        )),
-                      ),
-                    ),
-                  ],
-                )))
-          ],
-        ),
-        Column(
-          children: [
-            Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Center(
-                    child: Wrap(
-                  spacing: 20,
-                  runSpacing: 20.0,
-                  children: <Widget>[
-                    SizedBox(
-                      width: 350.0,
-                      height: 200.0,
-                      child: Card(
-                        elevation: 2.0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0)),
-                        child: Center(
-                            child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: const <Widget>[
-                              SizedBox(
-                                height: 10.0,
-                              ),
-                              Icon(
-                                Icons.food_bank_outlined,
-                                size: 60,
-                              ),
-                              Text(
+                              const Text(
                                 "Weekly Calories",
                                 style: TextStyle(
                                     fontFamily: "Poppins",
                                     fontWeight: FontWeight.bold,
                                     fontSize: 30.0),
                               ),
+                              const SizedBox(
+                                height: 5.0,
+                              ),
+                              Text(
+                                weeklyDisplayValue ?? "",
+                                style: const TextStyle(
+                                  fontFamily: "Poppins",
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 20.0,
+                                ),
+                              )
+                            ],
+                          ),
+                        )),
+                      ),
+                    ),
+                  ],
+                )))
+          ],
+        ),
+        Column(
+          children: [
+            Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Center(
+                    child: Wrap(
+                  spacing: 20,
+                  runSpacing: 20.0,
+                  children: <Widget>[
+                    SizedBox(
+                      width: 350.0,
+                      height: 200.0,
+                      child: Card(
+                        elevation: 2.0,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0)),
+                        child: Center(
+                            child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: const <Widget>[
+                              SizedBox(
+                                height: 10.0,
+                              ),
+                              Icon(
+                                Icons.qr_code,
+                                size: 60,
+                              ),
+                              Text(
+                                "Last scanned product",
+                                style: TextStyle(
+                                    fontFamily: "Poppins",
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 25.0),
+                              ),
                               SizedBox(
                                 height: 5.0,
                               ),
                               Text(
-                                "1900/2400 calories",
+                                "Product Name",
                                 style: TextStyle(
                                   fontFamily: "Poppins",
                                   fontWeight: FontWeight.w600,
@@ -183,15 +205,15 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                                 height: 10.0,
                               ),
                               Icon(
-                                Icons.food_bank_outlined,
+                                Icons.pie_chart,
                                 size: 60,
                               ),
                               Text(
-                                "Weekly Calories ",
+                                "Calories consumed today",
                                 style: TextStyle(
                                     fontFamily: "Poppins",
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 30.0),
+                                    fontSize: 20.0),
                               ),
                               SizedBox(
                                 height: 5.0,
@@ -201,7 +223,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                                 style: TextStyle(
                                   fontFamily: "Poppins",
                                   fontWeight: FontWeight.w600,
-                                  fontSize: 20.0,
+                                  fontSize: 18.0,
                                 ),
                               )
                             ],

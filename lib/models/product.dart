@@ -17,9 +17,10 @@ class Product {
   String? category;
   String? productname;
   String? image;
+  String? allergens;
 
   NutrientLevels? nutrientLevels;
-  Nutriments? nutriments;
+  Nutriments nutriments;
 
   Product(
       {this.id,
@@ -28,7 +29,8 @@ class Product {
       this.productname,
       this.image,
       this.nutrientLevels,
-      this.nutriments});
+      required this.nutriments,
+      this.allergens});
 
   //still needs more attributes but starting out with this
 
@@ -38,7 +40,9 @@ class Product {
         category: json["categories"],
         productname: json["product_name"],
         image: json["image_front_small_url"],
-        nutrientLevels: NutrientLevels.fromJson(json["nutrient_levels"]));
+        nutrientLevels: NutrientLevels.fromJson(json["nutrient_levels"]),
+        nutriments: Nutriments.fromJson(json["nutriments"]),
+        allergens: json["allergens"]);
   }
 
   Map<String, dynamic> toJson() => {
@@ -46,7 +50,9 @@ class Product {
         'category': category,
         'productname': productname,
         'image': image,
-        "nutrient_levels": nutrientLevels
+        "nutrient_levels": nutrientLevels,
+        "nutriments": nutriments,
+        "allergens": allergens
       };
 }
 
@@ -68,88 +74,64 @@ class NutrientLevels {
 }
 
 class Nutriments {
-  String? carbohydrates;
-  String? carbohydratesPer100g;
-  String? carbohydratesServing;
-  String? energyKcal;
-  String? energyKcal100g;
-  String? energyKcalServing;
-  String? fat;
-  String? fatPer100g;
-  String? fatServing;
-  String? fiber;
-  String? fiber100g;
-  String? fiberServing;
-  String? proteins;
-  String? proteinsPer100g;
-  String? proteinsServing;
-  String? salt;
-  String? saltPer100g;
-  String? saltServing;
-  String? saturatedFat;
-  String? saturatedFatPer100g;
-  String? saturatedFatServing;
-  String? sodium;
-  String? sodiumPer100g;
-  String? sodiumServing;
-  String? sugars;
-  String? sugarsPer100g;
-  String? sugarsServing;
+  num? carbohydrates;
+  num? carbohydratesPer100g;
+  num? energyKcal;
+  num? energyKcal100g;
+  num? fat;
+  num? fatPer100g;
+  num? fiber;
+  num? fiber100g;
+  num? proteins;
+  num? proteinsPer100g;
+  num? salt;
+  num? saltPer100g;
+  num? saturatedFat;
+  num? saturatedFatPer100g;
+  num? sodium;
+  num? sodiumPer100g;
+  num? sugars;
+  num? sugarsPer100g;
 
   Nutriments(
       {this.carbohydrates,
       this.carbohydratesPer100g,
-      this.carbohydratesServing,
       this.energyKcal,
       this.energyKcal100g,
-      this.energyKcalServing,
       this.fat,
       this.fatPer100g,
-      this.fatServing,
       this.fiber,
       this.fiber100g,
-      this.fiberServing,
       this.proteins,
       this.proteinsPer100g,
-      this.proteinsServing,
       this.salt,
       this.saltPer100g,
-      this.saltServing,
       this.saturatedFat,
       this.saturatedFatPer100g,
-      this.saturatedFatServing,
       this.sodium,
       this.sodiumPer100g,
-      this.sodiumServing,
       this.sugars,
-      this.sugarsPer100g,
-      this.sugarsServing});
+      this.sugarsPer100g});
 
   factory Nutriments.fromJson(Map<String, dynamic> json) {
     return Nutriments(
         carbohydrates: json["carbohydrates"],
         carbohydratesPer100g: json["carbohydrates_100g"],
-        carbohydratesServing: json["carbohydrates_serving"],
         energyKcal: json["energy-kcal"],
         energyKcal100g: json["energy-kcal_100g"],
-        energyKcalServing: json["energy-kcal_serving"],
         fat: json["fat"],
         fatPer100g: json["fat_100g"],
-        fatServing: json["fat_serving"],
         fiber: json["fiber"],
         fiber100g: json["fiber_100g"],
-        fiberServing: json["fiber_serving"],
         proteins: json["proteins"],
         proteinsPer100g: json["proteins_100g"],
-        proteinsServing: json["proteins_serving"],
         salt: json["salt"],
         saltPer100g: json["salt_100g"],
-        saltServing: json["salt_serving"],
         saturatedFat: json["saturated-fat"],
         saturatedFatPer100g: json["saturated-fat_100g"],
-        saturatedFatServing: json["saturated-fat_serving"],
         sugars: json["sugars"],
         sugarsPer100g: json["sugars_100g"],
-        sugarsServing: json["sugars_serving"]);
+        sodium: json["sodium"],
+        sodiumPer100g: json["sodium_100g"]);
   }
 }
