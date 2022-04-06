@@ -13,6 +13,7 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   late Colors fatColor;
+  int? status;
   Product scannedProduct = Product(
       nutriments: Nutriments(
           carbohydrates: -1,
@@ -51,6 +52,7 @@ class _DetailPageState extends State<DetailPage> {
   void _getProduct(String barcode) {
     ProductApi.fetchProduct(barcode).then((result) {
       setState(() {
+        status = result.status;
         scannedProduct.productname = result.product!.productname;
         scannedProduct.brand = result.product!.brand;
         scannedProduct.category = result.product!.category;
@@ -649,18 +651,18 @@ class _DetailPageState extends State<DetailPage> {
                             ))
                       ],
                     ),
-                  ),
-                )
-              ],
-            ),
-            _checkAllergens(),
-            _getFatLevels(),
-            _getSaltLevel(),
-            _getSugarLevel(),
-            _getSaturatedFatLevel()
-          ],
-        ),
-      );
+                  )
+                ],
+              ),
+              _checkAllergens(),
+              _getFatLevels(),
+              _getSaltLevel(),
+              _getSugarLevel(),
+              _getSaturatedFatLevel()
+            ],
+          ),
+        );
+      }
     }
   }
 
