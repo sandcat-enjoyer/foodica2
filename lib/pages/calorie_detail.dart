@@ -10,6 +10,9 @@ class CalorieDetailPage extends StatefulWidget {
 class _CalorieDetailPageState extends State<CalorieDetailPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Text(""));
+    return Scaffold(
+        appBar: AppBar(
+      title: Text("Calorie Details"),
+    ));
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:foodica/data/data.dart';
 import 'package:foodica/data/main.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +7,9 @@ import 'package:foodica/pages/homescreen.dart';
 import 'package:foodica/pages/onboarding.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 

@@ -44,6 +44,11 @@ class _DetailPageState extends State<DetailPage> {
     _getProduct(widget.barcode);
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   void _getProduct(String barcode) {
     ProductApi.fetchProduct(barcode).then((result) {
       setState(() {
@@ -71,7 +76,7 @@ class _DetailPageState extends State<DetailPage> {
       case "high":
         return Colors.red;
     }
-    return Colors.white;
+    return Colors.blue;
   }
 
   Color _checkSaltAmount() {
@@ -83,7 +88,7 @@ class _DetailPageState extends State<DetailPage> {
       case "high":
         return Colors.red;
     }
-    return Colors.white;
+    return Colors.blue;
   }
 
   Color _checkSatFatAmount() {
@@ -95,7 +100,7 @@ class _DetailPageState extends State<DetailPage> {
       case "high":
         return Colors.red;
     }
-    return Colors.white;
+    return Colors.blue;
   }
 
   Color _checkSugarAmount() {
@@ -107,7 +112,7 @@ class _DetailPageState extends State<DetailPage> {
       case "high":
         return Colors.red;
     }
-    return Colors.white;
+    return Colors.blue;
   }
 
   Widget _getProductImage() {
@@ -133,7 +138,7 @@ class _DetailPageState extends State<DetailPage> {
                 runSpacing: 20.0,
                 children: <Widget>[
                   SizedBox(
-                      width: 250.0,
+                      width: 300.0,
                       height: 180.0,
                       child: Card(
                         elevation: 2.0,
@@ -170,7 +175,49 @@ class _DetailPageState extends State<DetailPage> {
         ],
       );
     } else {
-      return const Text("No salt levels found");
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Center(
+              child: Wrap(
+                spacing: 20,
+                runSpacing: 20.0,
+                children: <Widget>[
+                  SizedBox(
+                      width: 300.0,
+                      height: 180.0,
+                      child: Card(
+                        color: _checkSatFatAmount(),
+                        elevation: 2.0,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0)),
+                        child: Center(
+                            child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: const <Widget>[
+                                    SizedBox(height: 10.0),
+                                    Text("Saturated Fats",
+                                        style: TextStyle(
+                                            fontFamily: "Poppins",
+                                            fontSize: 25.0,
+                                            fontWeight: FontWeight.w800)),
+                                    SizedBox(height: 10.0),
+                                    Text("Not Found",
+                                        style: TextStyle(
+                                            fontFamily: "Poppins",
+                                            fontSize: 30.0,
+                                            fontWeight: FontWeight.w600))
+                                  ],
+                                ))),
+                      ))
+                ],
+              ),
+            ),
+          )
+        ],
+      );
     }
   }
 
@@ -186,7 +233,7 @@ class _DetailPageState extends State<DetailPage> {
                 runSpacing: 20.0,
                 children: <Widget>[
                   SizedBox(
-                      width: 250.0,
+                      width: 300.0,
                       height: 180.0,
                       child: Card(
                         color: _checkFatAmount(),
@@ -223,7 +270,49 @@ class _DetailPageState extends State<DetailPage> {
         ],
       );
     } else {
-      return const Text("No fat levels found");
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Center(
+              child: Wrap(
+                spacing: 20,
+                runSpacing: 20.0,
+                children: <Widget>[
+                  SizedBox(
+                      width: 300.0,
+                      height: 180.0,
+                      child: Card(
+                        color: _checkSatFatAmount(),
+                        elevation: 2.0,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0)),
+                        child: Center(
+                            child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: const <Widget>[
+                                    SizedBox(height: 10.0),
+                                    Text("Fat",
+                                        style: TextStyle(
+                                            fontFamily: "Poppins",
+                                            fontSize: 25.0,
+                                            fontWeight: FontWeight.w800)),
+                                    SizedBox(height: 10.0),
+                                    Text("Not Found",
+                                        style: TextStyle(
+                                            fontFamily: "Poppins",
+                                            fontSize: 30.0,
+                                            fontWeight: FontWeight.w600))
+                                  ],
+                                ))),
+                      ))
+                ],
+              ),
+            ),
+          )
+        ],
+      );
     }
   }
 
@@ -239,7 +328,7 @@ class _DetailPageState extends State<DetailPage> {
                 runSpacing: 20.0,
                 children: <Widget>[
                   SizedBox(
-                      width: 250.0,
+                      width: 300.0,
                       height: 180.0,
                       child: Card(
                         color: _checkSugarAmount(),
@@ -276,7 +365,49 @@ class _DetailPageState extends State<DetailPage> {
         ],
       );
     } else {
-      return const Text("No sugar levels found");
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Center(
+              child: Wrap(
+                spacing: 20,
+                runSpacing: 20.0,
+                children: <Widget>[
+                  SizedBox(
+                      width: 300.0,
+                      height: 180.0,
+                      child: Card(
+                        color: _checkSatFatAmount(),
+                        elevation: 2.0,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0)),
+                        child: Center(
+                            child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: const <Widget>[
+                                    SizedBox(height: 10.0),
+                                    Text("Sugar",
+                                        style: TextStyle(
+                                            fontFamily: "Poppins",
+                                            fontSize: 25.0,
+                                            fontWeight: FontWeight.w800)),
+                                    SizedBox(height: 10.0),
+                                    Text("Not Found",
+                                        style: TextStyle(
+                                            fontFamily: "Poppins",
+                                            fontSize: 30.0,
+                                            fontWeight: FontWeight.w600))
+                                  ],
+                                ))),
+                      ))
+                ],
+              ),
+            ),
+          )
+        ],
+      );
     }
   }
 
@@ -292,7 +423,7 @@ class _DetailPageState extends State<DetailPage> {
                 runSpacing: 20.0,
                 children: <Widget>[
                   SizedBox(
-                      width: 250.0,
+                      width: 300.0,
                       height: 180.0,
                       child: Card(
                         elevation: 2.0,
@@ -335,7 +466,7 @@ class _DetailPageState extends State<DetailPage> {
                 runSpacing: 20.0,
                 children: <Widget>[
                   SizedBox(
-                      width: 250.0,
+                      width: 300.0,
                       height: 180.0,
                       child: Card(
                         elevation: 2.0,
@@ -351,13 +482,13 @@ class _DetailPageState extends State<DetailPage> {
                                         style: TextStyle(
                                             fontFamily: "Poppins",
                                             fontSize: 30.0,
-                                            fontWeight: FontWeight.w600)),
+                                            fontWeight: FontWeight.w800)),
                                     SizedBox(height: 10.0),
                                     Text("None",
                                         style: TextStyle(
                                             fontFamily: "Poppins",
-                                            fontSize: 14.0,
-                                            fontWeight: FontWeight.w500))
+                                            fontSize: 30.0,
+                                            fontWeight: FontWeight.w600))
                                   ],
                                 ))),
                       ))
@@ -382,8 +513,8 @@ class _DetailPageState extends State<DetailPage> {
                 runSpacing: 20.0,
                 children: <Widget>[
                   SizedBox(
-                      width: 250.0,
-                      height: 150.0,
+                      width: 300.0,
+                      height: 180.0,
                       child: Card(
                         color: _checkSatFatAmount(),
                         elevation: 2.0,
@@ -419,7 +550,49 @@ class _DetailPageState extends State<DetailPage> {
         ],
       );
     } else {
-      return const Text("No saturated fat levels found");
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Center(
+              child: Wrap(
+                spacing: 20,
+                runSpacing: 20.0,
+                children: <Widget>[
+                  SizedBox(
+                      width: 300.0,
+                      height: 150.0,
+                      child: Card(
+                        color: _checkSatFatAmount(),
+                        elevation: 2.0,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0)),
+                        child: Center(
+                            child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: const <Widget>[
+                                    SizedBox(height: 10.0),
+                                    Text("Saturated Fats",
+                                        style: TextStyle(
+                                            fontFamily: "Poppins",
+                                            fontSize: 25.0,
+                                            fontWeight: FontWeight.w800)),
+                                    SizedBox(height: 10.0),
+                                    Text("Not Found",
+                                        style: TextStyle(
+                                            fontFamily: "Poppins",
+                                            fontSize: 30.0,
+                                            fontWeight: FontWeight.w600))
+                                  ],
+                                ))),
+                      ))
+                ],
+              ),
+            ),
+          )
+        ],
+      );
     }
   }
 
@@ -427,64 +600,56 @@ class _DetailPageState extends State<DetailPage> {
     if (scannedProduct.nutriments.carbohydrates == -1) {
       return const Center(child: CircularProgressIndicator());
     } else {
-      if (status == 0) {
-        return Text("Product not found");
-      } else {
-        return SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20.0),
-                child: const Text("Product Details",
-                    style: TextStyle(
-                        fontFamily: "Poppins",
-                        fontWeight: FontWeight.bold,
-                        fontSize: 30.0)),
-              ),
-              _getProductImage(),
-              Text(widget.barcode),
-              Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Center(
-                      child: Wrap(
-                        spacing: 20,
-                        runSpacing: 20.0,
-                        children: <Widget>[
-                          SizedBox(
-                              width: 250.0,
-                              height: 180.0,
-                              child: Card(
-                                elevation: 2.0,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.0)),
-                                child: Center(
-                                    child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Column(
-                                          children: <Widget>[
-                                            const SizedBox(height: 10.0),
-                                            const Text("Product Name",
-                                                style: TextStyle(
-                                                    fontFamily: "Poppins",
-                                                    fontSize: 28.0,
-                                                    fontWeight:
-                                                        FontWeight.w800)),
-                                            const SizedBox(height: 10.0),
-                                            Text(
-                                                scannedProduct.productname ??
-                                                    "",
-                                                style: const TextStyle(
-                                                    fontFamily: "Poppins",
-                                                    fontSize: 22.0,
-                                                    fontWeight:
-                                                        FontWeight.w600))
-                                          ],
-                                        ))),
-                              ))
-                        ],
-                      ),
+      return SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20.0),
+              child: const Text("Product Details",
+                  style: TextStyle(
+                      fontFamily: "Poppins",
+                      fontWeight: FontWeight.bold,
+                      fontSize: 30.0)),
+            ),
+            _getProductImage(),
+            const SizedBox(height: 10.0),
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Center(
+                    child: Wrap(
+                      spacing: 20,
+                      runSpacing: 20.0,
+                      children: <Widget>[
+                        SizedBox(
+                            width: 300.0,
+                            height: 180.0,
+                            child: Card(
+                              elevation: 2.0,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0)),
+                              child: Center(
+                                  child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        children: <Widget>[
+                                          const SizedBox(height: 10.0),
+                                          const Text("Product Name",
+                                              style: TextStyle(
+                                                  fontFamily: "Poppins",
+                                                  fontSize: 28.0,
+                                                  fontWeight: FontWeight.w800)),
+                                          const SizedBox(height: 10.0),
+                                          Text(scannedProduct.productname ?? "",
+                                              style: const TextStyle(
+                                                  fontFamily: "Poppins",
+                                                  fontSize: 22.0,
+                                                  fontWeight: FontWeight.w600))
+                                        ],
+                                      ))),
+                            ))
+                      ],
                     ),
                   )
                 ],

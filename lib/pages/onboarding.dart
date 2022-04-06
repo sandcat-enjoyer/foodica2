@@ -1,7 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:foodica/data/data.dart';
+import 'package:foodica/pages/history.dart';
 import 'package:foodica/pages/login.dart';
+import 'package:foodica/utils/authentication.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'homescreen.dart';
@@ -15,12 +18,14 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   int introViewed = 0;
-  List<SliderModel> mySLides = <SliderModel>[];
+  List<SliderModel> mySlides = <SliderModel>[];
   int slideIndex = 0;
   PageController? controller;
+  late User loggedInUser;
 
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   late Future<bool> _isIntroViewed;
+  late bool isLoggedIn = false;
 
   Future<void> _introWasViewed() async {
     final SharedPreferences prefs = await _prefs;
@@ -49,7 +54,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    mySLides = getSlides();
+    mySlides = getSlides();
     controller = PageController();
     _isIntroViewed = _prefs.then((SharedPreferences prefs) {
       return prefs.getBool("isIntroViewed") ?? false;
@@ -71,19 +76,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             },
             children: <Widget>[
               SlideTile(
-                imagePath: mySLides[0].getImageAssetPath(),
-                title: mySLides[0].getTitle(),
-                desc: mySLides[0].getDesc(),
+                imagePath: mySlides[0].getImageAssetPath(),
+                title: mySlides[0].getTitle(),
+                desc: mySlides[0].getDesc(),
               ),
               SlideTile(
-                imagePath: mySLides[1].getImageAssetPath(),
-                title: mySLides[1].getTitle(),
-                desc: mySLides[1].getDesc(),
+                imagePath: mySlides[1].getImageAssetPath(),
+                title: mySlides[1].getTitle(),
+                desc: mySlides[1].getDesc(),
               ),
               SlideTile(
-                imagePath: mySLides[2].getImageAssetPath(),
-                title: mySLides[2].getTitle(),
-                desc: mySLides[2].getDesc(),
+                imagePath: mySlides[2].getImageAssetPath(),
+                title: mySlides[2].getTitle(),
+                desc: mySlides[2].getDesc(),
               )
             ],
           ),
@@ -97,7 +102,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     TextButton(
                       onPressed: () {
                         controller!.animateToPage(2,
-                            duration: const Duration(milliseconds: 250),
+                            duration: const Duration(milliseconds: 150),
                             curve: Curves.easeInOut);
                       },
                       child: const Text(
@@ -148,7 +153,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       ),
     );
   }
-
   /* Route _createRoute() {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) =>
@@ -172,14 +176,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   } */
 
-  void navigateToHome() {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => const HomeScreenPage()));
-  }
-
   navigateToLogin() {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => const HomeScreenPage()));
+    Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginPage()));
   }
 }
 

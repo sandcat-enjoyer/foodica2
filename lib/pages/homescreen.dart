@@ -1,18 +1,27 @@
 import 'dart:ui';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:foodica/pages/calorie_detail.dart';
 import 'package:foodica/pages/history.dart';
+import 'package:foodica/pages/login.dart';
 import 'package:foodica/pages/productdetail.dart';
 import 'package:foodica/pages/settings.dart';
 import 'package:foodica/pages/tips.dart';
+import 'package:foodica/utils/authentication.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreenPage extends StatefulWidget {
-  const HomeScreenPage({Key? key}) : super(key: key);
+  const HomeScreenPage({Key? key, required User user})
+      : _user = user,
+        super(key: key);
+
+  final User _user;
+
   @override
   _HomeScreenPageState createState() => _HomeScreenPageState();
 }
@@ -20,14 +29,18 @@ class HomeScreenPage extends StatefulWidget {
 class _HomeScreenPageState extends State<HomeScreenPage> {
   late Future<int> _weeklyCalories;
   late Future<int> _calorieGoal;
+  late User _user;
 
   //i genuinely forgot how to easily concatenate strings in dart
   //so for now i just append 2 numbers in a string and return the value of that
   String? weeklyDisplayValue;
+  String displayName = "";
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   Widget? mainWidget;
   bool codeIsScanned = false;
   Colors? navBackColor;
+  Color? bgColor;
+  bool _isSigningOut = false;
 
   int? _weeklyCaloriesInt;
   int? _calorieGoalInt;
@@ -35,12 +48,34 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   @override
   void initState() {
     super.initState();
+    _user = widget._user;
     _weeklyCalories = _prefs.then((SharedPreferences prefs) {
       return prefs.getInt("weekly") ?? 0;
     });
     _calorieGoal = _prefs.then((SharedPreferences prefs) {
       return prefs.getInt("goal") ?? 0;
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  String _checkProfileName() {
+    if (_user.displayName == null) {
+      return "";
+    } else {
+      return _user.displayName!;
+    }
+  }
+
+  String _checkPhotoURL() {
+    if (_user.photoURL == null) {
+      return "https://via.placeholder.com/300";
+    } else {
+      return _user.photoURL!;
+    }
   }
 
   void navigateToHistory() {
@@ -58,6 +93,25 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
         .push(MaterialPageRoute(builder: (context) => const TipsPage()));
   }
 
+  Route _routeToLoginScreen() {
+    return PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const LoginPage(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          var begin = const Offset(-1.0, 0.0);
+          var end = Offset.zero;
+          var curve = Curves.ease;
+
+          var tween =
+              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+        });
+  }
+
   Widget? _buildHomeScreen() {
     if (mainWidget == null) {
       return SingleChildScrollView(
@@ -68,7 +122,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontFamily: "Poppins",
-                  fontSize: 35)),
+                  fontSize: 40)),
         ),
         Column(
           children: [
@@ -83,43 +137,48 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                       width: 350.0,
                       height: 200.0,
                       child: Card(
-                        elevation: 2.0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0)),
-                        child: Center(
-                            child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: <Widget>[
-                              const SizedBox(
-                                height: 10.0,
+                          elevation: 2.0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0)),
+                          child: InkWell(
+                            onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CalorieDetailPage())),
+                            child: Center(
+                                child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                children: <Widget>[
+                                  const SizedBox(
+                                    height: 10.0,
+                                  ),
+                                  const Icon(
+                                    Icons.food_bank_outlined,
+                                    size: 60,
+                                  ),
+                                  const Text(
+                                    "Weekly Calories",
+                                    style: TextStyle(
+                                        fontFamily: "Poppins",
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 30.0),
+                                  ),
+                                  const SizedBox(
+                                    height: 5.0,
+                                  ),
+                                  Text(
+                                    weeklyDisplayValue ?? "",
+                                    style: const TextStyle(
+                                      fontFamily: "Poppins",
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 20.0,
+                                    ),
+                                  )
+                                ],
                               ),
-                              const Icon(
-                                Icons.food_bank_outlined,
-                                size: 60,
-                              ),
-                              const Text(
-                                "Weekly Calories",
-                                style: TextStyle(
-                                    fontFamily: "Poppins",
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 30.0),
-                              ),
-                              const SizedBox(
-                                height: 5.0,
-                              ),
-                              Text(
-                                weeklyDisplayValue ?? "",
-                                style: const TextStyle(
-                                  fontFamily: "Poppins",
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 20.0,
-                                ),
-                              )
-                            ],
-                          ),
-                        )),
-                      ),
+                            )),
+                          )),
                     ),
                   ],
                 )))
@@ -272,12 +331,17 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
             // Important: Remove any padding from the ListView.
             padding: EdgeInsets.zero,
             children: [
-              const DrawerHeader(
-                decoration: BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage("assets/drawer-header.jpg"),
-                        fit: BoxFit.cover)),
-                child: null,
+              UserAccountsDrawerHeader(
+                accountEmail: Text(_user.email!,
+                    style: const TextStyle(fontFamily: "Poppins")),
+                accountName: Text(_checkProfileName(),
+                    style: const TextStyle(fontFamily: "Poppins")),
+                currentAccountPicture: ClipOval(
+                  child: Image(
+                    image: NetworkImage(_checkPhotoURL()),
+                  ),
+                ),
+                decoration: const BoxDecoration(color: Colors.black),
               ),
               ListTile(
                 title: RichText(
@@ -368,6 +432,28 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                   });
                   Navigator.pop(context);
                 },
+              ),
+              ListTile(
+                title: RichText(
+                  text: const TextSpan(children: [
+                    WidgetSpan(child: Icon(Icons.settings, size: 22)),
+                    TextSpan(
+                        text: "Sign Out",
+                        style: TextStyle(
+                          fontFamily: "Poppins",
+                        ))
+                  ]),
+                ),
+                onTap: () async {
+                  setState(() {
+                    _isSigningOut = true;
+                  });
+                  await Authentication.signOut(context: context);
+                  setState(() {
+                    _isSigningOut = false;
+                  });
+                  Navigator.of(context).pushReplacement(_routeToLoginScreen());
+                },
               )
             ],
           ),
@@ -383,13 +469,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                 onPressed: () => Scaffold.of(context).openDrawer(),
                 icon: const Icon(Icons.menu)),
           ),
-          /* GestureDetector(
-          onTap: () { 
-           },
-          child: const Icon(
-              Icons.menu,  // add custom icons also
-          ),
-  ), */
           title: const Text("Foodica",
               style: TextStyle(
                 fontFamily: "Poppins",
