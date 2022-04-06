@@ -1,13 +1,15 @@
 class Scan {
   String? code;
   Product? product;
+  int? status;
 
-  Scan({this.code, this.product});
+  Scan({this.code, this.product, this.status});
 
   factory Scan.fromJson(Map<String, dynamic> parsedJson) {
     return Scan(
         code: parsedJson["code"],
-        product: Product.fromJson(parsedJson['product']));
+        product: Product.fromJson(parsedJson['product']),
+        status: parsedJson["status"]);
   }
 }
 

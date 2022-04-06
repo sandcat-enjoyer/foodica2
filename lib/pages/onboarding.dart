@@ -179,7 +179,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   navigateToLogin() {
     Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => const LoginPage()));
+        .push(MaterialPageRoute(builder: (context) => const HomeScreenPage()));
   }
 }
 

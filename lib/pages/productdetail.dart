@@ -13,6 +13,7 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   late Colors fatColor;
+  int? status;
   Product scannedProduct = Product(
       nutriments: Nutriments(
           carbohydrates: -1,
@@ -46,6 +47,7 @@ class _DetailPageState extends State<DetailPage> {
   void _getProduct(String barcode) {
     ProductApi.fetchProduct(barcode).then((result) {
       setState(() {
+        status = result.status;
         scannedProduct.productname = result.product!.productname;
         scannedProduct.brand = result.product!.brand;
         scannedProduct.category = result.product!.category;
@@ -425,69 +427,77 @@ class _DetailPageState extends State<DetailPage> {
     if (scannedProduct.nutriments.carbohydrates == -1) {
       return const Center(child: CircularProgressIndicator());
     } else {
-      return SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20.0),
-              child: const Text("Product Details",
-                  style: TextStyle(
-                      fontFamily: "Poppins",
-                      fontWeight: FontWeight.bold,
-                      fontSize: 30.0)),
-            ),
-            _getProductImage(),
-            Text(widget.barcode),
-            Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Center(
-                    child: Wrap(
-                      spacing: 20,
-                      runSpacing: 20.0,
-                      children: <Widget>[
-                        SizedBox(
-                            width: 250.0,
-                            height: 180.0,
-                            child: Card(
-                              elevation: 2.0,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8.0)),
-                              child: Center(
-                                  child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        children: <Widget>[
-                                          const SizedBox(height: 10.0),
-                                          const Text("Product Name",
-                                              style: TextStyle(
-                                                  fontFamily: "Poppins",
-                                                  fontSize: 28.0,
-                                                  fontWeight: FontWeight.w800)),
-                                          const SizedBox(height: 10.0),
-                                          Text(scannedProduct.productname ?? "",
-                                              style: const TextStyle(
-                                                  fontFamily: "Poppins",
-                                                  fontSize: 22.0,
-                                                  fontWeight: FontWeight.w600))
-                                        ],
-                                      ))),
-                            ))
-                      ],
+      if (status == 0) {
+        return Text("Product not found");
+      } else {
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(20.0),
+                child: const Text("Product Details",
+                    style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontWeight: FontWeight.bold,
+                        fontSize: 30.0)),
+              ),
+              _getProductImage(),
+              Text(widget.barcode),
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Center(
+                      child: Wrap(
+                        spacing: 20,
+                        runSpacing: 20.0,
+                        children: <Widget>[
+                          SizedBox(
+                              width: 250.0,
+                              height: 180.0,
+                              child: Card(
+                                elevation: 2.0,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0)),
+                                child: Center(
+                                    child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          children: <Widget>[
+                                            const SizedBox(height: 10.0),
+                                            const Text("Product Name",
+                                                style: TextStyle(
+                                                    fontFamily: "Poppins",
+                                                    fontSize: 28.0,
+                                                    fontWeight:
+                                                        FontWeight.w800)),
+                                            const SizedBox(height: 10.0),
+                                            Text(
+                                                scannedProduct.productname ??
+                                                    "",
+                                                style: const TextStyle(
+                                                    fontFamily: "Poppins",
+                                                    fontSize: 22.0,
+                                                    fontWeight:
+                                                        FontWeight.w600))
+                                          ],
+                                        ))),
+                              ))
+                        ],
+                      ),
                     ),
-                  ),
-                )
-              ],
-            ),
-            _checkAllergens(),
-            _getFatLevels(),
-            _getSaltLevel(),
-            _getSugarLevel(),
-            _getSaturatedFatLevel()
-          ],
-        ),
-      );
+                  )
+                ],
+              ),
+              _checkAllergens(),
+              _getFatLevels(),
+              _getSaltLevel(),
+              _getSugarLevel(),
+              _getSaturatedFatLevel()
+            ],
+          ),
+        );
+      }
     }
   }
 
