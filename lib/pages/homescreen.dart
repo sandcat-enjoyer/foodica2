@@ -42,24 +42,39 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   Color? bgColor;
   bool _isSigningOut = false;
 
-  int? _weeklyCaloriesInt;
-  int? _calorieGoalInt;
+  late int? _weeklyCaloriesInt = 0;
+  late int? _calorieGoalInt = 0;
 
   @override
   void initState() {
     super.initState();
     _user = widget._user;
-    _weeklyCalories = _prefs.then((SharedPreferences prefs) {
-      return prefs.getInt("weekly") ?? 0;
-    });
+    _getWeeklyCalories();
     _calorieGoal = _prefs.then((SharedPreferences prefs) {
-      return prefs.getInt("goal") ?? 0;
+      _calorieGoalInt = prefs.getInt("goal") ?? 0;
+      return _calorieGoal;
     });
+    _reloadLocalStorage();
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void _getWeeklyCalories() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _weeklyCaloriesInt = prefs.getInt("weekly");
+  }
+
+  void _getCalorieGoal() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _calorieGoalInt = prefs.getInt("goal");
+  }
+
+  void _reloadLocalStorage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.reload();
   }
 
   String _checkProfileName() {
@@ -168,7 +183,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                                     height: 5.0,
                                   ),
                                   Text(
-                                    weeklyDisplayValue ?? "",
+                                    _weeklyCaloriesInt.toString(),
                                     style: const TextStyle(
                                       fontFamily: "Poppins",
                                       fontWeight: FontWeight.w600,

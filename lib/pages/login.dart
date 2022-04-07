@@ -76,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
                       width: 400,
                       child: TextField(
                         obscureText: true,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           hintText: 'Password',
                         ),

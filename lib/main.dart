@@ -5,6 +5,7 @@ import 'package:foodica/data/main.dart';
 import 'package:flutter/material.dart';
 import 'package:foodica/pages/homescreen.dart';
 import 'package:foodica/pages/onboarding.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future main() async {
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       home: const OnboardingScreen(),
       theme: ThemeData(
           brightness: Brightness.light,
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
               const FloatingActionButtonThemeData(backgroundColor: Colors.red),
           appBarTheme: const AppBarTheme(
               backgroundColor: Colors.white, foregroundColor: Colors.black)),
+      themeMode: ThemeMode.system,
       darkTheme: ThemeData(
           brightness: Brightness.dark,
           backgroundColor: const Color.fromARGB(255, 0, 0, 0),
