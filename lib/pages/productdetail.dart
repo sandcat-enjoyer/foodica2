@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:foodica/models/product.dart';
 import 'package:foodica/models/product_api.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailPage extends StatefulWidget {
   const DetailPage({Key? key, required this.barcode}) : super(key: key);
@@ -13,6 +14,9 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   late Colors fatColor;
+  late Future<int> _weeklyCalories;
+  int _weeklyCaloriesInt = 0;
+  int _productCalories = 0;
   Product scannedProduct = Product(
       nutriments: Nutriments(
           carbohydrates: -1,
@@ -37,9 +41,16 @@ class _DetailPageState extends State<DetailPage> {
   bool productIsLoaded = false;
   String productImgUrl = "";
 
+  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
   @override
   void initState() {
     super.initState();
+    _weeklyCalories = _prefs.then((SharedPreferences prefs) {
+      _weeklyCaloriesInt = prefs.getInt("weekly")!;
+      debugPrint(_weeklyCaloriesInt.toString());
+      return prefs.getInt("weekly") ?? 0;
+    });
     _getProduct(widget.barcode);
   }
 
@@ -61,8 +72,118 @@ class _DetailPageState extends State<DetailPage> {
         debugPrint("Product loaded: " + productIsLoaded.toString());
         productIsLoaded = true;
         debugPrint("Now what? " + productIsLoaded.toString());
+        if (result.product!.nutriments.energyKcal != null) {
+          _productCalories = result.product!.nutriments.energyKcal!.toInt();
+        } else {
+          _productCalories = 0;
+        }
+
+        debugPrint(_productCalories.toString());
       });
+      _saveCaloriesToMemory();
     });
+  }
+
+  void _saveCaloriesToMemory() async {
+    if (scannedProduct.nutriments.energyKcal != null) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt("weekly", (_weeklyCaloriesInt + _productCalories));
+      debugPrint(prefs.getInt("weekly").toString());
+    }
+  }
+
+  Widget _getCalories() {
+    //can this process be more optimized?
+    if (scannedProduct.nutriments.energyKcal != null) {
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Center(
+              child: Wrap(
+                spacing: 20,
+                runSpacing: 20.0,
+                children: <Widget>[
+                  SizedBox(
+                      width: 300.0,
+                      height: 180.0,
+                      child: Card(
+                        elevation: 2.0,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0)),
+                        child: Center(
+                            child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: <Widget>[
+                                    const SizedBox(height: 10.0),
+                                    const Text("Total Calories",
+                                        style: TextStyle(
+                                            fontFamily: "Poppins",
+                                            fontSize: 30.0,
+                                            fontWeight: FontWeight.w800)),
+                                    const SizedBox(height: 10.0),
+                                    Text(
+                                        scannedProduct.nutriments.energyKcal
+                                                .toString() +
+                                            "Kcal",
+                                        style: const TextStyle(
+                                            fontFamily: "Poppins",
+                                            fontSize: 30.0,
+                                            fontWeight: FontWeight.w600))
+                                  ],
+                                ))),
+                      ))
+                ],
+              ),
+            ),
+          )
+        ],
+      );
+    } else {
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Center(
+              child: Wrap(
+                spacing: 20,
+                runSpacing: 20.0,
+                children: <Widget>[
+                  SizedBox(
+                      width: 300.0,
+                      height: 180.0,
+                      child: Card(
+                        elevation: 2.0,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0)),
+                        child: Center(
+                            child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: const <Widget>[
+                                    SizedBox(height: 10.0),
+                                    Text("Total Calories",
+                                        style: TextStyle(
+                                            fontFamily: "Poppins",
+                                            fontSize: 30.0,
+                                            fontWeight: FontWeight.w800)),
+                                    SizedBox(height: 10.0),
+                                    Text("Not Found",
+                                        style: TextStyle(
+                                            fontFamily: "Poppins",
+                                            fontSize: 30.0,
+                                            fontWeight: FontWeight.w600))
+                                  ],
+                                ))),
+                      ))
+                ],
+              ),
+            ),
+          )
+        ],
+      );
+    }
   }
 
   Color _checkFatAmount() {
@@ -74,7 +195,7 @@ class _DetailPageState extends State<DetailPage> {
       case "high":
         return Colors.red;
     }
-    return Colors.blue;
+    return Color.fromARGB(255, 64, 64, 64);
   }
 
   Color _checkSaltAmount() {
@@ -86,7 +207,7 @@ class _DetailPageState extends State<DetailPage> {
       case "high":
         return Colors.red;
     }
-    return Colors.blue;
+    return Color.fromARGB(255, 64, 64, 64);
   }
 
   Color _checkSatFatAmount() {
@@ -98,7 +219,7 @@ class _DetailPageState extends State<DetailPage> {
       case "high":
         return Colors.red;
     }
-    return Colors.blue;
+    return Color.fromARGB(255, 64, 64, 64);
   }
 
   Color _checkSugarAmount() {
@@ -110,7 +231,7 @@ class _DetailPageState extends State<DetailPage> {
       case "high":
         return Colors.red;
     }
-    return Colors.blue;
+    return Color.fromARGB(255, 64, 64, 64);
   }
 
   Widget _getProductImage() {
@@ -654,6 +775,7 @@ class _DetailPageState extends State<DetailPage> {
               ],
             ),
             _checkAllergens(),
+            _getCalories(),
             _getFatLevels(),
             _getSaltLevel(),
             _getSugarLevel(),

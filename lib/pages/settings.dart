@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
+import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -9,8 +11,13 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  bool _isSwitched = false;
+
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
   @override
   Widget build(BuildContext context) {
+    RxBool _isLightTheme = false.obs;
     return Scaffold(
         body: Row(
       children: [
@@ -32,8 +39,25 @@ class _SettingsPageState extends State<SettingsPage> {
                           fontFamily: "Poppins", fontWeight: FontWeight.w500)),
                 ),
                 SettingsTile.switchTile(
-                    initialValue: false,
-                    onToggle: (value) {},
+                    initialValue: _isSwitched,
+                    onToggle: (value) {
+                      if (Get.isDarkMode) {
+                        debugPrint(Get.isDarkMode.toString());
+                        Get.changeTheme(ThemeData.dark());
+                        debugPrint("Test");
+                        setState(() {
+                          _isSwitched = true;
+                        });
+                      } else {
+                        debugPrint(Get.isDarkMode.toString());
+                        Get.changeTheme(ThemeData.light());
+                        debugPrint("Test2");
+                        setState(() {
+                          _isSwitched = false;
+                        });
+                      }
+                    },
+                    onPressed: (context) {},
                     title: const Text("Dark Theme",
                         style: TextStyle(
                             fontFamily: "Poppins",
