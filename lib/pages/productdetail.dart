@@ -62,6 +62,7 @@ class _DetailPageState extends State<DetailPage> {
   void _getProduct(String barcode) {
     ProductApi.fetchProduct(barcode).then((result) {
       setState(() {
+        status = result.status;
         scannedProduct.productname = result.product!.productname;
         scannedProduct.brand = result.product!.brand;
         scannedProduct.category = result.product!.category;
@@ -783,6 +784,7 @@ class _DetailPageState extends State<DetailPage> {
           ],
         ),
       );
+
     }
   }
 
