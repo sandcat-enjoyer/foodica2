@@ -8,6 +8,7 @@ import 'package:foodica/utils/authentication.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'homescreen.dart';
+import 'package:loading_overlay/loading_overlay.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({Key? key}) : super(key: key);
@@ -17,27 +18,13 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  int introViewed = 0;
   List<SliderModel> mySlides = <SliderModel>[];
   int slideIndex = 0;
   PageController? controller;
   late User loggedInUser;
 
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-  late Future<bool> _isIntroViewed;
   late bool isLoggedIn = false;
-
-  Future<void> _introWasViewed() async {
-    final SharedPreferences prefs = await _prefs;
-    final bool isIntroViewed = true;
-
-    setState(() {
-      _isIntroViewed =
-          prefs.setBool("isIntroViewed", isIntroViewed).then((bool success) {
-        return isIntroViewed;
-      });
-    });
-  }
 
   Widget _buildPageIndicator(bool isCurrentPage) {
     return Container(
@@ -50,15 +37,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
+  _buildShowDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     mySlides = getSlides();
     controller = PageController();
-    _isIntroViewed = _prefs.then((SharedPreferences prefs) {
-      return prefs.getBool("isIntroViewed") ?? false;
-    });
   }
 
   @override
@@ -135,7 +130,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               )
             : InkWell(
-                onTap: () {
+                onTap: () async {
+                  showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (context) {
+                        return Center(
+                            child:
+                                CircularProgressIndicator(color: Colors.red));
+                      });
+                  await Future.delayed(const Duration(seconds: 2), () {});
                   navigateToLogin();
                 },
                 child: Container(
@@ -176,7 +180,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   } */
 
-  navigateToLogin() {
+  navigateToLogin() async {
     Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const LoginPage()));
   }

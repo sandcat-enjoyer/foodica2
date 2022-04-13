@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:foodica/models/product.dart';
 import 'package:foodica/models/product_api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class DetailPage extends StatefulWidget {
   const DetailPage({Key? key, required this.barcode}) : super(key: key);
@@ -15,6 +16,12 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage> {
   late Colors fatColor;
   late Future<int> _weeklyCalories;
+  final fb = FirebaseDatabase.instance;
+  //need a new way for this but i can only find solutions using a deprecated method
+  final databaseReference = FirebaseDatabase(
+          databaseURL:
+              "https://foodica-9743c-default-rtdb.europe-west1.firebasedatabase.app")
+      .ref();
   int _weeklyCaloriesInt = 0;
   int _productCalories = 0;
   Product scannedProduct = Product(
@@ -62,14 +69,17 @@ class _DetailPageState extends State<DetailPage> {
   void _getProduct(String barcode) {
     ProductApi.fetchProduct(barcode).then((result) {
       setState(() {
-        status = result.status;
         scannedProduct.productname = result.product!.productname;
         scannedProduct.brand = result.product!.brand;
         scannedProduct.category = result.product!.category;
         scannedProduct.image = result.product!.image;
         scannedProduct.nutriments = result.product!.nutriments;
         scannedProduct.nutrientLevels = result.product!.nutrientLevels;
-        scannedProduct.allergens = result.product!.allergens;
+        if (result.product!.allergens == "") {
+          scannedProduct.allergens = "None";
+        } else {
+          scannedProduct.allergens = result.product!.allergens;
+        }
         debugPrint("Product loaded: " + productIsLoaded.toString());
         productIsLoaded = true;
         debugPrint("Now what? " + productIsLoaded.toString());
@@ -78,7 +88,6 @@ class _DetailPageState extends State<DetailPage> {
         } else {
           _productCalories = 0;
         }
-
         debugPrint(_productCalories.toString());
       });
       _saveCaloriesToMemory();
@@ -125,8 +134,8 @@ class _DetailPageState extends State<DetailPage> {
                                             fontWeight: FontWeight.w800)),
                                     const SizedBox(height: 10.0),
                                     Text(
-                                        scannedProduct.nutriments.energyKcal
-                                                .toString() +
+                                        scannedProduct.nutriments.energyKcal!
+                                                .toStringAsPrecision(2) +
                                             "Kcal",
                                         style: const TextStyle(
                                             fontFamily: "Poppins",
@@ -196,7 +205,7 @@ class _DetailPageState extends State<DetailPage> {
       case "high":
         return Colors.red;
     }
-    return Color.fromARGB(255, 64, 64, 64);
+    return const Color.fromARGB(255, 64, 64, 64);
   }
 
   Color _checkSaltAmount() {
@@ -208,7 +217,7 @@ class _DetailPageState extends State<DetailPage> {
       case "high":
         return Colors.red;
     }
-    return Color.fromARGB(255, 64, 64, 64);
+    return const Color.fromARGB(255, 64, 64, 64);
   }
 
   Color _checkSatFatAmount() {
@@ -220,11 +229,11 @@ class _DetailPageState extends State<DetailPage> {
       case "high":
         return Colors.red;
     }
-    return Color.fromARGB(255, 64, 64, 64);
+    return const Color.fromARGB(255, 64, 64, 64);
   }
 
   Color _checkSugarAmount() {
-    switch (scannedProduct.nutrientLevels!.saturatedFat) {
+    switch (scannedProduct.nutrientLevels!.sugars) {
       case "low":
         return Colors.green;
       case "moderate":
@@ -232,7 +241,7 @@ class _DetailPageState extends State<DetailPage> {
       case "high":
         return Colors.red;
     }
-    return Color.fromARGB(255, 64, 64, 64);
+    return const Color.fromARGB(255, 64, 64, 64);
   }
 
   Widget _getProductImage() {
@@ -275,16 +284,18 @@ class _DetailPageState extends State<DetailPage> {
                                         style: TextStyle(
                                             fontFamily: "Poppins",
                                             fontSize: 30.0,
-                                            fontWeight: FontWeight.w800)),
+                                            fontWeight: FontWeight.w800,
+                                            color: Colors.white)),
                                     const SizedBox(height: 10.0),
                                     Text(
-                                        scannedProduct.nutriments.salt
-                                                .toString() +
+                                        scannedProduct.nutriments.salt!
+                                                .toStringAsPrecision(2) +
                                             "g",
                                         style: const TextStyle(
                                             fontFamily: "Poppins",
                                             fontSize: 30.0,
-                                            fontWeight: FontWeight.w600))
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white))
                                   ],
                                 ))),
                       ))
@@ -322,13 +333,15 @@ class _DetailPageState extends State<DetailPage> {
                                         style: TextStyle(
                                             fontFamily: "Poppins",
                                             fontSize: 25.0,
-                                            fontWeight: FontWeight.w800)),
+                                            fontWeight: FontWeight.w800,
+                                            color: Colors.white)),
                                     SizedBox(height: 10.0),
                                     Text("Not Found",
                                         style: TextStyle(
                                             fontFamily: "Poppins",
                                             fontSize: 30.0,
-                                            fontWeight: FontWeight.w600))
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white))
                                   ],
                                 ))),
                       ))
@@ -370,16 +383,18 @@ class _DetailPageState extends State<DetailPage> {
                                         style: TextStyle(
                                             fontFamily: "Poppins",
                                             fontSize: 30.0,
-                                            fontWeight: FontWeight.w800)),
+                                            fontWeight: FontWeight.w800,
+                                            color: Colors.white)),
                                     const SizedBox(height: 10.0),
                                     Text(
-                                        scannedProduct.nutriments.fat
-                                                .toString() +
+                                        scannedProduct.nutriments.fat!
+                                                .toStringAsFixed(2) +
                                             "g",
                                         style: const TextStyle(
                                             fontFamily: "Poppins",
                                             fontSize: 30.0,
-                                            fontWeight: FontWeight.w600))
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white))
                                   ],
                                 ))),
                       ))
@@ -465,16 +480,19 @@ class _DetailPageState extends State<DetailPage> {
                                         style: TextStyle(
                                             fontFamily: "Poppins",
                                             fontSize: 30.0,
-                                            fontWeight: FontWeight.w800)),
+                                            fontWeight: FontWeight.w800,
+                                            color: Colors.white)),
                                     const SizedBox(height: 10.0),
                                     Text(
-                                        scannedProduct.nutriments.sugars
+                                        scannedProduct.nutriments.sugars!
+                                                .toStringAsFixed(2)
                                                 .toString() +
                                             "g",
                                         style: const TextStyle(
                                             fontFamily: "Poppins",
                                             fontSize: 30.0,
-                                            fontWeight: FontWeight.w600))
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white))
                                   ],
                                 ))),
                       ))
@@ -650,7 +668,8 @@ class _DetailPageState extends State<DetailPage> {
                                         style: TextStyle(
                                             fontFamily: "Poppins",
                                             fontSize: 25.0,
-                                            fontWeight: FontWeight.w800)),
+                                            fontWeight: FontWeight.w800,
+                                            color: Colors.white)),
                                     const SizedBox(height: 10.0),
                                     Text(
                                         scannedProduct.nutriments.saturatedFat
@@ -659,7 +678,8 @@ class _DetailPageState extends State<DetailPage> {
                                         style: const TextStyle(
                                             fontFamily: "Poppins",
                                             fontSize: 30.0,
-                                            fontWeight: FontWeight.w600))
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white))
                                   ],
                                 ))),
                       ))
@@ -720,6 +740,23 @@ class _DetailPageState extends State<DetailPage> {
     if (scannedProduct.nutriments.carbohydrates == -1) {
       return const Center(child: CircularProgressIndicator());
     } else {
+      final productRef = databaseReference.child("products/");
+      productRef
+          .push()
+          .set({
+            'productname': scannedProduct.productname,
+            'brand': scannedProduct.brand,
+            'category': scannedProduct.category,
+            'calories': scannedProduct.nutriments.energyKcal,
+            'image': scannedProduct.image,
+            'allergens': scannedProduct.allergens,
+            'fat': scannedProduct.nutriments.fat,
+            'saturatedFat': scannedProduct.nutriments.saturatedFat,
+            'salt': scannedProduct.nutriments.salt,
+            'sugar': scannedProduct.nutriments.sugars
+          })
+          .then((_) => print("Product was written to the database"))
+          .catchError((error) => print("Error: " + error));
       return SingleChildScrollView(
         child: Column(
           children: [
@@ -784,7 +821,6 @@ class _DetailPageState extends State<DetailPage> {
           ],
         ),
       );
-
     }
   }
 
