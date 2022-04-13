@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:foodica/pages/calorie_detail.dart';
 import 'package:foodica/pages/history.dart';
+import 'package:foodica/pages/init_allergens.dart';
 import 'package:foodica/pages/login.dart';
 import 'package:foodica/pages/productdetail.dart';
 import 'package:foodica/pages/settings.dart';
@@ -29,6 +31,7 @@ class HomeScreenPage extends StatefulWidget {
 class _HomeScreenPageState extends State<HomeScreenPage> {
   late Future<int> _weeklyCalories;
   late Future<int> _calorieGoal;
+  late Future<String> _allergen;
   late User _user;
 
   //i genuinely forgot how to easily concatenate strings in dart
@@ -40,6 +43,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   bool codeIsScanned = false;
   Colors? navBackColor;
   Color? bgColor;
+  String allergen = "";
   bool _isSigningOut = false;
 
   late int? _weeklyCaloriesInt = 0;
@@ -50,6 +54,10 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
     super.initState();
     _user = widget._user;
     _getWeeklyCalories();
+    _allergen = _prefs.then((SharedPreferences prefs) {
+      allergen = prefs.getString("allergen") ?? "";
+      return _allergen;
+    });
     _calorieGoal = _prefs.then((SharedPreferences prefs) {
       _calorieGoalInt = prefs.getInt("goal") ?? 0;
       return _calorieGoal;
@@ -104,8 +112,8 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   }
 
   void navigateToTips() {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => const TipsPage()));
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => TipsPage(user: _user, allergen: allergen)));
   }
 
   Route _routeToLoginScreen() {
@@ -335,7 +343,16 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
       if (!mounted) return;
     }
 
-    //to do: turn all of these views into actual pages
+    _setNavTextColor() {
+      var brightness = MediaQuery.of(context).platformBrightness;
+      bool isDarkMode = brightness == Brightness.dark;
+
+      if (isDarkMode) {
+        return Colors.white;
+      } else {
+        return Colors.black;
+      }
+    }
 
     return Scaffold(
         drawer: Drawer(
@@ -360,12 +377,13 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
               ),
               ListTile(
                 title: RichText(
-                  text: const TextSpan(children: [
-                    WidgetSpan(child: Icon(Icons.home, size: 22)),
+                  text: TextSpan(children: [
+                    const WidgetSpan(child: Icon(Icons.home, size: 22)),
                     TextSpan(
                         text: "Home",
                         style: TextStyle(
                           fontFamily: "Poppins",
+                          color: _setNavTextColor(),
                         ))
                   ]),
                 ),
@@ -378,12 +396,13 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
               ),
               ListTile(
                 title: RichText(
-                  text: const TextSpan(children: [
-                    WidgetSpan(child: Icon(Icons.history, size: 22)),
+                  text: TextSpan(children: [
+                    const WidgetSpan(child: Icon(Icons.history, size: 22)),
                     TextSpan(
                         text: "History",
                         style: TextStyle(
                           fontFamily: "Poppins",
+                          color: _setNavTextColor(),
                         ))
                   ]),
                 ),
@@ -396,30 +415,32 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
               ),
               ListTile(
                 title: RichText(
-                  text: const TextSpan(children: [
-                    WidgetSpan(child: Icon(Icons.lightbulb, size: 22)),
+                  text: TextSpan(children: [
+                    const WidgetSpan(child: Icon(Icons.lightbulb, size: 22)),
                     TextSpan(
                         text: "Tips",
                         style: TextStyle(
                           fontFamily: "Poppins",
+                          color: _setNavTextColor(),
                         ))
                   ]),
                 ),
                 onTap: () {
                   setState(() {
-                    mainWidget = const TipsPage();
+                    mainWidget = TipsPage(user: _user, allergen: allergen);
                   });
                   Navigator.pop(context);
                 },
               ),
               ListTile(
                 title: RichText(
-                  text: const TextSpan(children: [
-                    WidgetSpan(child: Icon(Icons.account_box, size: 22)),
+                  text: TextSpan(children: [
+                    const WidgetSpan(child: Icon(Icons.pie_chart, size: 22)),
                     TextSpan(
-                        text: "Extra",
+                        text: "Calorie Details",
                         style: TextStyle(
                           fontFamily: "Poppins",
+                          color: _setNavTextColor(),
                         ))
                   ]),
                 ),
@@ -432,12 +453,33 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
               ),
               ListTile(
                 title: RichText(
-                  text: const TextSpan(children: [
-                    WidgetSpan(child: Icon(Icons.settings, size: 22)),
+                  text: TextSpan(children: [
+                    const WidgetSpan(child: Icon(Icons.pie_chart, size: 22)),
+                    TextSpan(
+                        text: "Test",
+                        style: TextStyle(
+                          fontFamily: "Poppins",
+                          color: _setNavTextColor(),
+                        ))
+                  ]),
+                ),
+                onTap: () {
+                  // Update the state of the app.
+                  // ...
+                  setState(() {});
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => InitAllergens(user: _user)));
+                },
+              ),
+              ListTile(
+                title: RichText(
+                  text: TextSpan(children: [
+                    const WidgetSpan(child: Icon(Icons.settings, size: 22)),
                     TextSpan(
                         text: "Settings",
                         style: TextStyle(
                           fontFamily: "Poppins",
+                          color: _setNavTextColor(),
                         ))
                   ]),
                 ),
@@ -450,12 +492,13 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
               ),
               ListTile(
                 title: RichText(
-                  text: const TextSpan(children: [
-                    WidgetSpan(child: Icon(Icons.settings, size: 22)),
+                  text: TextSpan(children: [
+                    const WidgetSpan(child: Icon(Icons.settings, size: 22)),
                     TextSpan(
                         text: "Sign Out",
                         style: TextStyle(
                           fontFamily: "Poppins",
+                          color: _setNavTextColor(),
                         ))
                   ]),
                 ),

@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "828152655111",
+    "firebase_url": "https://foodica-9743c-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "foodica-9743c",
     "storage_bucket": "foodica-9743c.appspot.com"
   },
@@ -37,6 +38,13 @@
             {
               "client_id": "828152655111-1935rq5eft42fbne5lhp1ak864p0l6pb.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "828152655111-kqh94ul6shb2onndssg9bnivohnbn0te.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.julesdebbaut.foodica"
+              }
             }
           ]
         }
