@@ -1,4 +1,7 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+
+import '../models/product.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({Key? key}) : super(key: key);
@@ -8,6 +11,33 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
+  List<Product> productList = [];
+  _getHistoryFromFirebase() async {
+    final ref = FirebaseDatabase(
+            databaseURL:
+                "https://foodica-9743c-default-rtdb.europe-west1.firebasedatabase.app")
+        .ref();
+    final snapshot = await ref.child("products/").onChildAdded.forEach((event) {
+      print(event.snapshot.key! + ": " + event.snapshot.value.toString());
+    });
+    if (snapshot.exists) {
+      print(snapshot.value);
+    } else {
+      print("No data found?");
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getHistoryFromFirebase();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
