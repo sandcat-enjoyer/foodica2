@@ -19,6 +19,17 @@ class _RegisterPageState extends State<RegisterPage> {
   String email = "";
   String password = "";
   String name = "";
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,8 +100,9 @@ class _RegisterPageState extends State<RegisterPage> {
                                           }
                                         else
                                           {
-                                            Scaffold.of(context).showSnackBar(
-                                                SnackBar(content: Text(result)))
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                                    content: Text(result)))
                                           }
                                       })
                             },

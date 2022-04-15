@@ -22,6 +22,16 @@ class _SettingsPageState extends State<SettingsPage> {
   bool soy = false;
   bool _isSigningOut = false;
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   Route _routeToLoginScreen() {

@@ -150,6 +150,16 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final _sections = [_fat, _sugar, _salt];
     return Scaffold(
