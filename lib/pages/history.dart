@@ -1,17 +1,23 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:openfoodfacts/model/Product.dart';
 
 import '../models/product.dart';
 
 class HistoryPage extends StatefulWidget {
-  const HistoryPage({Key? key}) : super(key: key);
+  const HistoryPage({Key? key, required User user}) : _user = user, super(key: key);
+
+  final User _user;
 
   @override
   _HistoryPageState createState() => _HistoryPageState();
 }
 
 class _HistoryPageState extends State<HistoryPage> {
+  late User user;
   List<Product> productList = [];
+  var products = {};
   _getHistoryFromFirebase() async {
     final ref = FirebaseDatabase(
             databaseURL:
@@ -19,9 +25,13 @@ class _HistoryPageState extends State<HistoryPage> {
         .ref();
     final snapshot = await ref.child("products/").onChildAdded.forEach((event) {
       print(event.snapshot.key! + ": " + event.snapshot.value.toString());
+      print(event.snapshot.key!);
+      products[event.snapshot.key!] = event.snapshot.value.toString();
+      print(event.snapshot.value);
     });
+
     if (snapshot.exists) {
-      print(snapshot.value);
+      // print(snapshot.value);
     } else {
       print("No data found?");
     }
@@ -31,6 +41,7 @@ class _HistoryPageState extends State<HistoryPage> {
   void initState() {
     super.initState();
     _getHistoryFromFirebase();
+    print(products.toString());
   }
 
   @override
@@ -63,7 +74,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   runSpacing: 20.0,
                   children: <Widget>[
                     SizedBox(
-                        width: 250.0,
+                        width: 300.0,
                         height: 180.0,
                         child: Card(
                           elevation: 2.0,
@@ -73,16 +84,16 @@ class _HistoryPageState extends State<HistoryPage> {
                               child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Column(
-                                    children: <Widget>[
-                                      const SizedBox(height: 10.0),
-                                      const Text("Product 1",
+                                    children: const <Widget>[
+                                      SizedBox(height: 10.0),
+                                      Text("Product 1",
                                           style: TextStyle(
                                               fontFamily: "Poppins",
                                               fontSize: 30.0,
                                               fontWeight: FontWeight.w800)),
-                                      const SizedBox(height: 10.0),
+                                      SizedBox(height: 10.0),
                                       Text("lorem ipsum lol",
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                               fontFamily: "Poppins",
                                               fontSize: 16.0,
                                               fontWeight: FontWeight.w600))
