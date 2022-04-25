@@ -1,20 +1,24 @@
 class Scan {
   String? code;
-  Product? product;
+  Food? product;
   int? status;
 
   Scan({this.code, this.product, this.status});
 
   factory Scan.fromJson(Map<String, dynamic> parsedJson) {
-    return Scan(
-        code: parsedJson["code"],
-        status: parsedJson["status"],
-        //MUST find a way to fix this possibly being null but i have no idea how to do this
-        product: Product?.fromJson(parsedJson['product']));
+    if (parsedJson["status"] == 0) {
+      return Scan(code: parsedJson["code"], status: parsedJson["status"]);
+      //MUST find a way to fix this possibly being null but i have no idea how to do
+    } else {
+      return Scan(
+          code: parsedJson["code"],
+          status: parsedJson["status"],
+          product: Food?.fromJson(parsedJson["product"]));
+    }
   }
 }
 
-class Product {
+class Food {
   var id;
   String? brand;
   String? category;
@@ -25,7 +29,7 @@ class Product {
   NutrientLevels? nutrientLevels;
   Nutriments nutriments;
 
-  Product(
+  Food(
       {this.id,
       this.brand,
       this.category,
@@ -37,8 +41,8 @@ class Product {
 
   //still needs more attributes but starting out with this
 
-  factory Product.fromJson(Map<String, dynamic> json) {
-    return Product(
+  factory Food.fromJson(Map<String, dynamic> json) {
+    return Food(
         brand: json["brands"],
         category: json["categories"],
         productname: json["product_name"],

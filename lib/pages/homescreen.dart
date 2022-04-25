@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,14 +8,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:foodica/pages/add_food_manual.dart';
 import 'package:foodica/pages/calorie_detail.dart';
 import 'package:foodica/pages/history.dart';
 import 'package:foodica/pages/init_allergens.dart';
+import 'package:foodica/pages/init_caloriegoals.dart';
 import 'package:foodica/pages/login.dart';
 import 'package:foodica/pages/productdetail.dart';
 import 'package:foodica/pages/settings.dart';
 import 'package:foodica/pages/tips.dart';
 import 'package:foodica/utils/authentication.dart';
+import 'package:foodica/widgets/ActionButton.dart';
+import 'package:foodica/widgets/ExpandableFab.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreenPage extends StatefulWidget {
@@ -49,11 +54,21 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   late int? _weeklyCaloriesInt = 0;
   late int? _calorieGoalInt = 0;
 
+  _checkIfWeeklyCaloriesIsNull() {
+    _getCalorieGoal();
+    if (_weeklyCaloriesInt == 0) {
+      return "0";
+    } else {
+      return _weeklyCaloriesInt.toString() + "/" + _calorieGoalInt.toString();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _user = widget._user;
     _getWeeklyCalories();
+    _getCalorieGoal();
     _allergen = _prefs.then((SharedPreferences prefs) {
       allergen = prefs.getString("allergen") ?? "";
       return _allergen;
@@ -72,7 +87,9 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
 
   void _getWeeklyCalories() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _weeklyCaloriesInt = prefs.getInt("weekly");
+    setState(() {
+      _weeklyCaloriesInt = prefs.getInt("weekly");
+    });
   }
 
   void _getCalorieGoal() async {
@@ -103,7 +120,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
 
   void navigateToHistory() {
     Navigator.of(context)
-        .pop(MaterialPageRoute(builder: (context) => const HistoryPage()));
+        .pop(MaterialPageRoute(builder: (context) =>  HistoryPage(user: _user,)));
   }
 
   void navigateToSettings() {
@@ -114,6 +131,12 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   void navigateToTips() {
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => TipsPage(user: _user, allergen: allergen)));
+  }
+
+  void navigateToAddFoodManual() {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => ManualFoodPage(user: _user)
+    ));
   }
 
   Route _routeToLoginScreen() {
@@ -191,7 +214,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                                     height: 5.0,
                                   ),
                                   Text(
-                                    _weeklyCaloriesInt.toString(),
+                                    _checkIfWeeklyCaloriesIsNull(),
                                     style: const TextStyle(
                                       fontFamily: "Poppins",
                                       fontWeight: FontWeight.w600,
@@ -356,9 +379,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
 
     return Scaffold(
         drawer: Drawer(
-          // Add a ListView to the drawer. This ensures the user can scroll
-          // through the options in the drawer if there isn't enough vertical
-          // space to fit everything.
           child: ListView(
             // Important: Remove any padding from the ListView.
             padding: EdgeInsets.zero,
@@ -369,10 +389,9 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                 accountName: Text(_checkProfileName(),
                     style: const TextStyle(fontFamily: "Poppins")),
                 currentAccountPicture: ClipOval(
-                  child: Image(
-                    image: NetworkImage(_checkPhotoURL()),
-                  ),
-                ),
+                    child: CachedNetworkImage(
+                  imageUrl: _checkPhotoURL(),
+                )),
                 decoration: const BoxDecoration(color: Colors.black),
               ),
               ListTile(
@@ -408,7 +427,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                 ),
                 onTap: () {
                   setState(() {
-                    mainWidget = const HistoryPage();
+                    mainWidget = HistoryPage(user: _user);
                   });
                   Navigator.pop(context);
                 },
@@ -468,7 +487,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                   // ...
                   setState(() {});
                   Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => InitAllergens(user: _user)));
+                      builder: (context) => InitCalorieGoal(user: _user)));
                 },
               ),
               ListTile(
@@ -516,10 +535,19 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => {scanBarcode()},
-          child: const Icon(Icons.add_rounded, size: 40),
+        floatingActionButton: ExpandableFab(
+          distance: 112.0,
+          children: [
+            ActionButton(icon: Icon(Icons.code_rounded), onPressed: () => scanBarcode(),),
+            ActionButton(icon: Icon(Icons.emoji_food_beverage_rounded), onPressed: () => {
+              navigateToAddFoodManual()
+            },)
+          ]
         ),
+        // floatingActionButton: FloatingActionButton(
+        //   onPressed: () => {scanBarcode()},
+        //   child: const Icon(Icons.add_rounded, size: 40),
+        // ),
         appBar: AppBar(
           automaticallyImplyLeading: false,
           leading: Builder(

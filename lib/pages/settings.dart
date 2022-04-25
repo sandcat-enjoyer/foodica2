@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:numberpicker/numberpicker.dart';
 
 import '../utils/authentication.dart';
 import 'login.dart';
@@ -25,6 +26,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
+    _getWeeklyCalorieGoal();
   }
 
   @override
@@ -33,6 +35,72 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
+  int? _weeklyCaloriesGoalInt = 0;
+
+  _getWeeklyCalorieGoal() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _weeklyCaloriesGoalInt = prefs.getInt("goal");
+    });
+  }
+
+  _checkIfWeeklyCaloriesIsNull() {
+    if (_weeklyCaloriesGoalInt == null) {
+      return "No calorie goal set";
+    } else {
+      return _weeklyCaloriesGoalInt.toString() + " calories";
+    }
+  }
+
+  _nullCheckNumPicker() {
+    if (_weeklyCaloriesGoalInt == null) {
+      return 2400; //give a random value instead of 0 to avoid null errors, doesn't really matter in the picker anyway
+    } else {
+      return _weeklyCaloriesGoalInt;
+    }
+  }
+
+  _showCalorieGoalPicker() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(
+                  20.0,
+                ),
+              ),
+            ),
+            title: Text("Calorie Goal"),
+            content: Container(
+                width: 400,
+                height: 400,
+                child: NumberPicker(
+                    maxValue: 9900,
+                    minValue: 0,
+                    itemHeight: 100,
+                    haptics: true,
+                    textStyle: TextStyle(
+                        fontFamily: "Poppins",
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24),
+                    value: _nullCheckNumPicker(),
+                    onChanged: (value) =>
+                        setState(() => _weeklyCaloriesGoalInt = value),
+                    step: 100)),
+            actions: [
+              TextButton(
+                  onPressed: () async {
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.setInt("goal", _weeklyCaloriesGoalInt!);
+                  },
+                  child: Text("Done"))
+            ],
+          );
+        });
+  }
 
   Route _routeToLoginScreen() {
     return PageRouteBuilder(
@@ -172,6 +240,20 @@ class _SettingsPageState extends State<SettingsPage> {
                       style: TextStyle(
                           fontFamily: "Poppins", fontWeight: FontWeight.bold)),
                   value: Text("Possible allergens",
+                      style: TextStyle(
+                          fontFamily: "Poppins", fontWeight: FontWeight.w500)),
+                ),
+                SettingsTile.navigation(
+                  leading: const Icon(Icons.food_bank),
+                  onPressed: (value) {
+                    _showCalorieGoalPicker();
+                  },
+                  title: const Text("Set Calorie Goal",
+                      style: TextStyle(
+                          fontFamily: "Poppins", fontWeight: FontWeight.bold)),
+                  value: Text(
+                      "Set your weekly calorie goal. Current goal: " +
+                          _checkIfWeeklyCaloriesIsNull(),
                       style: TextStyle(
                           fontFamily: "Poppins", fontWeight: FontWeight.w500)),
                 ),
