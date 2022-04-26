@@ -55,10 +55,54 @@ class _SettingsPageState extends State<SettingsPage> {
 
   _nullCheckNumPicker() {
     if (_weeklyCaloriesGoalInt == null) {
-      return 2400; //give a random value instead of 0 to avoid null errors, doesn't really matter in the picker anyway
+      return 2400; //give a random value instead of 0 to avoid null errors,
+      // doesn't really matter in the picker anyway
     } else {
       return _weeklyCaloriesGoalInt;
     }
+  }
+
+  _deleteProductHistory() {
+    showDialog(context: context, builder: (context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(
+              20.0
+            )
+          )
+        ),
+        title: Text("Delete Product History",
+        style: TextStyle(
+          fontFamily: "Poppins",
+          fontWeight: FontWeight.bold
+        )),
+        content: Container(
+          width: 400,
+          child: Text("Are you sure you want to wipe your product history? This action can't be undone.",
+          style: TextStyle(
+            fontFamily: "Poppins"
+          ))
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+
+            },
+            child: Text("Delete",
+            style: TextStyle(
+              fontFamily: "Poppins"
+            ))
+          ),
+          TextButton(onPressed: () {
+            Navigator.pop(context);
+          }, child: Text("Cancel",
+          style: TextStyle(
+            fontFamily: "Poppins"
+          )))
+        ],
+      );
+    });
   }
 
   _showCalorieGoalPicker() {
@@ -73,31 +117,42 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
             ),
-            title: Text("Calorie Goal"),
-            content: Container(
-                width: 400,
-                height: 400,
-                child: NumberPicker(
-                    maxValue: 9900,
-                    minValue: 0,
-                    itemHeight: 100,
-                    haptics: true,
-                    textStyle: TextStyle(
-                        fontFamily: "Poppins",
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24),
-                    value: _nullCheckNumPicker(),
-                    onChanged: (value) =>
-                        setState(() => _weeklyCaloriesGoalInt = value),
-                    step: 100)),
-            actions: [
+            title: Text("Calorie Goal",
+            style: TextStyle(
+              fontFamily: "Poppins",
+              fontWeight: FontWeight.bold
+            )),
+            content: StatefulBuilder(
+              builder: (context, SBsetState) {
+                return  NumberPicker(
+                        maxValue: 9900,
+                        minValue: 0,
+                        itemHeight: 100,
+                        haptics: true,
+                        textStyle: TextStyle(
+                            fontFamily: "Poppins",
+                            fontWeight: FontWeight.bold,
+                            fontSize: 24),
+                        value: _nullCheckNumPicker(),
+                        onChanged: (value) {
+                          setState(() => _weeklyCaloriesGoalInt = value);
+                          SBsetState(() => _weeklyCaloriesGoalInt = value);
+                        },
+                        step: 100);
+              },
+            ),
+              actions: [
               TextButton(
-                  onPressed: () async {
-                    final prefs = await SharedPreferences.getInstance();
-                    await prefs.setInt("goal", _weeklyCaloriesGoalInt!);
-                  },
-                  child: Text("Done"))
-            ],
+              onPressed: () async {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setInt("goal", _weeklyCaloriesGoalInt!);
+            Navigator.pop(context);
+          },
+          child: Text("Done",
+          style: TextStyle(
+            fontFamily: "Poppins"
+          )))
+          ],
           );
         });
   }
@@ -124,7 +179,7 @@ class _SettingsPageState extends State<SettingsPage> {
   _showAllergensMenu() {
     showDialog(
         context: context,
-        builder: (context) {
+        builder: (BuildContext context) {
           return AlertDialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(
@@ -139,81 +194,97 @@ class _SettingsPageState extends State<SettingsPage> {
                     fontFamily: "Poppins",
                     fontSize: 24,
                     fontWeight: FontWeight.bold)),
-            content: Container(
-              height: 400,
-              width: 400,
-              child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      CheckboxListTile(
-                          value: this.gluten,
-                          title: Text("Gluten",
-                              style: TextStyle(
-                                fontFamily: "Poppins",
-                                fontWeight: FontWeight.w600,
-                              )),
-                          controlAffinity: ListTileControlAffinity.leading,
-                          onChanged: (bool? gluten) {
-                            setState(() {
-                              this.gluten = gluten!;
-                            });
-                          }),
-                      CheckboxListTile(
-                          value: this.eggs,
-                          title: Text("Eggs",
-                              style: TextStyle(
-                                fontFamily: "Poppins",
-                                fontWeight: FontWeight.w600,
-                              )),
-                          controlAffinity: ListTileControlAffinity.leading,
-                          onChanged: (bool? eggs) {
-                            setState(() {
-                              this.eggs = eggs!;
-                            });
-                          }),
-                      CheckboxListTile(
-                          value: this.milk,
-                          title: Text("Milk",
-                              style: TextStyle(
-                                fontFamily: "Poppins",
-                                fontWeight: FontWeight.w600,
-                              )),
-                          controlAffinity: ListTileControlAffinity.leading,
-                          onChanged: (bool? milk) {
-                            setState(() {
-                              this.milk = milk!;
-                            });
-                          }),
-                      CheckboxListTile(
-                          value: this.peanuts,
-                          title: Text("Peanuts",
-                              style: TextStyle(
-                                fontFamily: "Poppins",
-                                fontWeight: FontWeight.w600,
-                              )),
-                          controlAffinity: ListTileControlAffinity.leading,
-                          onChanged: (bool? peanuts) {
-                            setState(() {
-                              this.peanuts = peanuts!;
-                            });
-                          }),
-                      CheckboxListTile(
-                          value: this.soy,
-                          title: Text("Soy",
-                              style: TextStyle(
-                                fontFamily: "Poppins",
-                                fontWeight: FontWeight.w600,
-                              )),
-                          controlAffinity: ListTileControlAffinity.leading,
-                          onChanged: (bool? soy) {
-                            setState(() {
-                              this.soy = soy!;
-                            });
-                          }),
-                    ],
-                  )),
+            content: StatefulBuilder(
+              builder: (context, SBsetState) {
+                return Container(
+                  width: 400,
+                  child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          CheckboxListTile(
+                              value: this.gluten,
+                              title: Text("Gluten",
+                                  style: TextStyle(
+                                    fontFamily: "Poppins",
+                                    fontWeight: FontWeight.w600,
+                                  )),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              onChanged: (bool? gluten) {
+                                setState(() {
+                                  this.gluten = gluten!;
+                                });
+                                SBsetState(() => this.gluten = gluten!);
+                              }),
+                          CheckboxListTile(
+                              value: this.eggs,
+                              title: Text("Eggs",
+                                  style: TextStyle(
+                                    fontFamily: "Poppins",
+                                    fontWeight: FontWeight.w600,
+                                  )),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              onChanged: (bool? eggs) {
+                                setState(() {
+                                  this.eggs = eggs!;
+                                });
+                                SBsetState(() => this.eggs = eggs!);
+                              }),
+                          CheckboxListTile(
+                              value: this.milk,
+                              title: Text("Milk",
+                                  style: TextStyle(
+                                    fontFamily: "Poppins",
+                                    fontWeight: FontWeight.w600,
+                                  )),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              onChanged: (bool? milk) {
+                                setState(() {
+                                  this.milk = milk!;
+                                });
+                                SBsetState(() => this.milk = milk!);
+                              }),
+                          CheckboxListTile(
+                              value: this.peanuts,
+                              title: Text("Peanuts",
+                                  style: TextStyle(
+                                    fontFamily: "Poppins",
+                                    fontWeight: FontWeight.w600,
+                                  )),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              onChanged: (bool? peanuts) {
+                                setState(() {
+                                  this.peanuts = peanuts!;
+                                });
+                                SBsetState(() => this.peanuts = peanuts!);
+                              }),
+                          CheckboxListTile(
+                              value: this.soy,
+                              title: Text("Soy",
+                                  style: TextStyle(
+                                    fontFamily: "Poppins",
+                                    fontWeight: FontWeight.w600,
+                                  )),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              onChanged: (bool? soy) {
+                                setState(() {
+                                  this.soy = soy!;
+                                });
+                                SBsetState(() => this.soy = soy!);
+                              }),
+                        ],
+                      )),
+                );
+              }
             ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text("Done")
+              )
+            ],
           );
         });
   }
@@ -260,7 +331,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 SettingsTile.navigation(
                   leading: const Icon(Icons.delete_forever),
                   onPressed: (value) {
-                    _showAllergensMenu();
+                    _deleteProductHistory();
                   },
                   title: const Text("Delete History",
                       style: TextStyle(

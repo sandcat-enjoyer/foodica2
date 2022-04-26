@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:foodica/pages/homescreen.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 class InitCalorieGoal extends StatefulWidget {
@@ -14,9 +15,14 @@ class InitCalorieGoal extends StatefulWidget {
 }
 
 class _InitCalorieGoalState extends State<InitCalorieGoal> {
+
+  late User user;
+
+  int calorieGoalDaily = 0;
   @override
   void initState() {
     super.initState();
+    user = widget._user;
   }
 
   @override
@@ -24,28 +30,80 @@ class _InitCalorieGoalState extends State<InitCalorieGoal> {
     super.dispose();
   }
 
+  _returnNumberPicker() {
+    return Column(
+      children: [
+        NumberPicker(
+          value: calorieGoalDaily,
+          minValue: 0,
+          maxValue: 9900,
+          step: 50,
+          axis: Axis.horizontal,
+          haptics: true,
+          onChanged: (value) => setState(() => calorieGoalDaily = value),
+        ),
+        SizedBox(height: 32),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              icon: Icon(Icons.remove),
+              onPressed: () => setState(() {
+                final newValue = calorieGoalDaily - 10;
+                calorieGoalDaily = newValue.clamp(0, 9900);
+              }),
+            ),
+            IconButton(
+              icon: Icon(Icons.add),
+              onPressed: () => setState(() {
+                final newValue = calorieGoalDaily + 20;
+                calorieGoalDaily = newValue.clamp(0, 9900);
+              }),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     int calorieGoalWeekly = 0;
-    int calorieGoalDaily = 0;
+
     return Scaffold(
         body: SingleChildScrollView(
       child: Container(
           alignment: Alignment.center,
           padding: EdgeInsets.all(20.0),
           child: Column(children: [
-            SizedBox(height: 90),
+            SizedBox(height: 40),
             Image.asset(
               "assets/splash_icon.png",
               width: 120,
             ),
-            const Center(
-                child: Text("Select your calorie goals",
-                    style: TextStyle(
-                      fontFamily: "Poppins",
-                      fontSize: 26.0,
-                      fontWeight: FontWeight.bold,
-                    ))),
+            Container(
+              alignment: Alignment.center,
+              child: const Center(
+                  child: Text("Determine your daily calorie goal",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 32.0,
+                        fontWeight: FontWeight.bold,
+                      ))),
+            ),
+            SizedBox(height: 10),
+            Container(
+              alignment: Alignment.center,
+              child: Text("The recommended daily calorie intake is: \n"
+                  "- 2,000 calories for women \n"
+                  "- 2,600 calories for men",
+              style: TextStyle(
+                fontFamily: "Poppins",
+                fontSize: 16,
+
+              )),
+            ),
             const SizedBox(height: 30.0),
             Container(
                 alignment: Alignment.center,
@@ -61,20 +119,20 @@ class _InitCalorieGoalState extends State<InitCalorieGoal> {
                     style: TextStyle(fontFamily: "Poppins", fontSize: 25))),
             Container(child: StatefulBuilder(
               builder: (BuildContext context, SBsetState) {
-                return NumberPicker(
-                    value: calorieGoalDaily,
-                    minValue: 0,
-                    maxValue: 9900,
-                    haptics: true,
-                    step: 100,
-                    onChanged: (value) {
-                      print(value);
-                      setState(() {
-                        calorieGoalDaily = value;
-                      });
-                      SBsetState(() => calorieGoalDaily = value);
-                    });
+                return _returnNumberPicker();
               },
+            )),
+            Container(alignment: Alignment.center,
+            child: ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.red)
+              ),
+              onPressed: () {
+                //functionality to save calories to localStorage
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreenPage(user: user)));
+
+              },
+              child: Text("Save Calorie Goal")
             ))
           ])),
     ));
