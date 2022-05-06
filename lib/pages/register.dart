@@ -70,7 +70,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       width: 400,
                       child: TextField(
                         obscureText: true,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           hintText: 'Password',
                         ),

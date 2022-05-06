@@ -1,14 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:foodica/data/data.dart';
-import 'package:foodica/pages/history.dart';
-import 'package:foodica/pages/login.dart';
-import 'package:foodica/utils/authentication.dart';
+import 'package:Foodica/data/data.dart';
+import 'package:Foodica/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
-import 'homescreen.dart';
-import 'package:loading_overlay/loading_overlay.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({Key? key}) : super(key: key);
@@ -35,17 +31,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         borderRadius: BorderRadius.circular(12),
       ),
     );
-  }
-
-  _buildShowDialog(BuildContext context) {
-    return showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        });
   }
 
   @override
@@ -140,7 +125,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       context: context,
                       barrierDismissible: false,
                       builder: (context) {
-                        return Center(
+                        return const Center(
                             child:
                                 CircularProgressIndicator(color: Colors.red));
                       });

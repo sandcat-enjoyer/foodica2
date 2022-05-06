@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 
@@ -146,7 +147,7 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
         return Image.file(photo!, width: 200);
       }
       else {
-        return Text("Image will appear here");
+        return const Text("Image will appear here");
       }
     }
 
@@ -159,7 +160,7 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
             _saveProductToFirebase();
             Navigator.pop(context);
         },
-        child: Icon(Icons.save)
+        child: const Icon(Icons.save)
       ),
       appBar: AppBar(
         title: const Text("Foodica",
@@ -214,13 +215,13 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                   builder: (BuildContext context) {
                 return Container(
                   height: 200,
-                  padding: EdgeInsets.all(15.0),
+                  padding: const EdgeInsets.all(15.0),
                   color: Colors.white,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text("Select Source",
+                      const Text("Select Source",
                       style: TextStyle(
                         fontFamily: "Poppins",
                         fontSize: 25,
@@ -228,12 +229,12 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                         color: Colors.black
                       )),
                       Row(children: [
-                        Icon(Icons.camera, color: Colors.black),
+                        const Icon(Icons.camera, color: Colors.black),
                         TextButton(
                             onPressed: () {
                               getImageFromCamera();
                             },
-                            child: Text("Open Camera",
+                            child: const Text("Open Camera",
                               textAlign: TextAlign.left,
                             style: TextStyle(
                               fontFamily: "Poppins",
@@ -242,12 +243,12 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                         ),
                       ]),
                       Row(children: [
-                        Icon(Icons.photo, color: Colors.black),
+                        const Icon(Icons.photo, color: Colors.black),
                         TextButton(
                             onPressed: () {
                               selectImageFromGallery();
                             },
-                            child: Text("Select from gallery",
+                            child: const Text("Select from gallery",
                             style: TextStyle(fontFamily: "Poppins",
                                 color: Colors.black))
                         )
@@ -259,11 +260,12 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                 );
               });
 
-            }, child: Text("Take picture")),
-            SizedBox(height: 10),
+            }, child: const Text("Take picture")),
+            const SizedBox(height: 10),
             SizedBox(
               width: 350,
               child: TextField(
+                keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: "Amount of Calories (in Kcal)",
@@ -276,10 +278,11 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                 },
               )
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             SizedBox(
               width: 350,
               child: TextField(
+                keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: "Amount of Fat (in Grams)"
@@ -289,10 +292,11 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                 },
               )
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             SizedBox(
               width: 350,
               child: TextField(
+                keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: "Amount of Salt (in Grams)"
@@ -302,10 +306,11 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                 },
               )
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             SizedBox(
               width: 350,
               child: TextField(
+                keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: "Amount of Saturated Fats (in Grams)"
@@ -315,10 +320,11 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                 },
               )
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             SizedBox(
               width: 350,
               child: TextField(
+                keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: "Amount of Sugars (in Grams)"
@@ -328,7 +334,7 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                 },
               )
             ),
-            SizedBox(height: 50)
+            const SizedBox(height: 50)
 
 
 

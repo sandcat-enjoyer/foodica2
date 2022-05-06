@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import "package:flutter/material.dart";
-import 'package:foodica/utils/authentication.dart';
+import 'package:Foodica/utils/authentication.dart';
 
 import 'homescreen.dart';
 import 'register.dart';
@@ -177,7 +177,7 @@ class _LoginPageState extends State<LoginPage> {
                     OutlinedButton(
                         onPressed: () =>
                             {Navigator.of(context).push(_toRegisterPage())},
-                        child: Text("Create New Account"))
+                        child: const Text("Create New Account"))
                   ],
                 ))));
   }
