@@ -1,10 +1,18 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
 import 'package:fl_chart/fl_chart.dart';
+import 'package:Foodica/models/scanned_product.dart';
+
+import '../models/scanned_product.dart';
 
 class CalorieDetailPage extends StatefulWidget {
-  const CalorieDetailPage({Key? key}) : super(key: key);
+  const CalorieDetailPage({Key? key, required User user})
+      : _user = user,
+        super(key: key);
 
+  final User _user;
   @override
   _CalorieDetailPageState createState() => _CalorieDetailPageState();
 }
@@ -17,6 +25,10 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
   PieChartSectionData _salt = PieChartSectionData(
       color: Colors.green, value: 12, title: "Salt", radius: 50);
   DateTime selectedDate = DateTime.now();
+  int? _fatValue;
+  int? _sugarValue;
+  int? _saltValue;
+  DataSnapshot? snapshot;
   _selectDate(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     assert(theme.platform != null);
@@ -28,6 +40,27 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
       default:
         return buildMaterialDatePicker(context);
     }
+  }
+
+  List<ScannedProduct> products = [];
+
+  DatabaseReference database = FirebaseDatabase(
+          databaseURL:
+              "https://foodica-9743c-default-rtdb.europe-west1.firebasedatabase.app")
+      .ref();
+
+  _getData() async {
+    final snapshot =
+        await database.child("/products/").onChildAdded.forEach((event) {
+      print(event.snapshot.value);
+    });
+    if (snapshot.exists) {
+      print(snapshot!.key);
+      print(snapshot!.value);
+    } else {
+      print("No data found");
+    }
+    setState(() {});
   }
 
   buildCupertinoDatePicker(BuildContext context) {
@@ -71,14 +104,14 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
       context: context,
       initialDate: selectedDate,
       firstDate: DateTime(2000),
-      lastDate: DateTime(2025),
+      lastDate: DateTime.now(),
       initialEntryMode: DatePickerEntryMode.calendar,
       initialDatePickerMode: DatePickerMode.day,
       cancelText: 'Cancel',
       confirmText: 'Select',
       errorFormatText: 'Enter valid date',
       errorInvalidText: 'Enter date in valid range',
-      fieldLabelText: 'Booking date',
+      fieldLabelText: 'Date',
       fieldHintText: 'Month/Date/Year',
       builder: (context, child) {
         return Theme(data: _setThemeForDatePicker(), child: child!);
@@ -152,6 +185,7 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
   @override
   void initState() {
     super.initState();
+    _getData();
   }
 
   @override
@@ -164,7 +198,7 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
     final _sections = [_fat, _sugar, _salt];
     return Scaffold(
         appBar: AppBar(
-            title: Text("Details",
+            title: const Text("Details",
                 style: TextStyle(
                     fontFamily: "Poppins", fontWeight: FontWeight.bold)),
             actions: [
@@ -181,7 +215,7 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
                     children: [
-                      Text("Details",
+                      const Text("Details",
                           style: TextStyle(
                               fontFamily: "Poppins",
                               fontSize: 36,
@@ -216,7 +250,7 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
               Container(
                   alignment: Alignment.topLeft,
                   padding: const EdgeInsets.all(20.0),
-                  child: Text("Fats consumed: "))
+                  child: const Text("Fats consumed: "))
             ],
           ),
         ));

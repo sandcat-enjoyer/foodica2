@@ -106,7 +106,7 @@ class _ExpandableFabState extends State<ExpandableFab> with SingleTickerProvider
               padding: const EdgeInsets.all(10.0),
               child: Icon(
                 Icons.close,
-                color: Theme.of(context).primaryColor,
+                color: Colors.red,
               ),
             ),
           ),
@@ -133,7 +133,7 @@ class _ExpandableFabState extends State<ExpandableFab> with SingleTickerProvider
           duration: const Duration(milliseconds: 250),
           child: FloatingActionButton(
             onPressed: _toggle,
-            child: const Icon(Icons.create),
+            child: const Icon(Icons.add, size: 36,),
           ),
         ),
       ),

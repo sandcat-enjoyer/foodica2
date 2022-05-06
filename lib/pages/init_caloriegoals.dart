@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:foodica/pages/homescreen.dart';
+import 'package:Foodica/pages/homescreen.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 class InitCalorieGoal extends StatefulWidget {
@@ -15,7 +15,6 @@ class InitCalorieGoal extends StatefulWidget {
 }
 
 class _InitCalorieGoalState extends State<InitCalorieGoal> {
-
   late User user;
 
   int calorieGoalDaily = 0;
@@ -76,7 +75,7 @@ class _InitCalorieGoalState extends State<InitCalorieGoal> {
           alignment: Alignment.center,
           padding: EdgeInsets.all(20.0),
           child: Column(children: [
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             Image.asset(
               "assets/splash_icon.png",
               width: 120,
@@ -92,22 +91,22 @@ class _InitCalorieGoalState extends State<InitCalorieGoal> {
                         fontWeight: FontWeight.bold,
                       ))),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Container(
               alignment: Alignment.center,
-              child: Text("The recommended daily calorie intake is: \n"
+              child: const Text(
+                  "The recommended daily calorie intake is: \n"
                   "- 2,000 calories for women \n"
                   "- 2,600 calories for men",
-              style: TextStyle(
-                fontFamily: "Poppins",
-                fontSize: 16,
-
-              )),
+                  style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontSize: 16,
+                  )),
             ),
             const SizedBox(height: 30.0),
             Container(
                 alignment: Alignment.center,
-                child: Text("Daily Calories",
+                child: const Text("Daily Calories",
                     style: TextStyle(
                         fontFamily: "Poppins",
                         fontSize: 25,
@@ -117,23 +116,22 @@ class _InitCalorieGoalState extends State<InitCalorieGoal> {
                 child: Text(calorieGoalDaily.toString() + "\nKcal",
                     textAlign: TextAlign.center,
                     style: TextStyle(fontFamily: "Poppins", fontSize: 25))),
-            Container(child: StatefulBuilder(
+            StatefulBuilder(
               builder: (BuildContext context, SBsetState) {
                 return _returnNumberPicker();
               },
-            )),
-            Container(alignment: Alignment.center,
-            child: ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.red)
-              ),
-              onPressed: () {
-                //functionality to save calories to localStorage
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreenPage(user: user)));
-
-              },
-              child: Text("Save Calorie Goal")
-            ))
+            ),
+            Container(
+                alignment: Alignment.center,
+                child: ElevatedButton(
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(Colors.red)),
+                    onPressed: () {
+                      //functionality to save calories to localStorage
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => HomeScreenPage(user: user)));
+                    },
+                    child: const Text("Save Calorie Goal")))
           ])),
     ));
   }

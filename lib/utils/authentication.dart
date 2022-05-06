@@ -14,16 +14,6 @@ class Authentication {
 
     User? user = FirebaseAuth.instance.currentUser;
 
-    if (user != null) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => HomeScreenPage(
-            user: user,
-          ),
-        ),
-      );
-    }
-
     return firebaseApp;
   }
 

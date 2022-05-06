@@ -2,6 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'homescreen.dart';
 
 class InitAllergens extends StatefulWidget {
   const InitAllergens({Key? key, required User user})
@@ -13,21 +16,63 @@ class InitAllergens extends StatefulWidget {
 }
 
 class _InitAllergensState extends State<InitAllergens> {
-  bool value = false;
   bool gluten = false;
   bool eggs = false;
   bool milk = false;
   bool peanuts = false;
   bool soy = false;
 
+  late User user;
+
+  String allergen = "";
+
   @override
   void initState() {
     super.initState();
+    user = widget._user;
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  _determineAllergenToSave() {
+    //this still needs to be adjusted for multiple allergens but for now just one
+    //so this code kinda sucks and isn't very pretty lol
+    if (gluten == true) {
+      setState(() {
+        allergen = "gluten";
+      });
+    }
+    else if (eggs == true) {
+      setState(() {
+        allergen = "eggs";
+      });
+    }
+
+    else if (milk == true) {
+      setState(() {
+        allergen = "milk";
+      });
+    }
+    else if (peanuts == true) {
+      setState(() {
+        allergen = "peanuts";
+      });
+    }
+    else if (soy == true) {
+      setState(() {
+        allergen = "soy";
+      });
+    }
+    _saveAllergenToMemory();
+  }
+
+  _saveAllergenToMemory() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString("allergen", allergen);
+    print(prefs.getString("allergen"));
   }
 
   @override
@@ -121,7 +166,10 @@ class _InitAllergensState extends State<InitAllergens> {
                         }),
                     SizedBox(height: 100.0),
                     TextButton(
-                        onPressed: () => {},
+                        onPressed: () => {
+                          _determineAllergenToSave(),
+                          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomeScreenPage(user: user)))
+                        },
                         child: const Text("Done",
                             style: TextStyle(
                                 fontFamily: "Poppins",
