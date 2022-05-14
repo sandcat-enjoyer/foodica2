@@ -8,11 +8,14 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 
+import '../models/scanned_product.dart';
+
 class ManualFoodPage extends StatefulWidget {
-  const ManualFoodPage({Key? key, required User user}) : _user = user,
+  const ManualFoodPage({Key? key, required User user, ScannedProduct? product}) : product = product, _user = user,
         super(key: key);
 
   final User _user;
+  final ScannedProduct? product;
 
 
 
@@ -50,10 +53,23 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
         .ref();
     ImagePicker imagePicker = ImagePicker();
 
+    _getProductInfo() {
+      if (widget.product != null) {
+        productNameController.text = widget.product!.productDetail!.productname!;
+        brandController.text = widget.product!.productDetail!.productname!;
+        caloriesController.text = widget.product?.productDetail?.calories ?? "";
+        fatController.text = widget.product?.productDetail?.fat ?? "";
+        saltController.text = widget.product?.productDetail?.salt ?? "";
+        saturatedFatController.text = widget.product?.productDetail?.saturatedFat ?? "";
+        sugarController.text = widget.product?.productDetail?.sugar ?? "";
+      }
+    }
+
     @override
     void initState() {
       super.initState();
       user = widget._user;
+      _getProductInfo();
     }
 
     @override
@@ -187,6 +203,7 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
             SizedBox(
               width: 350,
               child: TextField(
+                controller: productNameController,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: "Name of Food"
@@ -200,6 +217,7 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
 
             const SizedBox(height: 10),
              SizedBox(width: 350, child: TextField(
+               controller: brandController,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 hintText: "Brand"

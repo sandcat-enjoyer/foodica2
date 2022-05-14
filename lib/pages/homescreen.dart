@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
@@ -15,7 +14,6 @@ import 'package:Foodica/pages/login.dart';
 import 'package:Foodica/pages/productdetail.dart';
 import 'package:Foodica/pages/settings.dart';
 import 'package:Foodica/pages/tips.dart';
-import 'package:Foodica/utils/authentication.dart';
 import 'package:Foodica/widgets/ActionButton.dart';
 import 'package:Foodica/widgets/ExpandableFab.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,9 +30,6 @@ class HomeScreenPage extends StatefulWidget {
 }
 
 class _HomeScreenPageState extends State<HomeScreenPage> {
-  late Future<int> _weeklyCalories;
-  late Future<int> _calorieGoal;
-  late Future<String> _allergen;
   late User _user;
 
   //i genuinely forgot how to easily concatenate strings in dart
@@ -48,7 +43,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   String lastProductName = "";
   Color? bgColor;
   String allergen = "";
-  bool _isSigningOut = false;
 
   late int? _weeklyCaloriesInt = 0;
   late int? _dailyCaloriesInt = 0;
@@ -64,11 +58,12 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   }
 
   _checkIfDailyCaloriesIsNull() {
+    _getCalorieGoal();
     if (_dailyCaloriesInt == null) {
-      return "None";
+      return "0/" + _calorieGoalInt.toString() + "Kcal";
     }
     else {
-      return _dailyCaloriesInt.toString() + "Kcal";
+      return _dailyCaloriesInt.toString() + "/" + _calorieGoalInt.toString() + "Kcal";
     }
   }
 
@@ -82,6 +77,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   }
 
   @override
+
   void initState() {
     super.initState();
     _user = widget._user;
@@ -89,14 +85,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
     _getDailyCalories();
     _getLastScannedProduct();
     _getCalorieGoal();
-    _allergen = _prefs.then((SharedPreferences prefs) {
-      allergen = prefs.getString("allergen") ?? "";
-      return _allergen;
-    });
-    _calorieGoal = _prefs.then((SharedPreferences prefs) {
-      _calorieGoalInt = prefs.getInt("goal") ?? 0;
-      return _calorieGoal;
-    });
     _reloadLocalStorage();
   }
 
@@ -159,7 +147,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
 
   void navigateToSettings() {
     Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => const SettingsPage()));
+        .push(MaterialPageRoute(builder: (context) => SettingsPage(user: _user)));
   }
 
   void navigateToTips() {
@@ -221,39 +209,45 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                                 elevation: 2.0,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8.0)),
-                                child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        children: <Widget>[
-                                          const SizedBox(
-                                            height: 10.0,
-                                          ),
-                                          const Icon(
-                                            Icons.run_circle,
-                                            size: 60,
-                                          ),
-                                          const Text(
-                                            "Calories Consumed",
-                                            style: TextStyle(
-                                                fontFamily: "Poppins",
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 30.0),
-                                          ),
-                                          const SizedBox(
-                                            height: 5.0,
-                                          ),
-                                          Text(
-                                            _checkIfDailyCaloriesIsNull(),
-                                            style: const TextStyle(
-                                              fontFamily: "Poppins",
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 20.0,
+                                child: InkWell(
+                                  child: Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          children: <Widget>[
+                                            const SizedBox(
+                                              height: 10.0,
                                             ),
-                                          )
-                                        ],
-                                      ),
-                                    )),
+                                            const Icon(
+                                              Icons.run_circle,
+                                              size: 60,
+                                            ),
+                                            const Text(
+                                              "Calories Consumed",
+                                              style: TextStyle(
+                                                  fontFamily: "Poppins",
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 30.0),
+                                            ),
+                                            const SizedBox(
+                                              height: 5.0,
+                                            ),
+                                            Text(
+                                              _checkIfDailyCaloriesIsNull(),
+                                              style: const TextStyle(
+                                                fontFamily: "Poppins",
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 20.0,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      )),
+                                  onTap: () => Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              CalorieDetailPage(user: _user))),
+                                ),
                               ),
                             ),
                           ],
@@ -271,7 +265,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                           children: <Widget>[
                             SizedBox(
                               width: 350.0,
-                              height: 200.0,
                               child: Card(
                                 elevation: 2.0,
                                 shape: RoundedRectangleBorder(
@@ -300,6 +293,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                                           ),
                                           Text(
                                             _checkIfLastScannedProductIsNull(),
+                                            textAlign: TextAlign.center,
                                             style: const TextStyle(
                                               fontFamily: "Poppins",
                                               fontWeight: FontWeight.w600,
@@ -332,10 +326,9 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0)),
                           child: InkWell(
-                            onTap: () => Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                         CalorieDetailPage(user: _user))),
+                            onTap: () {
+
+                            },
                             child: Center(
                                 child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -394,7 +387,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => DetailPage(barcode: barcodeScan)));
+                  builder: (context) => DetailPage(barcode: barcodeScan, user: _user, isFromScan: true,)));
         }
       } on PlatformException {
         barcodeScan = "Failed to get platform version";
@@ -413,6 +406,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
         return Colors.black;
       }
     }
+
 
     return Scaffold(
         drawer: Drawer(
@@ -525,7 +519,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                 ),
                 onTap: () {
                   setState(() {
-                    mainWidget = const SettingsPage();
+                    mainWidget = SettingsPage(user: _user);
                   });
                   Navigator.pop(context);
                 },
@@ -548,6 +542,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
         //   child: const Icon(Icons.add_rounded, size: 40),
         // ),
         appBar: AppBar(
+
           automaticallyImplyLeading: false,
           leading: Builder(
             builder: (context) => IconButton(

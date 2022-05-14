@@ -94,6 +94,18 @@ flutter:
    - assets/start-2.png
    - assets/start-1.png
    - assets/splash_icon.png
+   - assets/allergencards/eggs1.jpg
+   - assets/allergencards/eggs2.jpg
+   - assets/allergencards/gluten1.jpg
+   - assets/allergencards/gluten2.jpg
+   - assets/allergencards/gluten3.jpg
+   - assets/allergencards/gluten4.jpg
+   - assets/allergencards/milk1.jpg
+   - assets/allergencards/milk2.jpg
+   - assets/allergencards/peanut1.jpg
+   - assets/allergencards/soy1.jpg
+   - assets/allergencards/soy2.jpg
+   - assets/allergencards/soy3.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

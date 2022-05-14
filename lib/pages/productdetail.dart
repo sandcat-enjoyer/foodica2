@@ -1,14 +1,26 @@
+import 'package:Foodica/pages/add_food_manual.dart';
 import 'package:Foodica/utils/uuid.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:flutter/material.dart';
 import 'package:openfoodfacts/model/Product.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_database/firebase_database.dart';
 
+import '../models/scanned_product.dart';
+
 class DetailPage extends StatefulWidget {
-  const DetailPage({Key? key, required this.barcode}) : super(key: key);
+  const DetailPage(
+      {Key? key,
+      required this.barcode,
+      required firebase.User user,
+      required this.isFromScan})
+      : _user = user,
+        super(key: key);
   final String barcode;
+  final firebase.User _user;
+  final bool isFromScan;
 
   @override
   _DetailPageState createState() => _DetailPageState();
@@ -16,7 +28,9 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   late Colors fatColor;
+  late firebase.User user;
   late Future<int> _weeklyCalories;
+  late Future<int> _dailyCalories;
   Uuid uuid = Uuid();
   final fb = FirebaseDatabase.instance;
   //need a new way for this but i can only find solutions using a deprecated method
@@ -24,8 +38,9 @@ class _DetailPageState extends State<DetailPage> {
           databaseURL:
               "https://foodica-9743c-default-rtdb.europe-west1.firebasedatabase.app")
       .ref();
-  int _weeklyCaloriesInt = 0;
+  int _dailyCaloriesInt = 0;
   int _productCalories = 0;
+  List<String> allergens = [];
   Product scannedProduct = Product();
 
   bool productIsLoaded = false;
@@ -36,13 +51,13 @@ class _DetailPageState extends State<DetailPage> {
   @override
   void initState() {
     super.initState();
-    _weeklyCalories = _prefs.then((SharedPreferences prefs) {
-      _weeklyCaloriesInt = prefs.getInt("weekly")!;
-      debugPrint(_weeklyCaloriesInt.toString());
-      return prefs.getInt("weekly") ?? 0;
+    user = widget._user;
+    _dailyCalories = _prefs.then((SharedPreferences prefs) {
+      _dailyCaloriesInt = prefs.getInt("daily")!;
+      debugPrint(_dailyCaloriesInt.toString());
+      return prefs.getInt("daily") ?? 0;
     });
     getProduct();
-    _saveCaloriesToMemory();
   }
 
   Future<Product?> getProduct() async {
@@ -56,7 +71,12 @@ class _DetailPageState extends State<DetailPage> {
       Future.delayed(Duration(milliseconds: 500), () {
         setState(() {
           scannedProduct = result.product!;
+          result.product?.allergens!.names.forEach((element) {
+            allergens.add(element);
+          });
           productIsLoaded = true;
+
+          _saveCaloriesToMemory();
         });
       });
     } else {
@@ -99,10 +119,10 @@ class _DetailPageState extends State<DetailPage> {
   // }
 
   void _saveCaloriesToMemory() async {
-    if (scannedProduct.nutriments?.energyKcal != null) {
+    if (scannedProduct.productName != null) {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt("weekly", (_weeklyCaloriesInt + _productCalories));
-      debugPrint(prefs.getInt("weekly").toString());
+      await prefs.setInt("daily", (_dailyCaloriesInt + _productCalories));
+      debugPrint(prefs.getInt("daily").toString());
       await prefs.setString("productname", scannedProduct.productName!);
     }
   }
@@ -281,6 +301,26 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
+  _showAllergens() {
+    print(allergens);
+    String allergenString = "";
+    print(allergens.length);
+    for (int i = 0; i <= allergens.length - 1; i++) {
+      if (allergens.length != 0) {
+        allergenString += allergens[i] + "\n";
+      } else {
+        allergenString = "No allergens found";
+      }
+    }
+    print(allergenString);
+    return Text(
+      allergenString,
+      style: TextStyle(
+          fontFamily: "Poppins", fontSize: 20, fontWeight: FontWeight.w600),
+      textAlign: TextAlign.center,
+    );
+  }
+
   Widget _buildSaltCard() {
     return Column(
       children: [
@@ -336,6 +376,65 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
+  _manuallyAddDetailsPopUp() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20))),
+            title: Text("Not all product values found",
+                style: TextStyle(
+                  fontFamily: "Poppins",
+                  fontWeight: FontWeight.bold,
+                )),
+            content: StatefulBuilder(
+              builder: (context, SBsetState) {
+                return Text(
+                    "Some values of this product were not found in the Open Food Facts database. Would you like to add these values manually?",
+                    style: TextStyle(
+                      fontFamily: "Poppins",
+                    ));
+              },
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    ScannedProduct product = ScannedProduct(
+                        productID: uuid.generateV4(),
+                        productDetail: ProductDetail(
+                          productname: scannedProduct.productName ?? "",
+                          brand: scannedProduct.brands ?? "",
+                          calories: scannedProduct.nutriments!.energyKcal100g
+                              .toString(),
+                          fat: scannedProduct.nutriments?.fat.toString(),
+                          salt: scannedProduct.nutriments?.salt.toString(),
+                          sugar: scannedProduct.nutriments?.sugars.toString(),
+                          image: scannedProduct.imagePackagingUrl ?? "",
+                          scanTime: DateTime.now(),
+                          allergens: scannedProduct.allergens!.names,
+                          saturatedFat: scannedProduct.nutriments!.saturatedFat!
+                              .toString(),
+                          category: scannedProduct.categories ?? "",
+                        ));
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) =>
+                            ManualFoodPage(user: user, product: product)));
+                  },
+                  child: Text("Add Details",
+                      style: TextStyle(
+                          fontFamily: "Poppins", fontWeight: FontWeight.bold))),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text("Cancel", style: TextStyle(fontFamily: "Poppins")),
+              )
+            ],
+          );
+        });
+  }
+
   Widget _buildSugarCard() {
     return Column(
       children: [
@@ -383,62 +482,24 @@ class _DetailPageState extends State<DetailPage> {
     );
   }
 
-  // Color _checkFatAmount() {
-  //   switch (scannedProduct.nutrientLevels?.levels) {
-  //     case "low":
-  //       return Colors.green;
-  //     case "moderate":
-  //       return Colors.orange;
-  //     case "high":
-  //       return Colors.red;
-  //   }
-  //   return const Color.fromARGB(255, 64, 64, 64);
-  // }
-  //
-  // Color _checkSaltAmount() {
-  //   switch (scannedProduct.nutrientLevels!.salt) {
-  //     case "low":
-  //       return Colors.green;
-  //     case "moderate":
-  //       return Colors.orange;
-  //     case "high":
-  //       return Colors.red;
-  //   }
-  //   return const Color.fromARGB(255, 64, 64, 64);
-  // }
-  //
-  // Color _checkSatFatAmount() {
-  //   switch (scannedProduct.nutrientLevels!.saturatedFat) {
-  //     case "low":
-  //       return Colors.green;
-  //     case "moderate":
-  //       return Colors.orange;
-  //     case "high":
-  //       return Colors.red;
-  //   }
-  //   return const Color.fromARGB(255, 64, 64, 64);
-  // }
-  //
-  // Color _checkSugarAmount() {
-  //   switch (scannedProduct.nutrientLevels!.sugars) {
-  //     case "low":
-  //       return Colors.green;
-  //     case "moderate":
-  //       return Colors.orange;
-  //     case "high":
-  //       return Colors.red;
-  //   }
-  //   return const Color.fromARGB(255, 64, 64, 64);
-  // }
-
   Widget _getProductImage() {
     String url = "";
+    print(scannedProduct.imagePackagingUrl);
     if (scannedProduct.imagePackagingUrl != null) {
       url = scannedProduct.imagePackagingUrl!;
-      return CachedNetworkImage(imageUrl: url);
+      return CachedNetworkImage(imageUrl: url, width: 300);
     } else {
-      url = "https://via.placeholder.com/300";
-      return CachedNetworkImage(imageUrl: url);
+      return Column(
+        children: [
+          Image.asset("assets/splash_icon.png", width: 300),
+          SizedBox(height: 10),
+          Text("No Product Image Found",
+              style: TextStyle(
+                  fontFamily: "Poppins",
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold))
+        ],
+      );
     }
   }
 
@@ -744,7 +805,6 @@ class _DetailPageState extends State<DetailPage> {
                 children: <Widget>[
                   SizedBox(
                       width: 300.0,
-                      height: 180.0,
                       child: Card(
                         elevation: 2.0,
                         shape: RoundedRectangleBorder(
@@ -753,7 +813,7 @@ class _DetailPageState extends State<DetailPage> {
                             child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
-                                  children: const <Widget>[
+                                  children: <Widget>[
                                     SizedBox(height: 10.0),
                                     Text("Allergens",
                                         style: TextStyle(
@@ -761,12 +821,7 @@ class _DetailPageState extends State<DetailPage> {
                                             fontSize: 30.0,
                                             fontWeight: FontWeight.w800)),
                                     SizedBox(height: 10.0),
-                                    Text(
-                                        "Allergens", //scannedProduct.allergens?.names,
-                                        style: TextStyle(
-                                            fontFamily: "Poppins",
-                                            fontSize: 30.0,
-                                            fontWeight: FontWeight.w600))
+                                    _showAllergens()
                                   ],
                                 ))),
                       ))
@@ -822,153 +877,49 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
-  Widget _getSaturatedFatLevel() {
-    if (scannedProduct.nutriments?.saturatedFat != null) {
-      return Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Center(
-              child: Wrap(
-                spacing: 20,
-                runSpacing: 20.0,
-                children: <Widget>[
-                  SizedBox(
-                      width: 300.0,
-                      height: 180.0,
-                      child: Card(
-                        elevation: 2.0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0)),
-                        child: Center(
-                            child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  children: <Widget>[
-                                    const SizedBox(height: 10.0),
-                                    const Text("Saturated Fats",
-                                        style: TextStyle(
-                                          fontFamily: "Poppins",
-                                          fontSize: 25.0,
-                                          fontWeight: FontWeight.w800,
-                                        )),
-                                    const SizedBox(height: 10.0),
-                                    Text(
-                                        scannedProduct.nutriments!.saturatedFat
-                                                .toString() +
-                                            "g",
-                                        style: const TextStyle(
-                                          fontFamily: "Poppins",
-                                          fontSize: 30.0,
-                                          fontWeight: FontWeight.w600,
-                                        ))
-                                  ],
-                                ))),
-                      ))
-                ],
-              ),
-            ),
-          )
-        ],
-      );
-    } else {
-      return Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Center(
-              child: Wrap(
-                spacing: 20,
-                runSpacing: 20.0,
-                children: <Widget>[
-                  SizedBox(
-                      width: 300.0,
-                      height: 150.0,
-                      child: Card(
-                        elevation: 2.0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0)),
-                        child: Center(
-                            child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  children: const <Widget>[
-                                    SizedBox(height: 10.0),
-                                    Text("Saturated Fats",
-                                        style: TextStyle(
-                                            fontFamily: "Poppins",
-                                            fontSize: 25.0,
-                                            fontWeight: FontWeight.w800)),
-                                    SizedBox(height: 10.0),
-                                    Text("Not Found",
-                                        style: TextStyle(
-                                            fontFamily: "Poppins",
-                                            fontSize: 30.0,
-                                            fontWeight: FontWeight.w600))
-                                  ],
-                                ))),
-                      ))
-                ],
-              ),
-            ),
-          )
-        ],
-      );
-    }
-  }
-
   _pushToDatabase() {
-    final productRef = databaseReference.child("products/");
-    productRef
-        .push()
-        .set({
-          'productID': uuid.generateV4(),
-          "product": {
-            "productname": scannedProduct.productName ?? "",
-            'brand': scannedProduct.brands ?? "",
-            'category': scannedProduct.categories ?? "",
-            'calories': scannedProduct.nutriments?.energyKcal ?? 0,
-            'image': scannedProduct.imagePackagingUrl ?? 0,
-            'allergens': scannedProduct.allergens?.names ?? [""],
-            'fat': scannedProduct.nutriments?.fat ?? 0,
-            'saturatedFat': scannedProduct.nutriments?.saturatedFat ?? 0,
-            'salt': scannedProduct.nutriments?.salt ?? 0,
-            'sugar': scannedProduct.nutriments?.sugars ?? 0,
-            "scanTime": DateTime.now().toString()
-          },
-
-        })
-        .then((_) => print("Product was written to the database"))
-        .catchError((error) => print("Error: " + error));
+    final productRef =
+        databaseReference.child("users/" + user.uid + "/products");
+    if (widget.isFromScan == true) {
+      if (scannedProduct.productName != null) {
+        productRef
+            .push()
+            .set({
+              'productID': uuid.generateV4(),
+              "product": {
+                "code": scannedProduct.barcode,
+                "productname": scannedProduct.productName ?? "",
+                'brand': scannedProduct.brands ?? "",
+                'category': scannedProduct.categories ?? "",
+                'calories': scannedProduct.nutriments?.energyKcal ?? 0,
+                'image': scannedProduct.imagePackagingUrl ?? 0,
+                'allergens': scannedProduct.allergens?.names ?? [""],
+                'fat': scannedProduct.nutriments?.fat ?? 0,
+                'saturatedFat': scannedProduct.nutriments?.saturatedFat ?? 0,
+                'salt': scannedProduct.nutriments?.salt ?? 0,
+                'sugar': scannedProduct.nutriments?.sugars ?? 0,
+                "scanTime": DateTime.now().toString()
+              },
+            })
+            .then((_) => print("Product was written to the database"))
+            .catchError((error) => print("Error: " + error));
+      }
+    }
   }
 
   Widget? _buildPage() {
     if (productIsLoaded == false) {
       return const Center(child: CircularProgressIndicator());
-      //need a way to also check for the status of the scan
-      //if the result of that equals 0 then this progress indicator should disappear
-      //and a message saying the product couldn't be found would appear here
     } else {
-      // print(scanProperties.status);
-      // if (scanProperties.status == 0) {
-      //   return SingleChildScrollView(
-      //       child: Container(
-      //     alignment: Alignment.center,
-      //     child: Column(
-      //       children: [
-      //         Text("Product not found",
-      //             style: TextStyle(
-      //               fontFamily: "Poppins",
-      //               fontSize: 36,
-      //               fontWeight: FontWeight.bold,
-      //             )),
-      //         SizedBox(height: 10.0),
-      //         Text("Try scanning a different product")
-      //       ],
-      //     ),
-      //   ));
-      // }
-
+      Future.delayed(Duration.zero, () {
+        if (scannedProduct.nutriments?.energyKcal100g == null ||
+            scannedProduct.nutriments?.saturatedFat == null ||
+            scannedProduct.nutriments?.fat == null ||
+            scannedProduct.nutriments?.salt == null ||
+            scannedProduct.nutriments?.sugars == null) {
+          _manuallyAddDetailsPopUp();
+        }
+      });
       _pushToDatabase();
       return SingleChildScrollView(
         child: Column(
@@ -994,7 +945,6 @@ class _DetailPageState extends State<DetailPage> {
                       children: <Widget>[
                         SizedBox(
                             width: 300.0,
-                            height: 180.0,
                             child: Card(
                               elevation: 2.0,
                               shape: RoundedRectangleBorder(
@@ -1012,6 +962,7 @@ class _DetailPageState extends State<DetailPage> {
                                                   fontWeight: FontWeight.w800)),
                                           const SizedBox(height: 10.0),
                                           Text(scannedProduct.productName ?? "",
+                                              textAlign: TextAlign.center,
                                               style: const TextStyle(
                                                   fontFamily: "Poppins",
                                                   fontSize: 22.0,

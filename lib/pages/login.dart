@@ -1,6 +1,8 @@
+import 'package:Foodica/pages/init_allergens.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import "package:flutter/material.dart";
 import 'package:Foodica/utils/authentication.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'homescreen.dart';
 import 'register.dart';
@@ -155,13 +157,20 @@ class _LoginPageState extends State<LoginPage> {
                                     });
 
                                     if (user != null) {
-                                      Navigator.of(context).pushReplacement(
-                                        MaterialPageRoute(
-                                          builder: (context) => HomeScreenPage(
-                                            user: user,
+                                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                                      if (prefs.getString("allergen") != null) {
+                                        Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                            builder: (context) => HomeScreenPage(
+                                              user: user,
+                                            ),
                                           ),
-                                        ),
-                                      );
+                                        );
+                                      }
+                                      else {
+                                        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => InitAllergens(user: user)));
+                                      }
+
                                     }
                                   },
                                   child: const Text("Google",

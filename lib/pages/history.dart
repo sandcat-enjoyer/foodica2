@@ -1,5 +1,7 @@
+import 'package:Foodica/pages/productdetail.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:openfoodfacts/model/Product.dart';
 
@@ -17,6 +19,7 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   late User user;
+  DateTime selectedDate = DateTime.now();
   List<ScannedProduct> productList = [];
   var productKeys = [];
   var products = {};
@@ -37,48 +40,176 @@ class _HistoryPageState extends State<HistoryPage> {
 
   }
 
+  buildCupertinoDatePicker(BuildContext context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext builder) {
+          return Container(
+            height: MediaQuery.of(context).copyWith().size.height / 3,
+            color: Colors.white,
+            child: CupertinoDatePicker(
+              mode: CupertinoDatePickerMode.date,
+              onDateTimeChanged: (picked) {
+                if (picked != null && picked != selectedDate)
+                  setState(() {
+                    selectedDate = picked;
+                  });
+              },
+              initialDateTime: selectedDate,
+              minimumYear: 2000,
+              maximumYear: 2025,
+            ),
+          );
+        });
+  }
+
+  _setThemeForDatePicker() {
+    //need to set a fitting light theme since it's just default now
+    //but leaving it like this for now
+    var brightness = MediaQuery.of(context).platformBrightness;
+    bool isDarkMode = brightness == Brightness.dark;
+
+    if (isDarkMode) {
+      return ThemeData.dark();
+    } else {
+      return ThemeData.light();
+    }
+  }
+
+  buildMaterialDatePicker(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+      initialEntryMode: DatePickerEntryMode.calendar,
+      initialDatePickerMode: DatePickerMode.day,
+      cancelText: 'Cancel',
+      confirmText: 'Select',
+      errorFormatText: 'Enter valid date',
+      errorInvalidText: 'Enter date in valid range',
+      fieldLabelText: 'Date',
+      fieldHintText: 'Month/Date/Year',
+      builder: (context, child) {
+        return Theme(data: _setThemeForDatePicker(), child: child!);
+      },
+    );
+    if (picked != null && picked != selectedDate)
+      setState(() {
+        selectedDate = picked;
+      });
+    _dateFormatter(selectedDate);
+  }
+
+  String _dateFormatter(DateTime tm) {
+    DateTime today = DateTime.now();
+    Duration oneDay = const Duration(days: 1);
+    Duration twoDay = const Duration(days: 2);
+    String month;
+    switch (tm.month) {
+      case 1:
+        month = "January";
+        break;
+      case 2:
+        month = "February";
+        break;
+      case 3:
+        month = "March";
+        break;
+      case 4:
+        month = "April";
+        break;
+      case 5:
+        month = "May";
+        break;
+      case 6:
+        month = "June";
+        break;
+      case 7:
+        month = "July";
+        break;
+      case 8:
+        month = "August";
+        break;
+      case 9:
+        month = "September";
+        break;
+      case 10:
+        month = "October";
+        break;
+      case 11:
+        month = "November";
+        break;
+      case 12:
+        month = "December";
+        break;
+      default:
+        month = "Unknown";
+        break;
+    }
+
+    Duration difference = today.difference(tm);
+
+    if (difference.compareTo(oneDay) < 1) {
+      return "Today";
+    } else if (difference.compareTo(twoDay) < 1) {
+      return "Yesterday";
+    } else {
+      return "${tm.day} $month ${tm.year}";
+    }
+  }
+
   _buildHistory() {
     return FutureBuilder(
-        future: ref.child("/products/").orderByKey().get(),
+        future: ref.child("/users/" + user.uid + "/products").orderByKey().get(),
         builder: (context, AsyncSnapshot<DataSnapshot> snapshot) {
           if (snapshot.hasData) {
             productList.clear();
-            var values = snapshot.data!.value as Map<dynamic, dynamic>;
-            values.forEach((key, value) {
-              print(value["product"]["productname"]);
-              ScannedProduct newProduct = ScannedProduct(
-                  productID: value["productId"],
-                  productDetail: ProductDetail(
-                    productname: value["product"]["productname"],
-                    brand: value["product"]["brand"],
-                    sugar: value["product"]["sugar"].toString(),
-                    salt: value["product"]["salt"].toString(),
-                    fat: value["product"]["fat"].toString(),
-                    image: value["product"]["image"].toString(),
-                    category: value["product"]["category"],
-                    saturatedFat: value["product"]["saturatedFat"].toString(),
-                    calories: value["product"]["calories"].toString(),
-                    scanTime: DateTime.parse(value["product"]["scanTime"]),
-                  )
-              );
-              productList.add(newProduct);
-            });
+            print(snapshot.data!.value);
+            if (snapshot.data!.value != null) {
+              var values = snapshot.data!.value as Map<dynamic, dynamic>;
+              values.forEach((key, value) {
+                print(value["product"]["productname"]);
+                ScannedProduct newProduct = ScannedProduct(
+                    productID: value["productId"],
+                    productDetail: ProductDetail(
+                      productname: value["product"]["productname"],
+                      code: value["product"]["code"],
+                      brand: value["product"]["brand"],
+                      sugar: value["product"]["sugar"].toString(),
+                      salt: value["product"]["salt"].toString(),
+                      fat: value["product"]["fat"].toString(),
+                      image: value["product"]["image"].toString(),
+                      category: value["product"]["category"],
+                      saturatedFat: value["product"]["saturatedFat"].toString(),
+                      calories: value["product"]["calories"].toString(),
+                      scanTime: DateTime.parse(value["product"]["scanTime"]),
+                    )
+                );
+                productList.add(newProduct);
+              });
+            }
+
+
             return ListView.builder(
                 itemCount: productList.length,
                 shrinkWrap: true,
                 controller: scrollController,
                 itemBuilder: (BuildContext context, int position) {
+                  _deleteData() {
+                    Query dataQuery = ref.child("/users/" + user.uid + "/products/").orderByChild("productID").equalTo(productList[position].productID);
+
+                  }
                   return Container(
                       child: Column(
                         children: [
-
                           Center(
                             child: Wrap(
                               spacing: 20,
                               runSpacing: 20.0,
                               children: <Widget>[
                                 SizedBox(
-                                    width: 300.0,
+                                    width: 350.0,
                                     child: Card(
                                       elevation: 2.0,
                                       shape: RoundedRectangleBorder(
@@ -95,11 +226,48 @@ class _HistoryPageState extends State<HistoryPage> {
                                                           fontSize: 20.0,
                                                           fontWeight: FontWeight.w800)),
                                                   SizedBox(height: 10.0),
-                                                  Text("Category: " + productList[position].productDetail!.category!),
-                                                  Text("Scanned on: " + productList[position].productDetail!.scanTime.toString()),
+                                                  Text("Category: " + productList[position].productDetail!.category!, style: TextStyle(fontFamily: "Poppins"),),
+                                                  SizedBox(height: 10),
+                                                  Text("Scanned on: " + productList[position].productDetail!.scanTime.toString(), style: TextStyle(fontFamily: "Poppins")),
+                                                  Text("Fat: " + productList[position].productDetail!.fat.toString()),
                                                   TextButton(onPressed: () {
-                                                    debugPrint("Details about saved product");
-                                                  }, child: Text("More information"))
+                                                    debugPrint(productList[position].productDetail!.code ?? "Not Found");
+                                                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => DetailPage(barcode: productList[position].productDetail!.code ?? "", user: user, isFromScan: false,)));
+                                                  }, child: Text("More information")),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      showDialog(context: context, builder: (context) {
+                                                        return AlertDialog(
+                                                          shape: const RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.all(Radius.circular(20))
+                                                          ),
+                                                          title: const Text("Delete Product",
+                                                          style: TextStyle(
+                                                            fontFamily: "Poppins",
+                                                            fontWeight: FontWeight.bold
+                                                          )),
+                                                          content: StatefulBuilder(
+                                                            builder: (context, SBsetState) {
+                                                              return Text("Are you sure you want to delete this product from your history?");
+                                                            },
+                                                          ),
+                                                          actions: [
+                                                            TextButton(onPressed: () {
+                                                              Navigator.pop(context);
+
+                                                            }, child: Text("Delete", style: TextStyle(fontFamily: "Poppins", color: Colors.red))),
+                                                            TextButton(onPressed: () {
+                                                              Navigator.pop(context);
+                                                            }, child: Text("Cancel", style: TextStyle(fontFamily: "Poppins")))
+                                                          ],
+
+                                                        );
+                                                      });
+                                                    },
+                                                    child: Text("Delete Product", style: TextStyle(
+                                                      fontFamily: "Poppins", color: Colors.red
+                                                    ))
+                                                  )
                                                 ],
                                               ))),
                                     ))
@@ -124,10 +292,13 @@ class _HistoryPageState extends State<HistoryPage> {
 
 
 
+
+
   @override
   void initState() {
     super.initState();
     _getHistoryFromFirebase();
+    user = widget._user;
     print(products.toString());
   }
 

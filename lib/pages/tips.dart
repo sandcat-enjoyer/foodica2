@@ -27,7 +27,7 @@ class _TipsPageState extends State<TipsPage> {
                 alignment: Alignment.center,
                 children: [
                   Image.asset(
-                    "assets/drawer-header.jpg",
+                    "assets/allergencards/gluten1.jpg",
                     height: 240,
                     fit: BoxFit.cover,
                   ),
@@ -59,7 +59,7 @@ class _TipsPageState extends State<TipsPage> {
                 alignment: Alignment.center,
                 children: [
                   Image.asset(
-                    "assets/drawer-header.jpg",
+                    "assets/allergencards/gluten2.jpg",
                     height: 240,
                     fit: BoxFit.cover,
                   ),
@@ -92,7 +92,7 @@ class _TipsPageState extends State<TipsPage> {
                 alignment: Alignment.center,
                 children: [
                   Image.asset(
-                    "assets/drawer-header.jpg",
+                    "assets/allergencards/gluten3.jpg",
                     height: 240,
                     fit: BoxFit.cover,
                   ),
@@ -128,7 +128,7 @@ class _TipsPageState extends State<TipsPage> {
                 alignment: Alignment.center,
                 children: [
                   Image.asset(
-                    "assets/drawer-header.jpg",
+                    "assets/eggs1.jpg",
                     height: 240,
                     fit: BoxFit.cover,
                   ),
@@ -162,7 +162,7 @@ class _TipsPageState extends State<TipsPage> {
                 alignment: Alignment.center,
                 children: [
                   Image.asset(
-                    "assets/drawer-header.jpg",
+                    "assets/allergencards/eggs2.jpg",
                     height: 240,
                     fit: BoxFit.cover,
                   ),
@@ -199,7 +199,7 @@ class _TipsPageState extends State<TipsPage> {
                   alignment: Alignment.center,
                   children: [
                     Image.asset(
-                      "assets/drawer-header.jpg",
+                      "assets/soy1.jpg",
                       height: 240,
                       fit: BoxFit.cover,
                     ),
@@ -233,7 +233,7 @@ class _TipsPageState extends State<TipsPage> {
                   alignment: Alignment.center,
                   children: [
                     Image.asset(
-                      "assets/drawer-header.jpg",
+                      "assets/allergencards/soy2.jpg",
                       height: 240,
                       fit: BoxFit.cover,
                     ),
@@ -271,7 +271,7 @@ class _TipsPageState extends State<TipsPage> {
                 alignment: Alignment.center,
                 children: [
                   Image.asset(
-                    "assets/drawer-header.jpg",
+                    "assets/allergencards/peanut1.jpg",
                     height: 240,
                     fit: BoxFit.cover,
                   ),

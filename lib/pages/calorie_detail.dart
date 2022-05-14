@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
 import 'package:fl_chart/fl_chart.dart';
 import 'package:Foodica/models/scanned_product.dart';
-
+import 'dart:convert';
 import '../models/scanned_product.dart';
 
 class CalorieDetailPage extends StatefulWidget {
@@ -18,16 +18,18 @@ class CalorieDetailPage extends StatefulWidget {
 }
 
 class _CalorieDetailPageState extends State<CalorieDetailPage> {
-  PieChartSectionData _fat = PieChartSectionData(
-      color: Colors.red, value: 15, title: "Fat", radius: 50);
-  PieChartSectionData _sugar = PieChartSectionData(
-      color: Colors.blue, value: 10, title: "Sugar", radius: 50);
-  PieChartSectionData _salt = PieChartSectionData(
-      color: Colors.green, value: 12, title: "Salt", radius: 50);
+
+
+
   DateTime selectedDate = DateTime.now();
-  int? _fatValue;
-  int? _sugarValue;
-  int? _saltValue;
+  num _fatValue = 0;
+  num _sugarValue = 0;
+  late User user;
+  num _saturatedFatValue = 0;
+  num _calorieValue = 0;
+  ScrollController scrollController = ScrollController();
+  num _saltValue = 0;
+  List<PieChartSectionData> sections = [];
   DataSnapshot? snapshot;
   _selectDate(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -49,18 +51,389 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
               "https://foodica-9743c-default-rtdb.europe-west1.firebasedatabase.app")
       .ref();
 
-  _getData() async {
-    final snapshot =
-        await database.child("/products/").onChildAdded.forEach((event) {
-      print(event.snapshot.value);
-    });
-    if (snapshot.exists) {
-      print(snapshot!.key);
-      print(snapshot!.value);
-    } else {
-      print("No data found");
+
+  _resetOnReload() {
+      _fatValue = 0;
+      _saltValue = 0;
+      _saturatedFatValue = 0;
+      _sugarValue = 0;
+      _calorieValue = 0;
+      sections = [];
+  }
+  _getData() {
+
+    return FutureBuilder(
+      future: database.child("/users/" + user.uid + "/products").orderByKey().get(),
+      builder: (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
+    if(snapshot.hasData) {
+    products.clear();
+    _resetOnReload();
+    var values = snapshot.data!.value as Map<dynamic, dynamic>;
+    values.forEach((key, value) {
+    print(value["product"]["productname"]);
+    ScannedProduct newProduct = ScannedProduct(
+    productID: value["productId"],
+    productDetail: ProductDetail(
+    productname: value["product"]["productname"],
+    brand: value["product"]["brand"],
+    sugar: value["product"]["sugar"].toString(),
+    salt: value["product"]["salt"].toString(),
+    fat: value["product"]["fat"].toString(),
+    image: value["product"]["image"].toString(),
+    category: value["product"]["category"],
+    saturatedFat: value["product"]["saturatedFat"].toString(),
+    calories: value["product"]["calories"].toString(),
+    scanTime: DateTime.parse(value["product"]["scanTime"]),
+    )
+    );
+    if (newProduct.productDetail?.scanTime?.day == selectedDate.day) {
+      products.add(newProduct);
     }
-    setState(() {});
+    });
+
+    return ListView.builder(itemCount: 1,
+    shrinkWrap: true,
+    controller: scrollController,
+    itemBuilder: (BuildContext context, int pos) {
+      return SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.all(20),
+            child: Column(
+              children: [
+                Container(
+                    alignment: Alignment.topLeft,
+                    child: Text("Details",
+                        style: TextStyle(
+                            fontFamily: "Poppins",
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold
+                        ))
+                ),
+                SizedBox(height: 10),
+                Container(
+                    alignment: Alignment.topLeft,
+                    child: Text(_dateFormatter(selectedDate),
+                    style: TextStyle(
+                      fontFamily: "Poppins",
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22
+                    ))
+                ),
+
+                _buildChart(),
+                Container(
+                    child: Center(
+                        child: Wrap(
+                          runSpacing: 20.0,
+                          children: <Widget>[
+                            Row(
+                              children: [
+                                Center(
+                                  child:Container(
+                                    width: 370.0,
+                                    height: 200.0,
+                                    alignment: Alignment.center,
+                                    child: Card(
+                                      elevation: 2.0,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8.0)),
+                                      child: Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              children: <Widget>[
+                                                const SizedBox(
+                                                  height: 10.0,
+                                                ),
+                                                const Icon(
+                                                  Icons.run_circle,
+                                                  size: 60,
+                                                ),
+                                                const Text(
+                                                  "Calories Consumed",
+                                                  style: TextStyle(
+                                                      fontFamily: "Poppins",
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 23.0),
+                                                ),
+                                                const SizedBox(
+                                                  height: 5.0,
+                                                ),
+                                                Text(
+                                                  _calorieValue.toStringAsFixed(2) + " Kcal",
+                                                  style: const TextStyle(
+                                                    fontFamily: "Poppins",
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 20.0,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          )),
+                                    ),
+                                  ),
+                                )
+
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Container(
+                                  width: 180.0,
+                                  height: 200.0,
+                                  alignment: Alignment.centerLeft,
+                                  child: Card(
+                                    elevation: 2.0,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8.0)),
+                                    child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            children: <Widget>[
+                                              const SizedBox(
+                                                height: 10.0,
+                                              ),
+                                              const Icon(
+                                                Icons.run_circle,
+                                                size: 60,
+                                              ),
+                                              const Text(
+                                                "Fat",
+                                                style: TextStyle(
+                                                    fontFamily: "Poppins",
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 23.0),
+                                              ),
+                                              const SizedBox(
+                                                height: 5.0,
+                                              ),
+                                              Text(
+                                                _fatValue.toStringAsFixed(2) + "g",
+                                                style: const TextStyle(
+                                                  fontFamily: "Poppins",
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 20.0,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        )),
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                Container(
+                                  width: 180.0,
+                                  height: 200.0,
+                                  alignment: Alignment.centerRight,
+                                  child: Card(
+                                    elevation: 2.0,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8.0)),
+                                    child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            children: <Widget>[
+                                              const SizedBox(
+                                                height: 10.0,
+                                              ),
+                                              const Icon(
+                                                Icons.run_circle,
+                                                size: 60,
+                                              ),
+                                              const Text(
+                                                "Salt",
+                                                style: TextStyle(
+                                                    fontFamily: "Poppins",
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 23.0),
+                                              ),
+                                              const SizedBox(
+                                                height: 5.0,
+                                              ),
+                                              Text(
+                                                _saltValue.toStringAsFixed(2) + "g",
+                                                style: const TextStyle(
+                                                  fontFamily: "Poppins",
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 20.0,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        )),
+                                  ),
+                                ),
+
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                              children: [
+                                Container(
+                                  width: 180.0,
+                                  height: 200,
+                                  alignment: Alignment.centerRight,
+                                  child: Card(
+                                    elevation: 2.0,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8.0)),
+                                    child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            children: <Widget>[
+                                              const SizedBox(
+                                                height: 10.0,
+                                              ),
+                                              const Icon(
+                                                Icons.run_circle,
+                                                size: 60,
+                                              ),
+                                              const Text(
+                                                "Saturated\nFat", textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontFamily: "Poppins",
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 23.0),
+                                              ),
+                                              const SizedBox(
+                                                height: 5.0,
+                                              ),
+                                              Text(
+                                                _saturatedFatValue.toStringAsFixed(2) + "g",
+                                                style: const TextStyle(
+                                                  fontFamily: "Poppins",
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 20.0,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        )),
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                Container(
+                                  width: 180.0,
+                                  height: 200.0,
+                                  alignment: Alignment.centerRight,
+                                  child: Card(
+                                    elevation: 2.0,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8.0)),
+                                    child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            children: <Widget>[
+                                              const SizedBox(
+                                                height: 10.0,
+                                              ),
+                                              const Icon(
+                                                Icons.run_circle,
+                                                size: 60,
+                                              ),
+                                              const Text(
+                                                "Sugar",
+                                                style: TextStyle(
+                                                    fontFamily: "Poppins",
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 23.0),
+                                              ),
+                                              const SizedBox(
+                                                height: 5.0,
+                                              ),
+                                              Text(
+                                                _sugarValue.toStringAsFixed(2) + "g",
+                                                style: const TextStyle(
+                                                  fontFamily: "Poppins",
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 20.0,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        )),
+                                  ),
+                                ),
+                              ],
+                            )
+
+                          ],
+                        )))
+
+
+              ],
+            )
+        )
+
+
+      );
+
+    });
+
+    }
+    else {
+      return const Center(
+        child: CircularProgressIndicator(color: Colors.red)
+      );
+    }
+
+    });
+
+  }
+
+  _buildChart() {
+    products.forEach((element) {
+        _fatValue += double.parse(element.productDetail!.fat ?? "0");
+        _saltValue += double.parse(element.productDetail!.salt ?? "0");
+        _calorieValue += double.parse(element.productDetail!.calories ?? "0");
+        _sugarValue += double.parse(element.productDetail!.sugar ?? "0");
+        _saturatedFatValue += double.parse(element.productDetail!.saturatedFat ?? "0");
+    });
+    PieChartSectionData _fat = PieChartSectionData(
+        color: Colors.red, value: _fatValue.toDouble(), title: "Fat", radius: 90, titleStyle: TextStyle(
+      fontFamily: "Poppins",
+
+    ));
+    PieChartSectionData _sugar = PieChartSectionData(
+        color: Colors.blue, value: _sugarValue.toDouble(), title: "Sugar", radius: 90, titleStyle: TextStyle(
+        fontFamily: "Poppins",
+
+    ));
+    PieChartSectionData _salt = PieChartSectionData(
+        color: Colors.green, value: _saltValue.toDouble(), title: "Salt", radius: 90, titleStyle: TextStyle(
+        fontFamily: "Poppins",
+
+    ));
+    PieChartSectionData _saturatedFat = PieChartSectionData(
+      color: Colors.orange, value: _saturatedFatValue.toDouble(), title: "Saturated Fat", radius: 90, titleStyle: TextStyle(
+        fontFamily: "Poppins",
+    )
+    );
+    sections.add(_fat);
+    sections.add(_sugar);
+    sections.add(_salt);
+    sections.add(_saturatedFat);
+    return SizedBox(
+        width: 400,
+        height: 400,
+        child: Column(children: <Widget>[
+          AspectRatio(
+            aspectRatio: 1,
+            child: PieChart(
+              PieChartData(
+                sections: sections,
+                borderData: FlBorderData(show: false),
+                centerSpaceRadius: 90,
+                sectionsSpace: 9,
+              ),
+            ),
+          ),
+        ])
+    );
   }
 
   buildCupertinoDatePicker(BuildContext context) {
@@ -185,17 +558,22 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
   @override
   void initState() {
     super.initState();
-    _getData();
+    user = widget._user;
+    products.clear();
+
+    sections.clear();
   }
 
   @override
   void dispose() {
     super.dispose();
+    products.clear();
+    sections.clear();
   }
 
   @override
   Widget build(BuildContext context) {
-    final _sections = [_fat, _sugar, _salt];
+    products.clear();
     return Scaffold(
         appBar: AppBar(
             title: const Text("Details",
@@ -208,51 +586,8 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
               )
             ]),
         body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                  alignment: Alignment.topLeft,
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    children: [
-                      const Text("Details",
-                          style: TextStyle(
-                              fontFamily: "Poppins",
-                              fontSize: 36,
-                              fontWeight: FontWeight.bold)),
-                      SizedBox(height: 8.0),
-                      Text(
-                        _dateFormatter(selectedDate),
-                        textAlign: TextAlign.left,
-                        style: const TextStyle(
-                            fontFamily: "Poppins",
-                            fontSize: 24,
-                            fontWeight: FontWeight.w600),
-                      )
-                    ],
-                  )),
-              SizedBox(
-                  width: 300,
-                  height: 300,
-                  child: Column(children: <Widget>[
-                    AspectRatio(
-                      aspectRatio: 1,
-                      child: PieChart(
-                        PieChartData(
-                          sections: _sections,
-                          borderData: FlBorderData(show: false),
-                          centerSpaceRadius: 90,
-                          sectionsSpace: 9,
-                        ),
-                      ),
-                    ),
-                  ])),
-              Container(
-                  alignment: Alignment.topLeft,
-                  padding: const EdgeInsets.all(20.0),
-                  child: const Text("Fats consumed: "))
-            ],
-          ),
+          child: _getData()
+
         ));
   }
 }

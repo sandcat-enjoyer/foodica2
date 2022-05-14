@@ -19,6 +19,7 @@ class ScannedProduct {
 
 class ProductDetail {
   List<String>? allergens;
+  String? code;
   String? referenceId;
   String? brand;
   String? calories;
@@ -33,6 +34,7 @@ class ProductDetail {
 
   ProductDetail(
       {this.allergens,
+        this.code,
       this.brand,
       this.referenceId,
       this.calories,
@@ -48,6 +50,7 @@ class ProductDetail {
   factory ProductDetail.fromJson(Map<String, dynamic> json) {
     return ProductDetail(
         allergens: null,
+        code: json["code"] ?? "",
         brand: json["brand"] ?? "",
         calories: json["calories"] ?? "",
         category: json["category"] ?? "",

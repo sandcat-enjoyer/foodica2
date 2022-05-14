@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,7 +9,9 @@ import '../utils/authentication.dart';
 import 'login.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({Key? key, required User user}) : _user = user, super(key: key);
+
+  final User _user;
 
   @override
   _SettingsPageState createState() => _SettingsPageState();
@@ -22,11 +26,18 @@ class _SettingsPageState extends State<SettingsPage> {
   bool peanuts = false;
   bool soy = false;
   bool _isSigningOut = false;
+  late User user;
+
+  final databaseReference = FirebaseDatabase(
+      databaseURL:
+      "https://foodica-9743c-default-rtdb.europe-west1.firebasedatabase.app")
+      .ref();
 
   @override
   void initState() {
     super.initState();
-    _getWeeklyCalorieGoal();
+    user = widget._user;
+    _getDailyCalorieGoal();
   }
 
   @override
@@ -59,28 +70,31 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
   int? _weeklyCaloriesGoalInt = 0;
+  int? _dailyCaloriesGoalInt = 0;
 
-  _getWeeklyCalorieGoal() async {
+
+
+  _getDailyCalorieGoal() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _weeklyCaloriesGoalInt = prefs.getInt("goal");
+      _dailyCaloriesGoalInt = prefs.getInt("goal");
     });
   }
 
-  _checkIfWeeklyCaloriesIsNull() {
-    if (_weeklyCaloriesGoalInt == null) {
+  _checkIfDailyCaloriesIsNull() {
+    if (_dailyCaloriesGoalInt == 0) {
       return "No calorie goal set";
     } else {
-      return _weeklyCaloriesGoalInt.toString() + " calories";
+      return _dailyCaloriesGoalInt.toString() + " calories";
     }
   }
 
   _nullCheckNumPicker() {
-    if (_weeklyCaloriesGoalInt == null) {
+    if (_dailyCaloriesGoalInt == null) {
       return 2400; //give a random value instead of 0 to avoid null errors,
       // doesn't really matter in the picker anyway
     } else {
-      return _weeklyCaloriesGoalInt;
+      return _dailyCaloriesGoalInt;
     }
   }
 
@@ -101,7 +115,16 @@ class _SettingsPageState extends State<SettingsPage> {
                     style: TextStyle(fontFamily: "Poppins"))),
             actions: [
               TextButton(
-                  onPressed: () {},
+                  onPressed: ()
+          {
+            databaseReference.child("users/" + user.uid + "/products")
+                .remove()
+                .then((value) => {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("History Deleted"))),
+                  Navigator.of(context).pop()
+            }
+            );
+          },
                   child: const Text("Delete",
                       style: TextStyle(fontFamily: "Poppins"))),
               TextButton(
@@ -143,8 +166,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         fontSize: 24),
                     value: _nullCheckNumPicker(),
                     onChanged: (value) {
-                      setState(() => _weeklyCaloriesGoalInt = value);
-                      SBsetState(() => _weeklyCaloriesGoalInt = value);
+                      setState(() => _dailyCaloriesGoalInt = value);
+                      SBsetState(() => _dailyCaloriesGoalInt = value);
                     },
                     step: 100);
               },
@@ -153,7 +176,7 @@ class _SettingsPageState extends State<SettingsPage> {
               TextButton(
                   onPressed: () async {
                     final prefs = await SharedPreferences.getInstance();
-                    await prefs.setInt("goal", _weeklyCaloriesGoalInt!);
+                    await prefs.setInt("goal", _dailyCaloriesGoalInt!);
                     Navigator.pop(context);
                   },
                   child: const Text("Done",
@@ -295,15 +318,25 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    _setThemeTextColor() {
+      var brightness = MediaQuery.of(context).platformBrightness;
+      bool isDarkMode = brightness == Brightness.dark;
+
+      if (isDarkMode) {
+        return Colors.white;
+      } else {
+        return Colors.black;
+      }
+    }
     return Scaffold(
         body: Row(
       children: [
         SettingsList(sections: [
           SettingsSection(
-              title: const Text("Settings",
+              title: Text("Settings",
                   style: TextStyle(
                       fontFamily: "Poppins",
-                      color: Colors.black,
+                      color: _setThemeTextColor(),
                       fontSize: 35.0,
                       fontWeight: FontWeight.bold)),
               tiles: <SettingsTile>[
@@ -328,8 +361,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       style: TextStyle(
                           fontFamily: "Poppins", fontWeight: FontWeight.bold)),
                   value: Text(
-                      "Set your weekly calorie goal. Current goal: " +
-                          _checkIfWeeklyCaloriesIsNull(),
+                      "Set your daily calorie goal. Current goal: " +
+                          _checkIfDailyCaloriesIsNull(),
                       style: const TextStyle(
                           fontFamily: "Poppins", fontWeight: FontWeight.w500)),
                 ),
@@ -364,10 +397,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ]),
           SettingsSection(
-              title: const Text("About",
+              title: Text("About",
                   style: TextStyle(
                       fontFamily: "Poppins",
-                      color: Colors.black,
+                      color: _setThemeTextColor(),
                       fontWeight: FontWeight.bold,
                       fontSize: 25.0)),
               tiles: [
