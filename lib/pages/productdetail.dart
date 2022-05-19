@@ -44,6 +44,7 @@ class _DetailPageState extends State<DetailPage> {
   Product scannedProduct = Product();
 
   bool productIsLoaded = false;
+  bool? productFound;
   String productImgUrl = "";
 
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
@@ -75,12 +76,29 @@ class _DetailPageState extends State<DetailPage> {
             allergens.add(element);
           });
           productIsLoaded = true;
-
           _saveCaloriesToMemory();
         });
       });
     } else {
-      throw Exception("Product not found");
+      showDialog(context: context, builder: (context) {
+        return AlertDialog(
+          title: Text("Product not found", style: TextStyle(
+            fontFamily: "Poppins",
+            fontWeight: FontWeight.bold
+          ),),
+          content: Text("Try scanning the product barcode again. If that doesn't work, add the details of this product manually.",
+          style: TextStyle(
+            fontFamily: "Poppins"
+          )),
+          actions: [
+            TextButton(onPressed: () {
+              Navigator.pop(context);
+            }, child: Text("Close", style: TextStyle(
+              fontFamily: "Poppins"
+            ),))
+          ],
+        );
+      });
     }
   }
 
@@ -403,18 +421,18 @@ class _DetailPageState extends State<DetailPage> {
                     ScannedProduct product = ScannedProduct(
                         productID: uuid.generateV4(),
                         productDetail: ProductDetail(
+                          code: scannedProduct.barcode,
                           productname: scannedProduct.productName ?? "",
                           brand: scannedProduct.brands ?? "",
                           calories: scannedProduct.nutriments!.energyKcal100g
                               .toString(),
-                          fat: scannedProduct.nutriments?.fat.toString(),
-                          salt: scannedProduct.nutriments?.salt.toString(),
-                          sugar: scannedProduct.nutriments?.sugars.toString(),
+                          fat: scannedProduct.nutriments?.fat.toString() ?? "0",
+                          salt: scannedProduct.nutriments?.salt.toString() ?? "0",
+                          sugar: scannedProduct.nutriments?.sugars.toString() ?? "0",
                           image: scannedProduct.imagePackagingUrl ?? "",
                           scanTime: DateTime.now(),
                           allergens: scannedProduct.allergens!.names,
-                          saturatedFat: scannedProduct.nutriments!.saturatedFat!
-                              .toString(),
+                          saturatedFat: scannedProduct.nutriments?.saturatedFat.toString() ?? "",
                           category: scannedProduct.categories ?? "",
                         ));
                     Navigator.of(context).push(MaterialPageRoute(

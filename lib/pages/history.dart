@@ -4,6 +4,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:openfoodfacts/model/Product.dart';
+import 'package:intl/intl.dart';
 
 import '../models/scanned_product.dart';
 
@@ -29,16 +30,9 @@ class _HistoryPageState extends State<HistoryPage> {
       databaseURL:
       "https://foodica-9743c-default-rtdb.europe-west1.firebasedatabase.app")
       .ref();
-  _getHistoryFromFirebase() async {
 
-    DatabaseEvent event = await ref.child("/products/").once();
+  final DateFormat formatter = DateFormat("dd/M/yyyy");
 
-
-
-    print(event.snapshot.value);
-
-
-  }
 
   buildCupertinoDatePicker(BuildContext context) {
     showModalBottomSheet(
@@ -161,7 +155,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
   _buildHistory() {
     return FutureBuilder(
-        future: ref.child("/users/" + user.uid + "/products").orderByKey().get(),
+        future: ref.child("/users/" + user.uid + "/products/").orderByKey().get(),
         builder: (context, AsyncSnapshot<DataSnapshot> snapshot) {
           if (snapshot.hasData) {
             productList.clear();
@@ -221,19 +215,21 @@ class _HistoryPageState extends State<HistoryPage> {
                                                 children: <Widget>[
                                                   SizedBox(height: 10.0),
                                                   Text(productList[position].productDetail?.productname ?? "",
+                                                      textAlign: TextAlign.center,
                                                       style: TextStyle(
                                                           fontFamily: "Poppins",
                                                           fontSize: 20.0,
                                                           fontWeight: FontWeight.w800)),
                                                   SizedBox(height: 10.0),
-                                                  Text("Category: " + productList[position].productDetail!.category!, style: TextStyle(fontFamily: "Poppins"),),
+                                                  Image.network(productList[position].productDetail!.image ?? "", width: 100,),
+                                                  Text("Category: " + productList[position].productDetail!.category!, style: TextStyle(fontFamily: "Poppins", fontSize: 18, fontWeight: FontWeight.w500),),
                                                   SizedBox(height: 10),
-                                                  Text("Scanned on: " + productList[position].productDetail!.scanTime.toString(), style: TextStyle(fontFamily: "Poppins")),
-                                                  Text("Fat: " + productList[position].productDetail!.fat.toString()),
+                                                  Text("Scanned on: " + formatter.format(productList[position].productDetail!.scanTime!).toString(), style: TextStyle(fontFamily: "Poppins", fontSize: 18, fontWeight: FontWeight.w500)),
+                                                  SizedBox(height: 10),
                                                   TextButton(onPressed: () {
                                                     debugPrint(productList[position].productDetail!.code ?? "Not Found");
                                                     Navigator.of(context).push(MaterialPageRoute(builder: (context) => DetailPage(barcode: productList[position].productDetail!.code ?? "", user: user, isFromScan: false,)));
-                                                  }, child: Text("More information")),
+                                                  }, child: Text("More information", style: TextStyle(fontFamily: "Poppins", fontWeight: FontWeight.bold))),
                                                   TextButton(
                                                     onPressed: () {
                                                       showDialog(context: context, builder: (context) {
@@ -297,7 +293,6 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   void initState() {
     super.initState();
-    _getHistoryFromFirebase();
     user = widget._user;
     print(products.toString());
   }

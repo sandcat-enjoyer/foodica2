@@ -18,15 +18,13 @@ class CalorieDetailPage extends StatefulWidget {
 }
 
 class _CalorieDetailPageState extends State<CalorieDetailPage> {
-
-
-
   DateTime selectedDate = DateTime.now();
   num _fatValue = 0;
   num _sugarValue = 0;
   late User user;
   num _saturatedFatValue = 0;
   num _calorieValue = 0;
+  BouncingScrollPhysics bouncingScrollPhysics = BouncingScrollPhysics();
   ScrollController scrollController = ScrollController();
   num _saltValue = 0;
   List<PieChartSectionData> sections = [];
@@ -60,8 +58,16 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
       _calorieValue = 0;
       sections = [];
   }
-  _getData() {
 
+  String _encodeUserEmail(String  userEmail) {
+    return userEmail.replaceAll(".", ",");
+  }
+
+  String _decodeUserEmail(String userEmail) {
+    return userEmail.replaceAll(",", ".");
+  }
+  _getData() {
+    print(user.uid);
     return FutureBuilder(
       future: database.child("/users/" + user.uid + "/products").orderByKey().get(),
       builder: (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {

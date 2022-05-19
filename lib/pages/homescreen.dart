@@ -1,8 +1,10 @@
 import 'dart:ui';
 
+import 'package:Foodica/pages/init_allergens.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -31,9 +33,6 @@ class HomeScreenPage extends StatefulWidget {
 
 class _HomeScreenPageState extends State<HomeScreenPage> {
   late User _user;
-
-  //i genuinely forgot how to easily concatenate strings in dart
-  //so for now i just append 2 numbers in a string and return the value of that
   String? weeklyDisplayValue;
   String displayName = "";
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
@@ -43,12 +42,17 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   String lastProductName = "";
   Color? bgColor;
   String allergen = "";
+  String? today;
+  BouncingScrollPhysics bouncingScrollPhysics = BouncingScrollPhysics();
 
-  late int? _weeklyCaloriesInt = 0;
-  late int? _dailyCaloriesInt = 0;
-  late int? _calorieGoalInt = 0;
+  final DateFormat formatter = DateFormat("dd/mm/yyyy");
+
+  int? _weeklyCaloriesInt;
+  int? _dailyCaloriesInt;
+  int? _calorieGoalInt;
 
   _checkIfWeeklyCaloriesIsNull() {
+    _getWeeklyCalories();
     _getCalorieGoal();
     if (_weeklyCaloriesInt == null) {
       return "0/" + _calorieGoalInt.toString() + " Kcal";
@@ -57,7 +61,10 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
     }
   }
 
+
+
   _checkIfDailyCaloriesIsNull() {
+    _getDailyCalories();
     _getCalorieGoal();
     if (_dailyCaloriesInt == null) {
       return "0/" + _calorieGoalInt.toString() + "Kcal";
@@ -81,6 +88,9 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   void initState() {
     super.initState();
     _user = widget._user;
+    setState(() {
+      today = formatter.format(DateTime.now());
+    });
     _getWeeklyCalories();
     _getDailyCalories();
     _getLastScannedProduct();
@@ -95,20 +105,25 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
 
   void _getWeeklyCalories() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
     setState(() {
       _weeklyCaloriesInt = prefs.getInt("weekly");
     });
+
   }
 
   void _getDailyCalories() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
     setState(() {
       _dailyCaloriesInt = prefs.getInt("daily");
     });
+
   }
 
   void _getLastScannedProduct() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
     setState(() {
       lastProductName = prefs.getString("productname")!;
     });
@@ -121,7 +136,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
 
   void _reloadLocalStorage() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.reload();
+    await prefs.reload();
   }
 
   String _checkProfileName() {
@@ -182,6 +197,199 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
 
   Widget? _buildHomeScreen() {
     if (mainWidget == null) {
+      return ListView(
+        physics: bouncingScrollPhysics,
+        children: [
+          Column(
+            children: [
+              Container(
+                alignment: Alignment.center,
+                padding: const EdgeInsets.all(20.0),
+                child: const Text("Today",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontFamily: "Poppins",
+                        fontSize: 45)),
+              ),
+              Column(
+                children: [
+                  Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Center(
+                          child: Wrap(
+                            spacing: 20,
+                            runSpacing: 20.0,
+                            children: <Widget>[
+                              SizedBox(
+                                width: 350.0,
+                                height: 200.0,
+                                child: Card(
+                                  elevation: 2.0,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0)),
+                                  child: InkWell(
+                                    child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            children: <Widget>[
+                                              const SizedBox(
+                                                height: 10.0,
+                                              ),
+                                              const Icon(
+                                                Icons.run_circle,
+                                                size: 60,
+                                              ),
+                                              const Text(
+                                                "Calories Consumed",
+                                                style: TextStyle(
+                                                    fontFamily: "Poppins",
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 30.0),
+                                              ),
+                                              const SizedBox(
+                                                height: 5.0,
+                                              ),
+                                              Text(
+                                                _checkIfDailyCaloriesIsNull(),
+                                                style: const TextStyle(
+                                                  fontFamily: "Poppins",
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 20.0,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        )),
+                                    onTap: () => Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                CalorieDetailPage(user: _user))),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )))
+                ],
+              ),
+              Column(
+                children: [
+                  Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Center(
+                          child: Wrap(
+                            spacing: 20,
+                            runSpacing: 20.0,
+                            children: <Widget>[
+                              SizedBox(
+                                width: 350.0,
+                                child: Card(
+                                  elevation: 2.0,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0)),
+                                  child: Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          children: <Widget>[
+                                            const SizedBox(
+                                              height: 10.0,
+                                            ),
+                                            const Icon(
+                                              Icons.qr_code,
+                                              size: 60,
+                                            ),
+                                            const Text(
+                                              "Last scanned product",
+                                              style: TextStyle(
+                                                  fontFamily: "Poppins",
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 25.0),
+                                            ),
+                                            const SizedBox(
+                                              height: 5.0,
+                                            ),
+                                            Text(
+                                              _checkIfLastScannedProductIsNull(),
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                fontFamily: "Poppins",
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 20.0,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      )),
+                                ),
+                              ),
+                            ],
+                          )))
+                ],
+              ),
+              Column(
+                children: [
+                  Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Center(
+                          child: Wrap(
+                            spacing: 20,
+                            runSpacing: 20.0,
+                            children: <Widget>[
+                              SizedBox(
+                                width: 350.0,
+                                height: 200.0,
+                                child: Card(
+                                    elevation: 2.0,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8.0)),
+                                    child: InkWell(
+                                      onTap: () {
+
+                                      },
+                                      child: Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              children: <Widget>[
+                                                const SizedBox(
+                                                  height: 10.0,
+                                                ),
+                                                const Icon(
+                                                  Icons.food_bank_outlined,
+                                                  size: 60,
+                                                ),
+                                                const Text(
+                                                  "Weekly Calories",
+                                                  style: TextStyle(
+                                                      fontFamily: "Poppins",
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 30.0),
+                                                ),
+                                                const SizedBox(
+                                                  height: 5.0,
+                                                ),
+                                                Text(
+                                                  _checkIfWeeklyCaloriesIsNull(),
+                                                  style: const TextStyle(
+                                                    fontFamily: "Poppins",
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 20.0,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          )),
+                                    )),
+                              ),
+                            ],
+                          )))
+                ],
+              ),
+            ],
+          )
+        ],
+      );
       return SingleChildScrollView(
           child: Column(children: [
         Container(
@@ -413,6 +621,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
           child: ListView(
             // Important: Remove any padding from the ListView.
             padding: EdgeInsets.zero,
+            physics: bouncingScrollPhysics,
             children: [
               UserAccountsDrawerHeader(
                 accountEmail: Text(_user.email!,
@@ -482,29 +691,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                   Navigator.pop(context);
                 },
               ),
-              ListTile(
-                title: RichText(
-                  text: TextSpan(children: [
-                    const WidgetSpan(child: Icon(Icons.pie_chart, size: 22)),
-                    TextSpan(
-                        text: "Calorie Details",
-                        style: TextStyle(
-                          fontFamily: "Poppins",
-                          color: _setNavTextColor(),
-                        ))
-                  ]),
-                ),
-                onTap: () {
-                  // Update the state of the app.
-                  // ...
-                  setState(() {
-                    mainWidget = CalorieDetailPage(user: _user);
-                  });
-                  Navigator.pop(context);
-                },
-              ),
-
-
               ListTile(
                 title: RichText(
                   text: TextSpan(children: [

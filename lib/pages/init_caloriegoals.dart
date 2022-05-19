@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:Foodica/pages/homescreen.dart';
 import 'package:numberpicker/numberpicker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class InitCalorieGoal extends StatefulWidget {
   const InitCalorieGoal({Key? key, required User user})
@@ -126,8 +127,10 @@ class _InitCalorieGoalState extends State<InitCalorieGoal> {
                 child: ElevatedButton(
                     style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(Colors.red)),
-                    onPressed: () {
-                      //functionality to save calories to localStorage
+                    onPressed: () async {
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      prefs.setInt("goal", calorieGoalDaily);
+                      print(prefs.getInt("goal"));
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => HomeScreenPage(user: user)));
                     },
