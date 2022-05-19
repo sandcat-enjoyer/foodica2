@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'homescreen.dart';
+import 'init_caloriegoals.dart';
 
 class InitAllergens extends StatefulWidget {
   const InitAllergens({Key? key, required User user})
@@ -25,6 +26,7 @@ class _InitAllergensState extends State<InitAllergens> {
   late User user;
 
   String allergen = "";
+  int? calorieGoal;
 
   @override
   void initState() {
@@ -166,9 +168,23 @@ class _InitAllergensState extends State<InitAllergens> {
                         }),
                     SizedBox(height: 100.0),
                     TextButton(
-                        onPressed: () => {
-                          _determineAllergenToSave(),
-                          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomeScreenPage(user: user)))
+                        onPressed: () async {
+                          _determineAllergenToSave();
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                          setState(() {
+                            calorieGoal = prefs.getInt("goal");
+                          });
+                          print(calorieGoal);
+                          if (calorieGoal == null) {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) =>
+                                    InitCalorieGoal(user: user)));
+                          }
+                          else {
+                            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomeScreenPage(user: user)));
+                          }
+
+
                         },
                         child: const Text("Done",
                             style: TextStyle(

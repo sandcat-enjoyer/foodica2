@@ -9,18 +9,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 
 import '../models/scanned_product.dart';
+import '../utils/uuid.dart';
 
 class ManualFoodPage extends StatefulWidget {
   const ManualFoodPage({Key? key, required User user, ScannedProduct? product}) : product = product, _user = user,
         super(key: key);
-
   final User _user;
   final ScannedProduct? product;
-
-
-
-
-
   @override
   _ManualFoodPageState createState() => _ManualFoodPageState();
 }
@@ -28,6 +23,7 @@ class ManualFoodPage extends StatefulWidget {
 class _ManualFoodPageState extends State<ManualFoodPage> {
     late User user;
     var storage = FirebaseStorage.instance;
+    Uuid uuid = Uuid();
     String productName = "";
     String brand = "";
     String category = "";
@@ -41,6 +37,7 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
 
     final productNameController = TextEditingController();
     final brandController = TextEditingController();
+    final categoryController = TextEditingController();
     final caloriesController = TextEditingController();
     final fatController = TextEditingController();
     final saltController = TextEditingController();
@@ -111,9 +108,6 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
         if (photo == null) return;
         var uid = user.uid;
         var fileName = basename(photo!.path);
-
-
-
         try {
           var destination = "users/" + user.uid + "/products";
           var storageRef = storage.ref(destination).child(user.uid + "/");
@@ -129,29 +123,30 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
         catch (e) {
           print("Error");
         }
-
-
-
       }
-
-
     }
 
     _saveProductToFirebase() {
-      final productRef = databaseReference.child("products/");
+      final productRef = databaseReference.child("/users/" + user.uid + "/products/");
       productRef
           .push()
           .set({
-        'productname': productName,
-        'brand': brand,
-        'category': category,
-        'calories': calories,
-        'image': imagePath,
-        'allergens': allergens,
-        'fat': fat,
-        'saturatedFat': saturatedFat,
-        'salt': salt,
-        'sugar': sugar
+        "productID": uuid.generateV4(),
+        "product": {
+          "code": widget.product?.productDetail?.code,
+          'productname': productName,
+          'brand': brand,
+          'category': category,
+          'calories': double.parse(calories),
+          'image': imagePath,
+          'allergens': allergens,
+          'fat': double.parse(fat) ,
+          'saturatedFat': double.parse(saturatedFat) ,
+          'salt': double.parse(salt),
+          'sugar': double.parse(sugar),
+          "scanTime": DateTime.now().toString()
+        }
+
       })
           .then((_) => print("Product was written to the database"))
           .catchError((error) => print("Error: " + error));
@@ -211,7 +206,6 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                 onChanged: (value) => {
                     productName = value.trim()
                 }
-
               ),
             ),
 
@@ -224,6 +218,17 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
               ),
               onChanged: (value) {
                 brand = value.trim();
+              },
+            )),
+            const SizedBox(height: 10),
+            SizedBox(width: 350, child: TextField(
+              controller: categoryController,
+              decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: "Category"
+              ),
+              onChanged: (value) {
+                category = value.trim();
               },
             )),
             const SizedBox(height: 10),

@@ -45,6 +45,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
           brightness: Brightness.light,
           primaryColor: Colors.black,
+          //fix this deprecation
           accentColor: Colors.red,
           floatingActionButtonTheme:
               const FloatingActionButtonThemeData(backgroundColor: Colors.red),
