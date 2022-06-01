@@ -940,6 +940,7 @@ class _DetailPageState extends State<DetailPage> {
       });
       _pushToDatabase();
       return SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
         child: Column(
           children: [
             Container(

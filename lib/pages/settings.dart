@@ -331,7 +331,9 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
         body: Row(
       children: [
-        SettingsList(sections: [
+        SettingsList(
+          physics: BouncingScrollPhysics(),
+            sections: [
           SettingsSection(
               title: Text("Settings",
                   style: TextStyle(

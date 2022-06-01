@@ -427,6 +427,7 @@ class _TipsPageState extends State<TipsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
             child: Column(
       children: [
         Container(

@@ -99,9 +99,11 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
 
     return ListView.builder(itemCount: 1,
     shrinkWrap: true,
+    physics: BouncingScrollPhysics(),
     controller: scrollController,
     itemBuilder: (BuildContext context, int pos) {
       return SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
         child: Container(
           padding: EdgeInsets.all(20),
             child: Column(
@@ -592,6 +594,7 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
               )
             ]),
         body: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
           child: _getData()
 
         ));
