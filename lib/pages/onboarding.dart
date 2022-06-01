@@ -53,6 +53,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         body: SizedBox(
           height: MediaQuery.of(context).size.height - 100,
           child: PageView(
+            physics: BouncingScrollPhysics(),
             controller: controller,
             onPageChanged: (index) {
               setState(() {

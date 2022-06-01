@@ -182,6 +182,7 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
 
       ),
       body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
         child: Column(
           children: [
             Container(
