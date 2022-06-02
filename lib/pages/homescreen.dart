@@ -55,9 +55,9 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
     _getWeeklyCalories();
     _getCalorieGoal();
     if (_weeklyCaloriesInt == null) {
-      return "0/" + _calorieGoalInt.toString() + " Kcal";
+      return "0" + _calorieGoalInt.toString() + " Kcal";
     } else {
-      return _weeklyCaloriesInt.toString() + "/" + _calorieGoalInt.toString() + " Kcal";
+      return _weeklyCaloriesInt.toString() + " Kcal";
     }
   }
 
