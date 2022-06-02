@@ -135,8 +135,11 @@ class _LoginPageState extends State<LoginPage> {
                           } else if (snapshot.connectionState ==
                               ConnectionState.done) {
                             return SizedBox(
-                                width: 150,
-                                child: OutlinedButton(
+                                child: _isSigningIn
+                                ? const CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                                )
+                                : OutlinedButton(
                                   style: ButtonStyle(
                                       backgroundColor:
                                           MaterialStateProperty.all(Colors.red),
@@ -173,7 +176,7 @@ class _LoginPageState extends State<LoginPage> {
 
                                     }
                                   },
-                                  child: const Text("Google",
+                                  child: const Text("Sign In with Google",
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontFamily: "Poppins",
@@ -181,7 +184,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ));
                           }
                           return const CircularProgressIndicator(
-                              color: Colors.red);
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.red),);
                         }),
                     OutlinedButton(
                         onPressed: () =>

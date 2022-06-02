@@ -55,9 +55,26 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
     _getWeeklyCalories();
     _getCalorieGoal();
     if (_weeklyCaloriesInt == null) {
-      return "0" + _calorieGoalInt.toString() + " Kcal";
+      return "No Calories Consumed";
     } else {
       return _weeklyCaloriesInt.toString() + " Kcal";
+    }
+  }
+
+  _determineIfOnHomeScreen() {
+    if (mainWidget == null) {
+      return ExpandableFab(
+          distance: 112.0,
+          children: [
+            ActionButton(icon: const Icon(Icons.qr_code), onPressed: () => scanBarcode(),),
+            ActionButton(icon: const Icon(Icons.create), onPressed: () => {
+              navigateToAddFoodManual()
+            },)
+          ]
+      );
+    }
+    else {
+      return null;
     }
   }
 
@@ -155,6 +172,24 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
     }
   }
 
+  Future<void> scanBarcode() async {
+    String barcodeScan;
+    try {
+      barcodeScan = await FlutterBarcodeScanner.scanBarcode(
+          "#ff6666", "Cancel", false, ScanMode.BARCODE);
+      if (barcodeScan != "" && barcodeScan != '-1') {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => DetailPage(barcode: barcodeScan, user: _user, isFromScan: true,)));
+      }
+    } on PlatformException {
+      barcodeScan = "Failed to get platform version";
+    }
+
+    if (!mounted) return;
+  }
+
   void navigateToHistory() {
     Navigator.of(context)
         .pop(MaterialPageRoute(builder: (context) =>  HistoryPage(user: _user,)));
@@ -241,7 +276,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                                                 size: 60,
                                               ),
                                               const Text(
-                                                "Calories Consumed",
+                                                "Daily Calories",
                                                 style: TextStyle(
                                                     fontFamily: "Poppins",
                                                     fontWeight: FontWeight.bold,
@@ -300,7 +335,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                                               size: 60,
                                             ),
                                             const Text(
-                                              "Last scanned product",
+                                              "Last Scanned Product",
                                               style: TextStyle(
                                                   fontFamily: "Poppins",
                                                   fontWeight: FontWeight.bold,
@@ -586,23 +621,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
 
   @override
   Widget build(BuildContext context) {
-    Future<void> scanBarcode() async {
-      String barcodeScan;
-      try {
-        barcodeScan = await FlutterBarcodeScanner.scanBarcode(
-            "#ff6666", "Cancel", false, ScanMode.BARCODE);
-        if (barcodeScan != "" && barcodeScan != '-1') {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => DetailPage(barcode: barcodeScan, user: _user, isFromScan: true,)));
-        }
-      } on PlatformException {
-        barcodeScan = "Failed to get platform version";
-      }
 
-      if (!mounted) return;
-    }
 
     _setNavTextColor() {
       var brightness = MediaQuery.of(context).platformBrightness;
@@ -617,6 +636,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
 
 
     return Scaffold(
+      floatingActionButton: _determineIfOnHomeScreen(),
         drawer: Drawer(
           child: ListView(
             // Important: Remove any padding from the ListView.
@@ -713,15 +733,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
 
             ],
           ),
-        ),
-        floatingActionButton: ExpandableFab(
-          distance: 112.0,
-          children: [
-            ActionButton(icon: const Icon(Icons.qr_code), onPressed: () => scanBarcode(),),
-            ActionButton(icon: const Icon(Icons.create), onPressed: () => {
-              navigateToAddFoodManual()
-            },)
-          ]
         ),
         // floatingActionButton: FloatingActionButton(
         //   onPressed: () => {scanBarcode()},

@@ -137,11 +137,13 @@ class _DetailPageState extends State<DetailPage> {
   // }
 
   void _saveCaloriesToMemory() async {
-    if (scannedProduct.productName != null) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt("daily", (_dailyCaloriesInt + _productCalories));
-      debugPrint(prefs.getInt("daily").toString());
-      await prefs.setString("productname", scannedProduct.productName!);
+    if (widget.isFromScan != false) {
+      if (scannedProduct.productName != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setInt("daily", (_dailyCaloriesInt + _productCalories));
+        debugPrint(prefs.getInt("daily").toString());
+        await prefs.setString("productname", scannedProduct.productName!);
+      }
     }
   }
 

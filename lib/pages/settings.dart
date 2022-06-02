@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:numberpicker/numberpicker.dart';
-
+import 'package:package_info_plus/package_info_plus.dart';
 import '../utils/authentication.dart';
 import 'login.dart';
 
@@ -25,6 +25,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool milk = false;
   bool peanuts = false;
   bool soy = false;
+  String version = "";
   bool _isSigningOut = false;
   late User user;
 
@@ -36,6 +37,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
+    _getVersionNumber();
     user = widget._user;
     _getDailyCalorieGoal();
   }
@@ -43,6 +45,13 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  _getVersionNumber() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      version = packageInfo.version;
+    });
   }
 
   List<String> allergens = [];
@@ -342,7 +351,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       fontSize: 35.0,
                       fontWeight: FontWeight.bold)),
               tiles: <SettingsTile>[
-                SettingsTile.navigation(
+                SettingsTile(
                   leading: const Icon(Icons.food_bank),
                   onPressed: (value) {
                     _showAllergensMenu();
@@ -354,7 +363,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       style: TextStyle(
                           fontFamily: "Poppins", fontWeight: FontWeight.w500)),
                 ),
-                SettingsTile.navigation(
+                SettingsTile(
                   leading: const Icon(Icons.run_circle_outlined),
                   onPressed: (value) {
                     _showCalorieGoalPicker();
@@ -363,12 +372,12 @@ class _SettingsPageState extends State<SettingsPage> {
                       style: TextStyle(
                           fontFamily: "Poppins", fontWeight: FontWeight.bold)),
                   value: Text(
-                      "Set your daily calorie goal. Current goal: " +
+                      "Current goal: \n" +
                           _checkIfDailyCaloriesIsNull(),
                       style: const TextStyle(
                           fontFamily: "Poppins", fontWeight: FontWeight.w500)),
                 ),
-                SettingsTile.navigation(
+                SettingsTile(
                   leading: const Icon(Icons.delete_forever),
                   onPressed: (value) {
                     _deleteProductHistory();
@@ -376,11 +385,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   title: const Text("Delete History",
                       style: TextStyle(
                           fontFamily: "Poppins", fontWeight: FontWeight.bold)),
-                  value: const Text("Delete all products from your history",
+                  value: const Text("Clear product history",
                       style: TextStyle(
                           fontFamily: "Poppins", fontWeight: FontWeight.w500)),
                 ),
-                SettingsTile.navigation(
+                SettingsTile(
                   leading: const Icon(Icons.logout_outlined),
                   onPressed: (value) async {
                     setState(() {
@@ -412,7 +421,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         style: TextStyle(
                             fontFamily: "Poppins",
                             fontWeight: FontWeight.bold)),
-                    description: const Text("v1.0.0"))
+                    description: Text(version))
               ])
         ]),
       ],

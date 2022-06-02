@@ -1,4 +1,5 @@
 import 'package:Foodica/pages/productdetail.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -153,6 +154,8 @@ class _HistoryPageState extends State<HistoryPage> {
     }
   }
 
+
+
   _buildHistory() {
     return FutureBuilder(
         future: ref.child("/users/" + user.uid + "/products/").orderByKey().get(),
@@ -190,10 +193,24 @@ class _HistoryPageState extends State<HistoryPage> {
                 shrinkWrap: true,
                 controller: scrollController,
                 itemBuilder: (BuildContext context, int position) {
-                  _deleteData() {
-                    Query dataQuery = ref.child("/users/" + user.uid + "/products/").orderByChild("productID").equalTo(productList[position].productID);
-
+                  Widget? _checkImageUrl() {
+                    if (productList[position].productDetail?.image == "" || productList[position].productDetail?.image == "0") {
+                      return null;
+                    }
+                    else {
+                      return CachedNetworkImage(imageUrl: productList[position].productDetail!.image!, width: 100,);
+                    }
                   }
+
+                  _checkIfCategoryIsEmpty() {
+                    if (productList[position].productDetail!.category == "") {
+                      return "Category: Unknown";
+                    }
+                    else {
+                      return "Category: " + productList[position].productDetail!.category!;
+                    }
+                  }
+
                   return Container(
                       child: Column(
                         children: [
@@ -221,8 +238,8 @@ class _HistoryPageState extends State<HistoryPage> {
                                                           fontSize: 20.0,
                                                           fontWeight: FontWeight.w800)),
                                                   SizedBox(height: 10.0),
-                                                  Image.network(productList[position].productDetail!.image ?? "", width: 100,),
-                                                  Text("Category: " + productList[position].productDetail!.category!, style: TextStyle(fontFamily: "Poppins", fontSize: 18, fontWeight: FontWeight.w500),),
+                                                  _checkImageUrl() ?? SizedBox(height: 0),
+                                                  Text(_checkIfCategoryIsEmpty(), style: TextStyle(fontFamily: "Poppins", fontSize: 18, fontWeight: FontWeight.w500),),
                                                   SizedBox(height: 10),
                                                   Text("Scanned on: " + formatter.format(productList[position].productDetail!.scanTime!).toString(), style: TextStyle(fontFamily: "Poppins", fontSize: 18, fontWeight: FontWeight.w500)),
                                                   SizedBox(height: 10),

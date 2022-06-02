@@ -138,7 +138,7 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
                               children: [
                                 Center(
                                   child:Container(
-                                    width: 370.0,
+                                    width: 350.0,
                                     height: 200.0,
                                     alignment: Alignment.center,
                                     child: Card(
@@ -231,7 +231,7 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
                                 ),
                                 SizedBox(width: 10),
                                 Container(
-                                  width: 180.0,
+                                  width: 160.0,
                                   height: 200.0,
                                   alignment: Alignment.centerRight,
                                   child: Card(
@@ -394,54 +394,74 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
   }
 
   _buildChart() {
-    products.forEach((element) {
+    if (products.length == 0) {
+      return Column(
+        children: [
+          SizedBox(height: 10),
+          Icon(Icons.warning_outlined, size: 72,),
+          Center(
+            child: Text("No available data for this day",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: "Poppins",
+              fontWeight: FontWeight.bold,
+              fontSize: 35
+            ))
+          ),
+        ],
+      );
+    }
+    else {
+      products.forEach((element) {
         _fatValue += double.parse(element.productDetail!.fat ?? "0");
         _saltValue += double.parse(element.productDetail!.salt ?? "0");
         _calorieValue += double.parse(element.productDetail!.calories ?? "0");
         _sugarValue += double.parse(element.productDetail!.sugar ?? "0");
         _saturatedFatValue += double.parse(element.productDetail!.saturatedFat ?? "0");
-    });
-    PieChartSectionData _fat = PieChartSectionData(
-        color: Colors.red, value: _fatValue.toDouble(), title: "Fat", radius: 90, titleStyle: TextStyle(
-      fontFamily: "Poppins",
-
-    ));
-    PieChartSectionData _sugar = PieChartSectionData(
-        color: Colors.blue, value: _sugarValue.toDouble(), title: "Sugar", radius: 90, titleStyle: TextStyle(
+      });
+      PieChartSectionData _fat = PieChartSectionData(
+          color: Colors.red, value: _fatValue.toDouble(), title: "Fat", radius: 90, titleStyle: TextStyle(
         fontFamily: "Poppins",
 
-    ));
-    PieChartSectionData _salt = PieChartSectionData(
-        color: Colors.green, value: _saltValue.toDouble(), title: "Salt", radius: 90, titleStyle: TextStyle(
+      ));
+      PieChartSectionData _sugar = PieChartSectionData(
+          color: Colors.blue, value: _sugarValue.toDouble(), title: "Sugar", radius: 90, titleStyle: TextStyle(
         fontFamily: "Poppins",
 
-    ));
-    PieChartSectionData _saturatedFat = PieChartSectionData(
-      color: Colors.orange, value: _saturatedFatValue.toDouble(), title: "Saturated Fat", radius: 90, titleStyle: TextStyle(
+      ));
+      PieChartSectionData _salt = PieChartSectionData(
+          color: Colors.green, value: _saltValue.toDouble(), title: "Salt", radius: 90, titleStyle: TextStyle(
         fontFamily: "Poppins",
-    )
-    );
-    sections.add(_fat);
-    sections.add(_sugar);
-    sections.add(_salt);
-    sections.add(_saturatedFat);
-    return SizedBox(
-        width: 400,
-        height: 400,
-        child: Column(children: <Widget>[
-          AspectRatio(
-            aspectRatio: 1,
-            child: PieChart(
-              PieChartData(
-                sections: sections,
-                borderData: FlBorderData(show: false),
-                centerSpaceRadius: 90,
-                sectionsSpace: 9,
+
+      ));
+      PieChartSectionData _saturatedFat = PieChartSectionData(
+          color: Colors.orange, value: _saturatedFatValue.toDouble(), title: "Saturated Fat", radius: 90, titleStyle: TextStyle(
+        fontFamily: "Poppins",
+      )
+      );
+      sections.add(_fat);
+      sections.add(_sugar);
+      sections.add(_salt);
+      sections.add(_saturatedFat);
+      return SizedBox(
+          width: 400,
+          height: 400,
+          child: Column(children: <Widget>[
+            AspectRatio(
+              aspectRatio: 1,
+              child: PieChart(
+                PieChartData(
+                  sections: sections,
+                  borderData: FlBorderData(show: false),
+                  centerSpaceRadius: 90,
+                  sectionsSpace: 9,
+                ),
               ),
             ),
-          ),
-        ])
-    );
+          ])
+      );
+    }
+
   }
 
   buildCupertinoDatePicker(BuildContext context) {
