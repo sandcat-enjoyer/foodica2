@@ -53,7 +53,6 @@ class _DetailPageState extends State<DetailPage> {
     user = widget._user;
     _dailyCalories = _prefs.then((SharedPreferences prefs) {
       _dailyCaloriesInt = prefs.getInt("daily")!;
-      debugPrint(_dailyCaloriesInt.toString());
       return prefs.getInt("daily") ?? 0;
     });
     getProduct();
@@ -78,28 +77,32 @@ class _DetailPageState extends State<DetailPage> {
         });
       });
     } else {
-      showDialog(context: context, builder: (context) {
-        return AlertDialog(
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(20))
-          ),
-          title: Text("Product not found", style: TextStyle(
-            fontFamily: "Poppins",
-            fontWeight: FontWeight.bold
-          ),),
-          content: Text("Try scanning the product barcode again. If that doesn't work, add the details of this product manually.",
-          style: TextStyle(
-            fontFamily: "Poppins"
-          )),
-          actions: [
-            TextButton(onPressed: () {
-              Navigator.pop(context);
-            }, child: Text("Close", style: TextStyle(
-              fontFamily: "Poppins"
-            ),))
-          ],
-        );
-      });
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20))),
+              title: Text(
+                "Product not found",
+                style: TextStyle(
+                    fontFamily: "Poppins", fontWeight: FontWeight.bold),
+              ),
+              content: Text(
+                  "Try scanning the product barcode again. If that doesn't work, add the details of this product manually.",
+                  style: TextStyle(fontFamily: "Poppins")),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      "Close",
+                      style: TextStyle(fontFamily: "Poppins"),
+                    ))
+              ],
+            );
+          });
     }
   }
 
@@ -108,41 +111,11 @@ class _DetailPageState extends State<DetailPage> {
     super.dispose();
   }
 
-  // void _getProduct(String barcode) {
-  //   ProductApi.fetchProduct(barcode).then((result) {
-  //     setState(() {
-  //       scanProperties.status = result.status;
-  //       scannedProduct.productname = result.product!.productname;
-  //       scannedProduct.brand = result.product!.brand;
-  //       scannedProduct.category = result.product!.category;
-  //       scannedProduct.image = result.product!.image;
-  //       scannedProduct.nutriments = result.product!.nutriments;
-  //       scannedProduct.nutrientLevels = result.product!.nutrientLevels;
-  //       if (result.product!.allergens == "") {
-  //         scannedProduct.allergens = "None";
-  //       } else {
-  //         scannedProduct.allergens = result.product!.allergens;
-  //       }
-  //       debugPrint("Product loaded: " + productIsLoaded.toString());
-  //       productIsLoaded = true;
-  //       debugPrint("Now what? " + productIsLoaded.toString());
-  //       if (result.product!.nutriments.energyKcal != null) {
-  //         _productCalories = result.product!.nutriments.energyKcal!.toInt();
-  //       } else {
-  //         _productCalories = 0;
-  //       }
-  //       debugPrint(_productCalories.toString());
-  //     });
-  //     _saveCaloriesToMemory();
-  //   });
-  // }
-
   void _saveCaloriesToMemory() async {
     if (widget.isFromScan != false) {
       if (scannedProduct.productName != null) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setInt("daily", (_dailyCaloriesInt + _productCalories));
-        debugPrint(prefs.getInt("daily").toString());
         await prefs.setString("productname", scannedProduct.productName!);
       }
     }
@@ -157,7 +130,6 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Widget _buildCaloriesCard() {
-    print(scannedProduct.allergens!.names);
     return Column(
       children: [
         Padding(
@@ -323,9 +295,7 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   _showAllergens() {
-    print(allergens);
     String allergenString = "";
-    print(allergens.length);
     for (int i = 0; i <= allergens.length - 1; i++) {
       if (allergens.length != 0) {
         allergenString += allergens[i] + "\n";
@@ -333,7 +303,6 @@ class _DetailPageState extends State<DetailPage> {
         allergenString = "No allergens found";
       }
     }
-    print(allergenString);
     return Text(
       allergenString,
       style: TextStyle(
@@ -430,12 +399,16 @@ class _DetailPageState extends State<DetailPage> {
                           calories: scannedProduct.nutriments!.energyKcal100g
                               .toString(),
                           fat: scannedProduct.nutriments?.fat.toString() ?? "0",
-                          salt: scannedProduct.nutriments?.salt.toString() ?? "0",
-                          sugar: scannedProduct.nutriments?.sugars.toString() ?? "0",
+                          salt:
+                              scannedProduct.nutriments?.salt.toString() ?? "0",
+                          sugar: scannedProduct.nutriments?.sugars.toString() ??
+                              "0",
                           image: scannedProduct.imagePackagingUrl ?? "",
                           scanTime: DateTime.now(),
                           allergens: scannedProduct.allergens!.names,
-                          saturatedFat: scannedProduct.nutriments?.saturatedFat.toString() ?? "",
+                          saturatedFat: scannedProduct.nutriments?.saturatedFat
+                                  .toString() ??
+                              "",
                           category: scannedProduct.categories ?? "",
                         ));
                     Navigator.of(context).push(MaterialPageRoute(
@@ -505,7 +478,6 @@ class _DetailPageState extends State<DetailPage> {
 
   Widget _getProductImage() {
     String url = "";
-    print(scannedProduct.imagePackagingUrl);
     if (scannedProduct.imagePackagingUrl != null) {
       url = scannedProduct.imagePackagingUrl!;
       return CachedNetworkImage(imageUrl: url, width: 300);
@@ -523,295 +495,6 @@ class _DetailPageState extends State<DetailPage> {
       );
     }
   }
-
-  // Widget _getSaltLevel() {
-  //   if (scannedProduct.nutriments?.salt != null) {
-  //     return Column(
-  //       children: [
-  //         Padding(
-  //           padding: const EdgeInsets.all(12.0),
-  //           child: Center(
-  //             child: Wrap(
-  //               spacing: 20,
-  //               runSpacing: 20.0,
-  //               children: <Widget>[
-  //                 SizedBox(
-  //                     width: 300.0,
-  //                     height: 180.0,
-  //                     child: Card(
-  //                       elevation: 2.0,
-  //                       shape: RoundedRectangleBorder(
-  //                           borderRadius: BorderRadius.circular(8.0)),
-  //                       child: Center(
-  //                           child: Padding(
-  //                               padding: const EdgeInsets.all(8.0),
-  //                               child: Column(
-  //                                 children: <Widget>[
-  //                                   const SizedBox(height: 10.0),
-  //                                   const Text("Salt",
-  //                                       style: TextStyle(
-  //                                           fontFamily: "Poppins",
-  //                                           fontSize: 30.0,
-  //                                           fontWeight: FontWeight.w800,
-  //                                           )),
-  //                                   const SizedBox(height: 10.0),
-  //                                   Text(
-  //                                       scannedProduct.nutriments!.salt!
-  //                                               .toStringAsPrecision(2) +
-  //                                           "g",
-  //                                       style: const TextStyle(
-  //                                           fontFamily: "Poppins",
-  //                                           fontSize: 30.0,
-  //                                           fontWeight: FontWeight.w600,
-  //                                           ))
-  //                                 ],
-  //                               ))),
-  //                     ))
-  //               ],
-  //             ),
-  //           ),
-  //         )
-  //       ],
-  //     );
-  //   } else {
-  //     return Column(
-  //       children: [
-  //         Padding(
-  //           padding: const EdgeInsets.all(12.0),
-  //           child: Center(
-  //             child: Wrap(
-  //               spacing: 20,
-  //               runSpacing: 20.0,
-  //               children: <Widget>[
-  //                 SizedBox(
-  //                     width: 300.0,
-  //                     height: 180.0,
-  //                     child: Card(
-  //                       elevation: 2.0,
-  //                       shape: RoundedRectangleBorder(
-  //                           borderRadius: BorderRadius.circular(8.0)),
-  //                       child: Center(
-  //                           child: Padding(
-  //                               padding: const EdgeInsets.all(8.0),
-  //                               child: Column(
-  //                                 children: const <Widget>[
-  //                                   SizedBox(height: 10.0),
-  //                                   Text("Saturated Fats",
-  //                                       style: TextStyle(
-  //                                           fontFamily: "Poppins",
-  //                                           fontSize: 25.0,
-  //                                           fontWeight: FontWeight.w800,
-  //                                           )),
-  //                                   SizedBox(height: 10.0),
-  //                                   Text("Not Found",
-  //                                       style: TextStyle(
-  //                                           fontFamily: "Poppins",
-  //                                           fontSize: 30.0,
-  //                                           fontWeight: FontWeight.w600,
-  //                                           ))
-  //                                 ],
-  //                               ))),
-  //                     ))
-  //               ],
-  //             ),
-  //           ),
-  //         )
-  //       ],
-  //     );
-  //   }
-  // }
-  //
-  // Widget _getFatLevels() {
-  //   if (scannedProduct.nutriments?.fat != null) {
-  //     return Column(
-  //       children: [
-  //         Padding(
-  //           padding: const EdgeInsets.all(12.0),
-  //           child: Center(
-  //             child: Wrap(
-  //               spacing: 20,
-  //               runSpacing: 20.0,
-  //               children: <Widget>[
-  //                 SizedBox(
-  //                     width: 300.0,
-  //                     height: 180.0,
-  //                     child: Card(
-  //
-  //                       elevation: 2.0,
-  //                       shape: RoundedRectangleBorder(
-  //                           borderRadius: BorderRadius.circular(8.0)),
-  //                       child: Center(
-  //                           child: Padding(
-  //                               padding: const EdgeInsets.all(8.0),
-  //                               child: Column(
-  //                                 children: <Widget>[
-  //                                   const SizedBox(height: 10.0),
-  //                                   const Text("Fat",
-  //                                       style: TextStyle(
-  //                                           fontFamily: "Poppins",
-  //                                           fontSize: 30.0,
-  //                                           fontWeight: FontWeight.w800,
-  //                                           )),
-  //                                   const SizedBox(height: 10.0),
-  //                                   Text(
-  //                                       scannedProduct.nutriments!.fat!
-  //                                               .toStringAsFixed(2) +
-  //                                           "g",
-  //                                       style: const TextStyle(
-  //                                           fontFamily: "Poppins",
-  //                                           fontSize: 30.0,
-  //                                           fontWeight: FontWeight.w600,
-  //                                           ))
-  //                                 ],
-  //                               ))),
-  //                     ))
-  //               ],
-  //             ),
-  //           ),
-  //         )
-  //       ],
-  //     );
-  //   } else {
-  //     return Column(
-  //       children: [
-  //         Padding(
-  //           padding: const EdgeInsets.all(12.0),
-  //           child: Center(
-  //             child: Wrap(
-  //               spacing: 20,
-  //               runSpacing: 20.0,
-  //               children: <Widget>[
-  //                 SizedBox(
-  //                     width: 300.0,
-  //                     height: 180.0,
-  //                     child: Card(
-  //                       elevation: 2.0,
-  //                       shape: RoundedRectangleBorder(
-  //                           borderRadius: BorderRadius.circular(8.0)),
-  //                       child: Center(
-  //                           child: Padding(
-  //                               padding: const EdgeInsets.all(8.0),
-  //                               child: Column(
-  //                                 children: const <Widget>[
-  //                                   SizedBox(height: 10.0),
-  //                                   Text("Fat",
-  //                                       style: TextStyle(
-  //                                           fontFamily: "Poppins",
-  //                                           fontSize: 25.0,
-  //                                           fontWeight: FontWeight.w800)),
-  //                                   SizedBox(height: 10.0),
-  //                                   Text("Not Found",
-  //                                       style: TextStyle(
-  //                                           fontFamily: "Poppins",
-  //                                           fontSize: 30.0,
-  //                                           fontWeight: FontWeight.w600))
-  //                                 ],
-  //                               ))),
-  //                     ))
-  //               ],
-  //             ),
-  //           ),
-  //         )
-  //       ],
-  //     );
-  //   }
-  // }
-  //
-  // Widget _getSugarLevel() {
-  //   if (scannedProduct.nutriments?.sugars != null) {
-  //     return Column(
-  //       children: [
-  //         Padding(
-  //           padding: const EdgeInsets.all(12.0),
-  //           child: Center(
-  //             child: Wrap(
-  //               spacing: 20,
-  //               runSpacing: 20.0,
-  //               children: <Widget>[
-  //                 SizedBox(
-  //                     width: 300.0,
-  //                     height: 180.0,
-  //                     child: Card(
-  //                       elevation: 2.0,
-  //                       shape: RoundedRectangleBorder(
-  //                           borderRadius: BorderRadius.circular(8.0)),
-  //                       child: Center(
-  //                           child: Padding(
-  //                               padding: const EdgeInsets.all(8.0),
-  //                               child: Column(
-  //                                 children: <Widget>[
-  //                                   const SizedBox(height: 10.0),
-  //                                   const Text("Sugar",
-  //                                       style: TextStyle(
-  //                                           fontFamily: "Poppins",
-  //                                           fontSize: 30.0,
-  //                                           fontWeight: FontWeight.w800,
-  //                                           )),
-  //                                   const SizedBox(height: 10.0),
-  //                                   Text(
-  //                                       scannedProduct.nutriments!.sugars!
-  //                                               .toStringAsFixed(2)
-  //                                               .toString() +
-  //                                           "g",
-  //                                       style: const TextStyle(
-  //                                           fontFamily: "Poppins",
-  //                                           fontSize: 30.0,
-  //                                           fontWeight: FontWeight.w600,
-  //                                           ))
-  //                                 ],
-  //                               ))),
-  //                     ))
-  //               ],
-  //             ),
-  //           ),
-  //         )
-  //       ],
-  //     );
-  //   } else {
-  //     return Column(
-  //       children: [
-  //         Padding(
-  //           padding: const EdgeInsets.all(12.0),
-  //           child: Center(
-  //             child: Wrap(
-  //               spacing: 20,
-  //               runSpacing: 20.0,
-  //               children: <Widget>[
-  //                 SizedBox(
-  //                     width: 300.0,
-  //                     height: 180.0,
-  //                     child: Card(
-  //                       elevation: 2.0,
-  //                       shape: RoundedRectangleBorder(
-  //                           borderRadius: BorderRadius.circular(8.0)),
-  //                       child: Center(
-  //                           child: Padding(
-  //                               padding: const EdgeInsets.all(8.0),
-  //                               child: Column(
-  //                                 children: const <Widget>[
-  //                                   SizedBox(height: 10.0),
-  //                                   Text("Sugar",
-  //                                       style: TextStyle(
-  //                                           fontFamily: "Poppins",
-  //                                           fontSize: 25.0,
-  //                                           fontWeight: FontWeight.w800)),
-  //                                   SizedBox(height: 10.0),
-  //                                   Text("Not Found",
-  //                                       style: TextStyle(
-  //                                           fontFamily: "Poppins",
-  //                                           fontSize: 30.0,
-  //                                           fontWeight: FontWeight.w600))
-  //                                 ],
-  //                               ))),
-  //                     ))
-  //               ],
-  //             ),
-  //           ),
-  //         )
-  //       ],
-  //     );
-  //   }
-  // }
 
   Widget _checkAllergens() {
     if (scannedProduct.allergens != "") {

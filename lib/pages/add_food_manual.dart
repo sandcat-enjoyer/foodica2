@@ -5,7 +5,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart';
 
 import '../models/scanned_product.dart';
 import '../utils/uuid.dart';
@@ -83,9 +82,7 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
       if (image != null) {
         photo = File(image.path);
         _saveImageToFirebase();
-      } else {
-        print('No image selected');
-      }
+      } else {}
     });
   }
 
@@ -95,9 +92,7 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
       if (image != null) {
         photo = File(image.path);
         _saveImageToFirebase();
-      } else {
-        print("No image selected");
-      }
+      } else {}
     });
   }
 
@@ -110,9 +105,7 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
         await storageRef.putFile(photo!);
         storageRef.getDownloadURL().then((url) => {
               setState(() => {imagePath = url}),
-              print(url)
             });
-        print(imagePath);
       } catch (e) {
         print("Error");
       }

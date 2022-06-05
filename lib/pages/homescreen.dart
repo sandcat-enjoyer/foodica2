@@ -519,10 +519,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
             ],
           ),
         ),
-        // floatingActionButton: FloatingActionButton(
-        //   onPressed: () => {scanBarcode()},
-        //   child: const Icon(Icons.add_rounded, size: 40),
-        // ),
         appBar: AppBar(
           automaticallyImplyLeading: false,
           leading: Builder(
@@ -536,7 +532,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                 fontWeight: FontWeight.bold,
               )),
         ),
-        //page needs to be scrollable so the body is wrapped in a SingleChildScrollView
         body: _buildHomeScreen());
   }
 }

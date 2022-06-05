@@ -147,7 +147,6 @@ class _InitAllergensState extends State<InitAllergens> {
                           if (peanuts == true) {
                             allergens.add("peanuts");
                           }
-                          print(allergens);
                           SharedPreferences.getInstance().then((prefs) =>
                               {prefs.setStringList("allergens", allergens)});
                           SharedPreferences prefs =
@@ -155,7 +154,6 @@ class _InitAllergensState extends State<InitAllergens> {
                           setState(() {
                             calorieGoal = prefs.getInt("goal");
                           });
-                          print(calorieGoal);
                           if (calorieGoal == null) {
                             Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(

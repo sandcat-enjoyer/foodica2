@@ -58,7 +58,6 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
   }
 
   _getData() {
-    print(user.uid);
     return FutureBuilder(
         future: database
             .child("/users/" + user.uid + "/products")
@@ -70,7 +69,6 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
             _resetOnReload();
             var values = snapshot.data!.value as Map<dynamic, dynamic>;
             values.forEach((key, value) {
-              print(value["product"]["productname"]);
               ScannedProduct newProduct = ScannedProduct(
                   productID: value["productId"],
                   productDetail: ProductDetail(

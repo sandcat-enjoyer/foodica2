@@ -367,7 +367,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     if (peanuts == true) {
                       allergens.add("peanuts");
                     }
-                    print(allergens);
                     SharedPreferences.getInstance().then((prefs) =>
                         {prefs.setStringList("allergens", allergens)});
                     Navigator.pop(context);

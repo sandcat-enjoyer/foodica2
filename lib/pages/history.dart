@@ -57,8 +57,6 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   _setThemeForDatePicker() {
-    //need to set a fitting light theme since it's just default now
-    //but leaving it like this for now
     var brightness = MediaQuery.of(context).platformBrightness;
     bool isDarkMode = brightness == Brightness.dark;
 
