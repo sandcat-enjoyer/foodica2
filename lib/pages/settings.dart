@@ -9,7 +9,9 @@ import '../utils/authentication.dart';
 import 'login.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({Key? key, required User user}) : _user = user, super(key: key);
+  const SettingsPage({Key? key, required User user})
+      : _user = user,
+        super(key: key);
 
   final User _user;
 
@@ -18,7 +20,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  bool _isSwitched = false;
   bool value = false;
   bool gluten = false;
   bool eggs = false;
@@ -30,8 +31,8 @@ class _SettingsPageState extends State<SettingsPage> {
   late User user;
 
   final databaseReference = FirebaseDatabase(
-      databaseURL:
-      "https://foodica-9743c-default-rtdb.europe-west1.firebasedatabase.app")
+          databaseURL:
+              "https://foodica-9743c-default-rtdb.europe-west1.firebasedatabase.app")
       .ref();
 
   @override
@@ -39,6 +40,8 @@ class _SettingsPageState extends State<SettingsPage> {
     super.initState();
     _getVersionNumber();
     user = widget._user;
+    allergens.clear();
+    _getAllergens();
     _getDailyCalorieGoal();
   }
 
@@ -52,6 +55,42 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() {
       version = packageInfo.version;
     });
+  }
+
+  _getAllergens() {
+    SharedPreferences.getInstance().then((prefs) => {
+          allergens = prefs.getStringList("allergens")!,
+          if (allergens.contains("gluten"))
+            {
+              setState(() {
+                gluten = true;
+              })
+            },
+          if (allergens.contains("eggs"))
+            {
+              setState(() {
+                eggs = true;
+              })
+            },
+          if (allergens.contains("soy"))
+            {
+              setState(() {
+                soy = true;
+              })
+            },
+          if (allergens.contains("milk"))
+            {
+              setState(() {
+                milk = true;
+              })
+            },
+          if (allergens.contains("peanuts"))
+            {
+              setState(() {
+                peanuts = true;
+              })
+            }
+        });
   }
 
   List<String> allergens = [];
@@ -76,12 +115,7 @@ class _SettingsPageState extends State<SettingsPage> {
     });
   }
 
-  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-
-  int? _weeklyCaloriesGoalInt = 0;
   int? _dailyCaloriesGoalInt = 0;
-
-
 
   _getDailyCalorieGoal() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -124,16 +158,16 @@ class _SettingsPageState extends State<SettingsPage> {
                     style: TextStyle(fontFamily: "Poppins"))),
             actions: [
               TextButton(
-                  onPressed: ()
-          {
-            databaseReference.child("users/" + user.uid + "/products")
-                .remove()
-                .then((value) => {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("History Deleted"))),
-                  Navigator.of(context).pop()
-            }
-            );
-          },
+                  onPressed: () {
+                    databaseReference
+                        .child("users/" + user.uid + "/products")
+                        .remove()
+                        .then((value) => {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text("History Deleted"))),
+                              Navigator.of(context).pop()
+                            });
+                  },
                   child: const Text("Delete",
                       style: TextStyle(fontFamily: "Poppins"))),
               TextButton(
@@ -316,7 +350,26 @@ class _SettingsPageState extends State<SettingsPage> {
             }),
             actions: [
               TextButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    allergens.clear();
+                    if (gluten == true) {
+                      allergens.add("gluten");
+                    }
+                    if (milk == true) {
+                      allergens.add("milk");
+                    }
+                    if (eggs == true) {
+                      allergens.add("eggs");
+                    }
+                    if (soy == true) {
+                      allergens.add("soy");
+                    }
+                    if (peanuts == true) {
+                      allergens.add("peanuts");
+                    }
+                    print(allergens);
+                    SharedPreferences.getInstance().then((prefs) =>
+                        {prefs.setStringList("allergens", allergens)});
                     Navigator.pop(context);
                   },
                   child: const Text("Done"))
@@ -337,12 +390,11 @@ class _SettingsPageState extends State<SettingsPage> {
         return Colors.black;
       }
     }
+
     return Scaffold(
         body: Row(
       children: [
-        SettingsList(
-          physics: BouncingScrollPhysics(),
-            sections: [
+        SettingsList(physics: BouncingScrollPhysics(), sections: [
           SettingsSection(
               title: Text("Settings",
                   style: TextStyle(
@@ -372,8 +424,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       style: TextStyle(
                           fontFamily: "Poppins", fontWeight: FontWeight.bold)),
                   value: Text(
-                      "Current goal: \n" +
-                          _checkIfDailyCaloriesIsNull(),
+                      "Current goal: \n" + _checkIfDailyCaloriesIsNull(),
                       style: const TextStyle(
                           fontFamily: "Poppins", fontWeight: FontWeight.w500)),
                 ),

@@ -14,7 +14,6 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  bool _isRegistering = false;
 
   String email = "";
   String password = "";

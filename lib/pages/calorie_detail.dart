@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
 import 'package:fl_chart/fl_chart.dart';
 import 'package:Foodica/models/scanned_product.dart';
-import 'dart:convert';
 import '../models/scanned_product.dart';
 
 class CalorieDetailPage extends StatefulWidget {
@@ -49,104 +48,150 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
               "https://foodica-9743c-default-rtdb.europe-west1.firebasedatabase.app")
       .ref();
 
-
   _resetOnReload() {
-      _fatValue = 0;
-      _saltValue = 0;
-      _saturatedFatValue = 0;
-      _sugarValue = 0;
-      _calorieValue = 0;
-      sections = [];
+    _fatValue = 0;
+    _saltValue = 0;
+    _saturatedFatValue = 0;
+    _sugarValue = 0;
+    _calorieValue = 0;
+    sections = [];
   }
 
-  String _encodeUserEmail(String  userEmail) {
-    return userEmail.replaceAll(".", ",");
-  }
-
-  String _decodeUserEmail(String userEmail) {
-    return userEmail.replaceAll(",", ".");
-  }
   _getData() {
     print(user.uid);
     return FutureBuilder(
-      future: database.child("/users/" + user.uid + "/products").orderByKey().get(),
-      builder: (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
-    if(snapshot.hasData) {
-    products.clear();
-    _resetOnReload();
-    var values = snapshot.data!.value as Map<dynamic, dynamic>;
-    values.forEach((key, value) {
-    print(value["product"]["productname"]);
-    ScannedProduct newProduct = ScannedProduct(
-    productID: value["productId"],
-    productDetail: ProductDetail(
-    productname: value["product"]["productname"],
-    brand: value["product"]["brand"],
-    sugar: value["product"]["sugar"].toString(),
-    salt: value["product"]["salt"].toString(),
-    fat: value["product"]["fat"].toString(),
-    image: value["product"]["image"].toString(),
-    category: value["product"]["category"],
-    saturatedFat: value["product"]["saturatedFat"].toString(),
-    calories: value["product"]["calories"].toString(),
-    scanTime: DateTime.parse(value["product"]["scanTime"]),
-    )
-    );
-    if (newProduct.productDetail?.scanTime?.day == selectedDate.day) {
-      products.add(newProduct);
-    }
-    });
+        future: database
+            .child("/users/" + user.uid + "/products")
+            .orderByKey()
+            .get(),
+        builder: (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
+          if (snapshot.hasData) {
+            products.clear();
+            _resetOnReload();
+            var values = snapshot.data!.value as Map<dynamic, dynamic>;
+            values.forEach((key, value) {
+              print(value["product"]["productname"]);
+              ScannedProduct newProduct = ScannedProduct(
+                  productID: value["productId"],
+                  productDetail: ProductDetail(
+                    productname: value["product"]["productname"],
+                    brand: value["product"]["brand"],
+                    sugar: value["product"]["sugar"].toString(),
+                    salt: value["product"]["salt"].toString(),
+                    fat: value["product"]["fat"].toString(),
+                    image: value["product"]["image"].toString(),
+                    category: value["product"]["category"],
+                    saturatedFat: value["product"]["saturatedFat"].toString(),
+                    calories: value["product"]["calories"].toString(),
+                    scanTime: DateTime.parse(value["product"]["scanTime"]),
+                  ));
+              if (newProduct.productDetail?.scanTime?.day == selectedDate.day) {
+                products.add(newProduct);
+              }
+            });
 
-    return ListView.builder(itemCount: 1,
-    shrinkWrap: true,
-    physics: BouncingScrollPhysics(),
-    controller: scrollController,
-    itemBuilder: (BuildContext context, int pos) {
-      return SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        child: Container(
-          padding: EdgeInsets.all(20),
-            child: Column(
-              children: [
-                Container(
-                    alignment: Alignment.topLeft,
-                    child: Text("Details",
-                        style: TextStyle(
-                            fontFamily: "Poppins",
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold
-                        ))
-                ),
-                SizedBox(height: 10),
-                Container(
-                    alignment: Alignment.topLeft,
-                    child: Text(_dateFormatter(selectedDate),
-                    style: TextStyle(
-                      fontFamily: "Poppins",
-                      fontWeight: FontWeight.bold,
-                      fontSize: 22
-                    ))
-                ),
-
-                _buildChart(),
-                Container(
-                    child: Center(
-                        child: Wrap(
-                          runSpacing: 20.0,
-                          children: <Widget>[
-                            Row(
-                              children: [
-                                Center(
-                                  child:Container(
-                                    width: 350.0,
-                                    height: 200.0,
-                                    alignment: Alignment.center,
-                                    child: Card(
-                                      elevation: 2.0,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8.0)),
-                                      child: Center(
-                                          child: Padding(
+            return ListView.builder(
+                itemCount: 1,
+                shrinkWrap: true,
+                physics: BouncingScrollPhysics(),
+                controller: scrollController,
+                itemBuilder: (BuildContext context, int pos) {
+                  return SingleChildScrollView(
+                      physics: BouncingScrollPhysics(),
+                      child: Container(
+                          padding: EdgeInsets.all(20),
+                          child: Column(
+                            children: [
+                              Container(
+                                  alignment: Alignment.topLeft,
+                                  child: Text("Details",
+                                      style: TextStyle(
+                                          fontFamily: "Poppins",
+                                          fontSize: 40,
+                                          fontWeight: FontWeight.bold))),
+                              SizedBox(height: 10),
+                              Container(
+                                  alignment: Alignment.topLeft,
+                                  child: Text(_dateFormatter(selectedDate),
+                                      style: TextStyle(
+                                          fontFamily: "Poppins",
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 22))),
+                              _buildChart(),
+                              Container(
+                                  child: Center(
+                                      child: Wrap(
+                                runSpacing: 20.0,
+                                children: <Widget>[
+                                  Row(
+                                    children: [
+                                      Center(
+                                        child: Container(
+                                          width: 350.0,
+                                          height: 200.0,
+                                          alignment: Alignment.center,
+                                          child: Card(
+                                            elevation: 2.0,
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8.0)),
+                                            child: Center(
+                                                child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Column(
+                                                children: <Widget>[
+                                                  const SizedBox(
+                                                    height: 10.0,
+                                                  ),
+                                                  const Icon(
+                                                    Icons.run_circle,
+                                                    size: 60,
+                                                  ),
+                                                  const Text(
+                                                    "Calories Consumed",
+                                                    style: TextStyle(
+                                                        fontFamily: "Poppins",
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 23.0),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 5.0,
+                                                  ),
+                                                  Text(
+                                                    _calorieValue
+                                                            .toStringAsFixed(
+                                                                2) +
+                                                        " Kcal",
+                                                    style: const TextStyle(
+                                                      fontFamily: "Poppins",
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize: 20.0,
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            )),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 160.0,
+                                        height: 200.0,
+                                        alignment: Alignment.centerLeft,
+                                        child: Card(
+                                          elevation: 2.0,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0)),
+                                          child: Center(
+                                              child: Padding(
                                             padding: const EdgeInsets.all(8.0),
                                             child: Column(
                                               children: <Widget>[
@@ -158,17 +203,19 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
                                                   size: 60,
                                                 ),
                                                 const Text(
-                                                  "Calories Consumed",
+                                                  "Fat",
                                                   style: TextStyle(
                                                       fontFamily: "Poppins",
-                                                      fontWeight: FontWeight.bold,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                       fontSize: 23.0),
                                                 ),
                                                 const SizedBox(
                                                   height: 5.0,
                                                 ),
                                                 Text(
-                                                  _calorieValue.toStringAsFixed(2) + " Kcal",
+                                                  _fatValue.toStringAsFixed(2) +
+                                                      "g",
                                                   style: const TextStyle(
                                                     fontFamily: "Poppins",
                                                     fontWeight: FontWeight.w600,
@@ -178,219 +225,169 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
                                               ],
                                             ),
                                           )),
-                                    ),
-                                  ),
-                                )
-
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Container(
-                                  width: 180.0,
-                                  height: 200.0,
-                                  alignment: Alignment.centerLeft,
-                                  child: Card(
-                                    elevation: 2.0,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8.0)),
-                                    child: Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Column(
-                                            children: <Widget>[
-                                              const SizedBox(
-                                                height: 10.0,
-                                              ),
-                                              const Icon(
-                                                Icons.run_circle,
-                                                size: 60,
-                                              ),
-                                              const Text(
-                                                "Fat",
-                                                style: TextStyle(
-                                                    fontFamily: "Poppins",
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 23.0),
-                                              ),
-                                              const SizedBox(
-                                                height: 5.0,
-                                              ),
-                                              Text(
-                                                _fatValue.toStringAsFixed(2) + "g",
-                                                style: const TextStyle(
-                                                  fontFamily: "Poppins",
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 20.0,
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Container(
+                                        width: 160.0,
+                                        height: 200.0,
+                                        alignment: Alignment.centerRight,
+                                        child: Card(
+                                          elevation: 2.0,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0)),
+                                          child: Center(
+                                              child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              children: <Widget>[
+                                                const SizedBox(
+                                                  height: 10.0,
                                                 ),
-                                              )
-                                            ],
-                                          ),
-                                        )),
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                Container(
-                                  width: 160.0,
-                                  height: 200.0,
-                                  alignment: Alignment.centerRight,
-                                  child: Card(
-                                    elevation: 2.0,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8.0)),
-                                    child: Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Column(
-                                            children: <Widget>[
-                                              const SizedBox(
-                                                height: 10.0,
-                                              ),
-                                              const Icon(
-                                                Icons.run_circle,
-                                                size: 60,
-                                              ),
-                                              const Text(
-                                                "Salt",
-                                                style: TextStyle(
-                                                    fontFamily: "Poppins",
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 23.0),
-                                              ),
-                                              const SizedBox(
-                                                height: 5.0,
-                                              ),
-                                              Text(
-                                                _saltValue.toStringAsFixed(2) + "g",
-                                                style: const TextStyle(
-                                                  fontFamily: "Poppins",
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 20.0,
+                                                const Icon(
+                                                  Icons.run_circle,
+                                                  size: 60,
                                                 ),
-                                              )
-                                            ],
-                                          ),
-                                        )),
-                                  ),
-                                ),
-
-                              ],
-                            ),
-                            SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Container(
-                                  width: 180.0,
-                                  height: 200,
-                                  alignment: Alignment.centerRight,
-                                  child: Card(
-                                    elevation: 2.0,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8.0)),
-                                    child: Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Column(
-                                            children: <Widget>[
-                                              const SizedBox(
-                                                height: 10.0,
-                                              ),
-                                              const Icon(
-                                                Icons.run_circle,
-                                                size: 60,
-                                              ),
-                                              const Text(
-                                                "Saturated\nFat", textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                    fontFamily: "Poppins",
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 23.0),
-                                              ),
-                                              const SizedBox(
-                                                height: 5.0,
-                                              ),
-                                              Text(
-                                                _saturatedFatValue.toStringAsFixed(2) + "g",
-                                                style: const TextStyle(
-                                                  fontFamily: "Poppins",
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 20.0,
+                                                const Text(
+                                                  "Salt",
+                                                  style: TextStyle(
+                                                      fontFamily: "Poppins",
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 23.0),
                                                 ),
-                                              )
-                                            ],
-                                          ),
-                                        )),
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                Container(
-                                  width: 180.0,
-                                  height: 200.0,
-                                  alignment: Alignment.centerRight,
-                                  child: Card(
-                                    elevation: 2.0,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8.0)),
-                                    child: Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Column(
-                                            children: <Widget>[
-                                              const SizedBox(
-                                                height: 10.0,
-                                              ),
-                                              const Icon(
-                                                Icons.run_circle,
-                                                size: 60,
-                                              ),
-                                              const Text(
-                                                "Sugar",
-                                                style: TextStyle(
-                                                    fontFamily: "Poppins",
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 23.0),
-                                              ),
-                                              const SizedBox(
-                                                height: 5.0,
-                                              ),
-                                              Text(
-                                                _sugarValue.toStringAsFixed(2) + "g",
-                                                style: const TextStyle(
-                                                  fontFamily: "Poppins",
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 20.0,
+                                                const SizedBox(
+                                                  height: 5.0,
                                                 ),
-                                              )
-                                            ],
-                                          ),
-                                        )),
+                                                Text(
+                                                  _saltValue
+                                                          .toStringAsFixed(2) +
+                                                      "g",
+                                                  style: const TextStyle(
+                                                    fontFamily: "Poppins",
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 20.0,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          )),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ],
-                            )
-
-                          ],
-                        )))
-
-
-              ],
-            )
-        )
-
-
-      );
-
-    });
-
-    }
-    else {
-      return const Center(
-        child: CircularProgressIndicator(color: Colors.red)
-      );
-    }
-
-    });
-
+                                  SizedBox(height: 10),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 160.0,
+                                        height: 200,
+                                        alignment: Alignment.centerRight,
+                                        child: Card(
+                                          elevation: 2.0,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0)),
+                                          child: Center(
+                                              child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              children: <Widget>[
+                                                const SizedBox(
+                                                  height: 10.0,
+                                                ),
+                                                const Icon(
+                                                  Icons.run_circle,
+                                                  size: 60,
+                                                ),
+                                                const Text(
+                                                  "Saturated\nFat",
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                      fontFamily: "Poppins",
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 23.0),
+                                                ),
+                                                const SizedBox(
+                                                  height: 5.0,
+                                                ),
+                                                Text(
+                                                  _saturatedFatValue
+                                                          .toStringAsFixed(2) +
+                                                      "g",
+                                                  style: const TextStyle(
+                                                    fontFamily: "Poppins",
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 20.0,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          )),
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Container(
+                                        width: 160.0,
+                                        height: 200.0,
+                                        alignment: Alignment.centerRight,
+                                        child: Card(
+                                          elevation: 2.0,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0)),
+                                          child: Center(
+                                              child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              children: <Widget>[
+                                                const SizedBox(
+                                                  height: 10.0,
+                                                ),
+                                                const Icon(
+                                                  Icons.run_circle,
+                                                  size: 60,
+                                                ),
+                                                const Text(
+                                                  "Sugar",
+                                                  style: TextStyle(
+                                                      fontFamily: "Poppins",
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 23.0),
+                                                ),
+                                                const SizedBox(
+                                                  height: 5.0,
+                                                ),
+                                                Text(
+                                                  _sugarValue
+                                                          .toStringAsFixed(2) +
+                                                      "g",
+                                                  style: const TextStyle(
+                                                    fontFamily: "Poppins",
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 20.0,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          )),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              )))
+                            ],
+                          )));
+                });
+          } else {
+            return const Center(
+                child: CircularProgressIndicator(color: Colors.red));
+          }
+        });
   }
 
   _buildChart() {
@@ -398,47 +395,61 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
       return Column(
         children: [
           SizedBox(height: 10),
-          Icon(Icons.warning_outlined, size: 72,),
-          Center(
-            child: Text("No available data for this day",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: "Poppins",
-              fontWeight: FontWeight.bold,
-              fontSize: 35
-            ))
+          Icon(
+            Icons.warning_outlined,
+            size: 72,
           ),
+          Center(
+              child: Text("No available data for this day",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontFamily: "Poppins",
+                      fontWeight: FontWeight.bold,
+                      fontSize: 35))),
+          SizedBox(height: 10)
         ],
       );
-    }
-    else {
+    } else {
       products.forEach((element) {
         _fatValue += double.parse(element.productDetail!.fat ?? "0");
         _saltValue += double.parse(element.productDetail!.salt ?? "0");
         _calorieValue += double.parse(element.productDetail!.calories ?? "0");
         _sugarValue += double.parse(element.productDetail!.sugar ?? "0");
-        _saturatedFatValue += double.parse(element.productDetail!.saturatedFat ?? "0");
+        _saturatedFatValue +=
+            double.parse(element.productDetail!.saturatedFat ?? "0");
       });
       PieChartSectionData _fat = PieChartSectionData(
-          color: Colors.red, value: _fatValue.toDouble(), title: "Fat", radius: 90, titleStyle: TextStyle(
-        fontFamily: "Poppins",
-
-      ));
+          color: Colors.red,
+          value: _fatValue.toDouble(),
+          title: "Fat",
+          radius: 90,
+          titleStyle: TextStyle(
+            fontFamily: "Poppins",
+          ));
       PieChartSectionData _sugar = PieChartSectionData(
-          color: Colors.blue, value: _sugarValue.toDouble(), title: "Sugar", radius: 90, titleStyle: TextStyle(
-        fontFamily: "Poppins",
-
-      ));
+          color: Colors.blue,
+          value: _sugarValue.toDouble(),
+          title: "Sugar",
+          radius: 90,
+          titleStyle: TextStyle(
+            fontFamily: "Poppins",
+          ));
       PieChartSectionData _salt = PieChartSectionData(
-          color: Colors.green, value: _saltValue.toDouble(), title: "Salt", radius: 90, titleStyle: TextStyle(
-        fontFamily: "Poppins",
-
-      ));
+          color: Colors.green,
+          value: _saltValue.toDouble(),
+          title: "Salt",
+          radius: 90,
+          titleStyle: TextStyle(
+            fontFamily: "Poppins",
+          ));
       PieChartSectionData _saturatedFat = PieChartSectionData(
-          color: Colors.orange, value: _saturatedFatValue.toDouble(), title: "Saturated Fat", radius: 90, titleStyle: TextStyle(
-        fontFamily: "Poppins",
-      )
-      );
+          color: Colors.orange,
+          value: _saturatedFatValue.toDouble(),
+          title: "Saturated Fat",
+          radius: 90,
+          titleStyle: TextStyle(
+            fontFamily: "Poppins",
+          ));
       sections.add(_fat);
       sections.add(_sugar);
       sections.add(_salt);
@@ -458,10 +469,8 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
                 ),
               ),
             ),
-          ])
-      );
+          ]));
     }
-
   }
 
   buildCupertinoDatePicker(BuildContext context) {
@@ -614,9 +623,6 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
               )
             ]),
         body: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          child: _getData()
-
-        ));
+            physics: BouncingScrollPhysics(), child: _getData()));
   }
 }

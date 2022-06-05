@@ -1,9 +1,5 @@
-import 'dart:ui';
-
-import 'package:Foodica/pages/init_allergens.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
@@ -12,7 +8,6 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:Foodica/pages/add_food_manual.dart';
 import 'package:Foodica/pages/calorie_detail.dart';
 import 'package:Foodica/pages/history.dart';
-import 'package:Foodica/pages/login.dart';
 import 'package:Foodica/pages/productdetail.dart';
 import 'package:Foodica/pages/settings.dart';
 import 'package:Foodica/pages/tips.dart';
@@ -35,7 +30,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   late User _user;
   String? weeklyDisplayValue;
   String displayName = "";
-  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   Widget? mainWidget;
   bool codeIsScanned = false;
   Colors? navBackColor;
@@ -63,45 +57,43 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
 
   _determineIfOnHomeScreen() {
     if (mainWidget == null) {
-      return ExpandableFab(
-          distance: 112.0,
-          children: [
-            ActionButton(icon: const Icon(Icons.qr_code), onPressed: () => scanBarcode(),),
-            ActionButton(icon: const Icon(Icons.create), onPressed: () => {
-              navigateToAddFoodManual()
-            },)
-          ]
-      );
-    }
-    else {
+      return ExpandableFab(distance: 112.0, children: [
+        ActionButton(
+          icon: const Icon(Icons.qr_code),
+          onPressed: () => scanBarcode(),
+        ),
+        ActionButton(
+          icon: const Icon(Icons.create),
+          onPressed: () => {navigateToAddFoodManual()},
+        )
+      ]);
+    } else {
       return null;
     }
   }
-
-
 
   _checkIfDailyCaloriesIsNull() {
     _getDailyCalories();
     _getCalorieGoal();
     if (_dailyCaloriesInt == null) {
       return "0/" + _calorieGoalInt.toString() + "Kcal";
-    }
-    else {
-      return _dailyCaloriesInt.toString() + "/" + _calorieGoalInt.toString() + "Kcal";
+    } else {
+      return _dailyCaloriesInt.toString() +
+          "/" +
+          _calorieGoalInt.toString() +
+          "Kcal";
     }
   }
 
   _checkIfLastScannedProductIsNull() {
     if (lastProductName == "") {
       return "None";
-    }
-    else {
+    } else {
       return lastProductName;
     }
   }
 
   @override
-
   void initState() {
     super.initState();
     _user = widget._user;
@@ -126,7 +118,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
     setState(() {
       _weeklyCaloriesInt = prefs.getInt("weekly");
     });
-
   }
 
   void _getDailyCalories() async {
@@ -135,14 +126,17 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
     setState(() {
       _dailyCaloriesInt = prefs.getInt("daily");
     });
-
   }
 
   void _getLastScannedProduct() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.reload();
     setState(() {
-      lastProductName = prefs.getString("productname")!;
+      if (prefs.getString("productname") == null) {
+        lastProductName = "";
+      } else {
+        lastProductName = prefs.getString("productname")!;
+      }
     });
   }
 
@@ -181,7 +175,11 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => DetailPage(barcode: barcodeScan, user: _user, isFromScan: true,)));
+                builder: (context) => DetailPage(
+                      barcode: barcodeScan,
+                      user: _user,
+                      isFromScan: true,
+                    )));
       }
     } on PlatformException {
       barcodeScan = "Failed to get platform version";
@@ -191,43 +189,25 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   }
 
   void navigateToHistory() {
-    Navigator.of(context)
-        .pop(MaterialPageRoute(builder: (context) =>  HistoryPage(user: _user,)));
+    Navigator.of(context).pop(MaterialPageRoute(
+        builder: (context) => HistoryPage(
+              user: _user,
+            )));
   }
 
   void navigateToSettings() {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => SettingsPage(user: _user)));
+    Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => SettingsPage(user: _user)));
   }
 
   void navigateToTips() {
-    Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => TipsPage(user: _user)));
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => TipsPage(user: _user)));
   }
 
   void navigateToAddFoodManual() {
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (context) => ManualFoodPage(user: _user)
-    ));
-  }
-
-  Route _routeToLoginScreen() {
-    return PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            const LoginPage(),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          var begin = const Offset(-1.0, 0.0);
-          var end = Offset.zero;
-          var curve = Curves.ease;
-
-          var tween =
-              Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-          return SlideTransition(
-            position: animation.drive(tween),
-            child: child,
-          );
-        });
+    Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => ManualFoodPage(user: _user)));
   }
 
   Widget? _buildHomeScreen() {
@@ -252,59 +232,59 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                       padding: const EdgeInsets.all(12.0),
                       child: Center(
                           child: Wrap(
-                            spacing: 20,
-                            runSpacing: 20.0,
-                            children: <Widget>[
-                              SizedBox(
-                                width: 350.0,
-                                height: 200.0,
-                                child: Card(
-                                  elevation: 2.0,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0)),
-                                  child: InkWell(
-                                    child: Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Column(
-                                            children: <Widget>[
-                                              const SizedBox(
-                                                height: 10.0,
-                                              ),
-                                              const Icon(
-                                                Icons.run_circle,
-                                                size: 60,
-                                              ),
-                                              const Text(
-                                                "Daily Calories",
-                                                style: TextStyle(
-                                                    fontFamily: "Poppins",
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 30.0),
-                                              ),
-                                              const SizedBox(
-                                                height: 5.0,
-                                              ),
-                                              Text(
-                                                _checkIfDailyCaloriesIsNull(),
-                                                style: const TextStyle(
-                                                  fontFamily: "Poppins",
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 20.0,
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        )),
-                                    onTap: () => Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                CalorieDetailPage(user: _user))),
+                        spacing: 20,
+                        runSpacing: 20.0,
+                        children: <Widget>[
+                          SizedBox(
+                            width: 350.0,
+                            height: 200.0,
+                            child: Card(
+                              elevation: 2.0,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0)),
+                              child: InkWell(
+                                child: Center(
+                                    child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    children: <Widget>[
+                                      const SizedBox(
+                                        height: 10.0,
+                                      ),
+                                      const Icon(
+                                        Icons.run_circle,
+                                        size: 60,
+                                      ),
+                                      const Text(
+                                        "Daily Calories",
+                                        style: TextStyle(
+                                            fontFamily: "Poppins",
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 30.0),
+                                      ),
+                                      const SizedBox(
+                                        height: 5.0,
+                                      ),
+                                      Text(
+                                        _checkIfDailyCaloriesIsNull(),
+                                        style: const TextStyle(
+                                          fontFamily: "Poppins",
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 20.0,
+                                        ),
+                                      )
+                                    ],
                                   ),
-                                ),
+                                )),
+                                onTap: () => Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            CalorieDetailPage(user: _user))),
                               ),
-                            ],
-                          )))
+                            ),
+                          ),
+                        ],
+                      )))
                 ],
               ),
               Column(
@@ -313,307 +293,116 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                       padding: const EdgeInsets.all(12.0),
                       child: Center(
                           child: Wrap(
-                            spacing: 20,
-                            runSpacing: 20.0,
-                            children: <Widget>[
-                              SizedBox(
-                                width: 350.0,
-                                child: Card(
-                                  elevation: 2.0,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0)),
+                        spacing: 20,
+                        runSpacing: 20.0,
+                        children: <Widget>[
+                          SizedBox(
+                            width: 350.0,
+                            child: Card(
+                              elevation: 2.0,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0)),
+                              child: Center(
+                                  child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: <Widget>[
+                                    const SizedBox(
+                                      height: 10.0,
+                                    ),
+                                    const Icon(
+                                      Icons.qr_code,
+                                      size: 60,
+                                    ),
+                                    const Text(
+                                      "Last Scanned Product",
+                                      style: TextStyle(
+                                          fontFamily: "Poppins",
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 25.0),
+                                    ),
+                                    const SizedBox(
+                                      height: 5.0,
+                                    ),
+                                    Text(
+                                      _checkIfLastScannedProductIsNull(),
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontFamily: "Poppins",
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 20.0,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              )),
+                            ),
+                          ),
+                        ],
+                      )))
+                ],
+              ),
+              Column(
+                children: [
+                  Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Center(
+                          child: Wrap(
+                        spacing: 20,
+                        runSpacing: 20.0,
+                        children: <Widget>[
+                          SizedBox(
+                            width: 350.0,
+                            height: 200.0,
+                            child: Card(
+                                elevation: 2.0,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0)),
+                                child: InkWell(
+                                  onTap: () {},
                                   child: Center(
                                       child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Column(
-                                          children: <Widget>[
-                                            const SizedBox(
-                                              height: 10.0,
-                                            ),
-                                            const Icon(
-                                              Icons.qr_code,
-                                              size: 60,
-                                            ),
-                                            const Text(
-                                              "Last Scanned Product",
-                                              style: TextStyle(
-                                                  fontFamily: "Poppins",
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 25.0),
-                                            ),
-                                            const SizedBox(
-                                              height: 5.0,
-                                            ),
-                                            Text(
-                                              _checkIfLastScannedProductIsNull(),
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                fontFamily: "Poppins",
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 20.0,
-                                              ),
-                                            )
-                                          ],
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      children: <Widget>[
+                                        const SizedBox(
+                                          height: 10.0,
                                         ),
-                                      )),
-                                ),
-                              ),
-                            ],
-                          )))
-                ],
-              ),
-              Column(
-                children: [
-                  Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Center(
-                          child: Wrap(
-                            spacing: 20,
-                            runSpacing: 20.0,
-                            children: <Widget>[
-                              SizedBox(
-                                width: 350.0,
-                                height: 200.0,
-                                child: Card(
-                                    elevation: 2.0,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8.0)),
-                                    child: InkWell(
-                                      onTap: () {
-
-                                      },
-                                      child: Center(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Column(
-                                              children: <Widget>[
-                                                const SizedBox(
-                                                  height: 10.0,
-                                                ),
-                                                const Icon(
-                                                  Icons.food_bank_outlined,
-                                                  size: 60,
-                                                ),
-                                                const Text(
-                                                  "Weekly Calories",
-                                                  style: TextStyle(
-                                                      fontFamily: "Poppins",
-                                                      fontWeight: FontWeight.bold,
-                                                      fontSize: 30.0),
-                                                ),
-                                                const SizedBox(
-                                                  height: 5.0,
-                                                ),
-                                                Text(
-                                                  _checkIfWeeklyCaloriesIsNull(),
-                                                  style: const TextStyle(
-                                                    fontFamily: "Poppins",
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 20.0,
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          )),
-                                    )),
-                              ),
-                            ],
-                          )))
+                                        const Icon(
+                                          Icons.food_bank_outlined,
+                                          size: 60,
+                                        ),
+                                        const Text(
+                                          "Weekly Calories",
+                                          style: TextStyle(
+                                              fontFamily: "Poppins",
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 30.0),
+                                        ),
+                                        const SizedBox(
+                                          height: 5.0,
+                                        ),
+                                        Text(
+                                          _checkIfWeeklyCaloriesIsNull(),
+                                          style: const TextStyle(
+                                            fontFamily: "Poppins",
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 20.0,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  )),
+                                )),
+                          ),
+                        ],
+                      )))
                 ],
               ),
             ],
           )
         ],
       );
-      return SingleChildScrollView(
-          child: Column(children: [
-        Container(
-          alignment: Alignment.center,
-          padding: const EdgeInsets.all(20.0),
-          child: const Text("Today",
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontFamily: "Poppins",
-                  fontSize: 45)),
-        ),
-            Column(
-              children: [
-                Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Center(
-                        child: Wrap(
-                          spacing: 20,
-                          runSpacing: 20.0,
-                          children: <Widget>[
-                            SizedBox(
-                              width: 350.0,
-                              height: 200.0,
-                              child: Card(
-                                elevation: 2.0,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.0)),
-                                child: InkWell(
-                                  child: Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Column(
-                                          children: <Widget>[
-                                            const SizedBox(
-                                              height: 10.0,
-                                            ),
-                                            const Icon(
-                                              Icons.run_circle,
-                                              size: 60,
-                                            ),
-                                            const Text(
-                                              "Calories Consumed",
-                                              style: TextStyle(
-                                                  fontFamily: "Poppins",
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 30.0),
-                                            ),
-                                            const SizedBox(
-                                              height: 5.0,
-                                            ),
-                                            Text(
-                                              _checkIfDailyCaloriesIsNull(),
-                                              style: const TextStyle(
-                                                fontFamily: "Poppins",
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 20.0,
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      )),
-                                  onTap: () => Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              CalorieDetailPage(user: _user))),
-                                ),
-                              ),
-                            ),
-                          ],
-                        )))
-              ],
-            ),
-            Column(
-              children: [
-                Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Center(
-                        child: Wrap(
-                          spacing: 20,
-                          runSpacing: 20.0,
-                          children: <Widget>[
-                            SizedBox(
-                              width: 350.0,
-                              child: Card(
-                                elevation: 2.0,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.0)),
-                                child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        children: <Widget>[
-                                          const SizedBox(
-                                            height: 10.0,
-                                          ),
-                                          const Icon(
-                                            Icons.qr_code,
-                                            size: 60,
-                                          ),
-                                          const Text(
-                                            "Last scanned product",
-                                            style: TextStyle(
-                                                fontFamily: "Poppins",
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 25.0),
-                                          ),
-                                          const SizedBox(
-                                            height: 5.0,
-                                          ),
-                                          Text(
-                                            _checkIfLastScannedProductIsNull(),
-                                            textAlign: TextAlign.center,
-                                            style: const TextStyle(
-                                              fontFamily: "Poppins",
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 20.0,
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    )),
-                              ),
-                            ),
-                          ],
-                        )))
-              ],
-            ),
-        Column(
-          children: [
-            Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Center(
-                    child: Wrap(
-                  spacing: 20,
-                  runSpacing: 20.0,
-                  children: <Widget>[
-                    SizedBox(
-                      width: 350.0,
-                      height: 200.0,
-                      child: Card(
-                          elevation: 2.0,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0)),
-                          child: InkWell(
-                            onTap: () {
-
-                            },
-                            child: Center(
-                                child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                children: <Widget>[
-                                  const SizedBox(
-                                    height: 10.0,
-                                  ),
-                                  const Icon(
-                                    Icons.food_bank_outlined,
-                                    size: 60,
-                                  ),
-                                  const Text(
-                                    "Weekly Calories",
-                                    style: TextStyle(
-                                        fontFamily: "Poppins",
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 30.0),
-                                  ),
-                                  const SizedBox(
-                                    height: 5.0,
-                                  ),
-                                  Text(
-                                    _checkIfWeeklyCaloriesIsNull(),
-                                    style: const TextStyle(
-                                      fontFamily: "Poppins",
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 20.0,
-                                    ),
-                                  )
-                                ],
-                              ),
-                            )),
-                          )),
-                    ),
-                  ],
-                )))
-          ],
-        ),
-
-
-      ]));
     } else {
       return mainWidget;
     }
@@ -621,8 +410,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
 
   @override
   Widget build(BuildContext context) {
-
-
     _setNavTextColor() {
       var brightness = MediaQuery.of(context).platformBrightness;
       bool isDarkMode = brightness == Brightness.dark;
@@ -634,9 +421,8 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
       }
     }
 
-
     return Scaffold(
-      floatingActionButton: _determineIfOnHomeScreen(),
+        floatingActionButton: _determineIfOnHomeScreen(),
         drawer: Drawer(
           child: ListView(
             // Important: Remove any padding from the ListView.
@@ -730,7 +516,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                   Navigator.pop(context);
                 },
               ),
-
             ],
           ),
         ),
@@ -739,7 +524,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
         //   child: const Icon(Icons.add_rounded, size: 40),
         // ),
         appBar: AppBar(
-
           automaticallyImplyLeading: false,
           leading: Builder(
             builder: (context) => IconButton(

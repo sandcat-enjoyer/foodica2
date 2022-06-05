@@ -4,14 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:openfoodfacts/model/Product.dart';
 import 'package:intl/intl.dart';
 
 import '../models/scanned_product.dart';
 
-
 class HistoryPage extends StatefulWidget {
-  const HistoryPage({Key? key, required User user}) : _user = user, super(key: key);
+  const HistoryPage({Key? key, required User user})
+      : _user = user,
+        super(key: key);
 
   final User _user;
 
@@ -28,12 +28,11 @@ class _HistoryPageState extends State<HistoryPage> {
   ScrollController scrollController = ScrollController();
   int productLength = 0;
   final ref = FirebaseDatabase(
-      databaseURL:
-      "https://foodica-9743c-default-rtdb.europe-west1.firebasedatabase.app")
+          databaseURL:
+              "https://foodica-9743c-default-rtdb.europe-west1.firebasedatabase.app")
       .ref();
 
   final DateFormat formatter = DateFormat("dd/M/yyyy");
-
 
   buildCupertinoDatePicker(BuildContext context) {
     showModalBottomSheet(
@@ -154,11 +153,10 @@ class _HistoryPageState extends State<HistoryPage> {
     }
   }
 
-
-
   _buildHistory() {
     return FutureBuilder(
-        future: ref.child("/users/" + user.uid + "/products/").orderByKey().get(),
+        future:
+            ref.child("/users/" + user.uid + "/products/").orderByKey().get(),
         builder: (context, AsyncSnapshot<DataSnapshot> snapshot) {
           if (snapshot.hasData) {
             productList.clear();
@@ -181,12 +179,10 @@ class _HistoryPageState extends State<HistoryPage> {
                       saturatedFat: value["product"]["saturatedFat"].toString(),
                       calories: value["product"]["calories"].toString(),
                       scanTime: DateTime.parse(value["product"]["scanTime"]),
-                    )
-                );
+                    ));
                 productList.add(newProduct);
               });
             }
-
 
             return ListView.builder(
                 itemCount: productList.length,
@@ -194,118 +190,137 @@ class _HistoryPageState extends State<HistoryPage> {
                 controller: scrollController,
                 itemBuilder: (BuildContext context, int position) {
                   Widget? _checkImageUrl() {
-                    if (productList[position].productDetail?.image == "" || productList[position].productDetail?.image == "0") {
+                    if (productList[position].productDetail?.image == "" ||
+                        productList[position].productDetail?.image == "0") {
                       return null;
-                    }
-                    else {
-                      return CachedNetworkImage(imageUrl: productList[position].productDetail!.image!, width: 100,);
+                    } else {
+                      return CachedNetworkImage(
+                        imageUrl: productList[position].productDetail!.image!,
+                        width: 100,
+                      );
                     }
                   }
 
                   _checkIfCategoryIsEmpty() {
                     if (productList[position].productDetail!.category == "") {
                       return "Category: Unknown";
-                    }
-                    else {
-                      return "Category: " + productList[position].productDetail!.category!;
+                    } else {
+                      return "Category: " +
+                          productList[position].productDetail!.category!;
                     }
                   }
 
                   return Container(
                       child: Column(
-                        children: [
-                          Center(
-                            child: Wrap(
-                              spacing: 20,
-                              runSpacing: 20.0,
-                              children: <Widget>[
-                                SizedBox(
-                                    width: 350.0,
-                                    child: Card(
-                                      elevation: 2.0,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8.0)),
-                                      child: Center(
-                                          child: Padding(
-                                              padding: const EdgeInsets.all(8.0),
-                                              child: Column(
-                                                children: <Widget>[
-                                                  SizedBox(height: 10.0),
-                                                  Text(productList[position].productDetail?.productname ?? "",
-                                                      textAlign: TextAlign.center,
-                                                      style: TextStyle(
-                                                          fontFamily: "Poppins",
-                                                          fontSize: 20.0,
-                                                          fontWeight: FontWeight.w800)),
-                                                  SizedBox(height: 10.0),
-                                                  _checkImageUrl() ?? SizedBox(height: 0),
-                                                  Text(_checkIfCategoryIsEmpty(), style: TextStyle(fontFamily: "Poppins", fontSize: 18, fontWeight: FontWeight.w500),),
-                                                  SizedBox(height: 10),
-                                                  Text("Scanned on: " + formatter.format(productList[position].productDetail!.scanTime!).toString(), style: TextStyle(fontFamily: "Poppins", fontSize: 18, fontWeight: FontWeight.w500)),
-                                                  SizedBox(height: 10),
-                                                  TextButton(onPressed: () {
-                                                    debugPrint(productList[position].productDetail!.code ?? "Not Found");
-                                                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => DetailPage(barcode: productList[position].productDetail!.code ?? "", user: user, isFromScan: false,)));
-                                                  }, child: Text("More information", style: TextStyle(fontFamily: "Poppins", fontWeight: FontWeight.bold))),
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      showDialog(context: context, builder: (context) {
-                                                        return AlertDialog(
-                                                          shape: const RoundedRectangleBorder(
-                                                            borderRadius: BorderRadius.all(Radius.circular(20))
-                                                          ),
-                                                          title: const Text("Delete Product",
-                                                          style: TextStyle(
-                                                            fontFamily: "Poppins",
-                                                            fontWeight: FontWeight.bold
-                                                          )),
-                                                          content: StatefulBuilder(
-                                                            builder: (context, SBsetState) {
-                                                              return Text("Are you sure you want to delete this product from your history?");
-                                                            },
-                                                          ),
-                                                          actions: [
-                                                            TextButton(onPressed: () {
-                                                              Navigator.pop(context);
+                    children: [
+                      Center(
+                        child: Wrap(
+                          spacing: 20,
+                          runSpacing: 20.0,
+                          children: <Widget>[
+                            SizedBox(
+                                width: 350.0,
+                                child: Card(
+                                  elevation: 2.0,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0)),
+                                  child: Center(
+                                      child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            children: <Widget>[
+                                              SizedBox(height: 10.0),
+                                              Text(
+                                                  productList[position]
+                                                          .productDetail
+                                                          ?.productname ??
+                                                      "",
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                      fontFamily: "Poppins",
+                                                      fontSize: 20.0,
+                                                      fontWeight:
+                                                          FontWeight.w800)),
+                                              SizedBox(height: 10.0),
+                                              _checkImageUrl() ??
+                                                  SizedBox(height: 0),
+                                              Text(
+                                                _checkIfCategoryIsEmpty(),
+                                                style: TextStyle(
+                                                    fontFamily: "Poppins",
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                              ),
+                                              SizedBox(height: 10),
+                                              Text(
+                                                  "Scanned on: " +
+                                                      formatter
+                                                          .format(productList[
+                                                                  position]
+                                                              .productDetail!
+                                                              .scanTime!)
+                                                          .toString(),
+                                                  style: TextStyle(
+                                                      fontFamily: "Poppins",
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.w500)),
+                                              SizedBox(height: 10),
+                                              // TextButton(onPressed: () {
+                                              //   debugPrint(productList[position].productDetail!.code ?? "Not Found");
+                                              //   Navigator.of(context).push(MaterialPageRoute(builder: (context) => DetailPage(barcode: productList[position].productDetail!.code ?? "", user: user, isFromScan: false,)));
+                                              // }, child: Text("More information", style: TextStyle(fontFamily: "Poppins", fontWeight: FontWeight.bold))),
+                                              // TextButton(
+                                              //   onPressed: () {
+                                              //     showDialog(context: context, builder: (context) {
+                                              //       return AlertDialog(
+                                              //         shape: const RoundedRectangleBorder(
+                                              //           borderRadius: BorderRadius.all(Radius.circular(20))
+                                              //         ),
+                                              //         title: const Text("Delete Product",
+                                              //         style: TextStyle(
+                                              //           fontFamily: "Poppins",
+                                              //           fontWeight: FontWeight.bold
+                                              //         )),
+                                              //         content: StatefulBuilder(
+                                              //           builder: (context, SBsetState) {
+                                              //             return Text("Are you sure you want to delete this product from your history?");
+                                              //           },
+                                              //         ),
+                                              //         actions: [
+                                              //           TextButton(onPressed: () {
+                                              //             Navigator.pop(context);
 
-                                                            }, child: Text("Delete", style: TextStyle(fontFamily: "Poppins", color: Colors.red))),
-                                                            TextButton(onPressed: () {
-                                                              Navigator.pop(context);
-                                                            }, child: Text("Cancel", style: TextStyle(fontFamily: "Poppins")))
-                                                          ],
+                                              //           }, child: Text("Delete", style: TextStyle(fontFamily: "Poppins", color: Colors.red))),
+                                              //           TextButton(onPressed: () {
+                                              //             Navigator.pop(context);
+                                              //           }, child: Text("Cancel", style: TextStyle(fontFamily: "Poppins")))
+                                              //         ],
 
-                                                        );
-                                                      });
-                                                    },
-                                                    child: Text("Delete Product", style: TextStyle(
-                                                      fontFamily: "Poppins", color: Colors.red
-                                                    ))
-                                                  )
-                                                ],
-                                              ))),
-                                    ))
-                              ],
-                            ),
-                          ),
-                        ],
-                      )
-                  );
-
-
+                                              //       );
+                                              //     });
+                                              //   },
+                                              //   child: Text("Delete Product", style: TextStyle(
+                                              //     fontFamily: "Poppins", color: Colors.red
+                                              //   ))
+                                              // )
+                                            ],
+                                          ))),
+                                )),
+                            SizedBox(height: 5),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ));
                 });
-          }
-          else {
+          } else {
             return const Center(
-                child: CircularProgressIndicator(color: Colors.red)
-            );
+                child: CircularProgressIndicator(color: Colors.red));
           }
-        }
-    );
+        });
   }
-
-
-
-
 
   @override
   void initState() {
@@ -320,92 +335,87 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   _printData() {
-    for (int i = 0; i < productLength; i++ ) {
+    for (int i = 0; i < productLength; i++) {
       print(productList[i]);
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-_printData();
+    _printData();
     return Scaffold(
         body: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          child: Container(
-            padding: EdgeInsets.all(20.0),
-            child: Column(
-              children: [
-                Container(
-                    alignment: Alignment.center,
-                    child: Text("History",
-                        style: TextStyle(
-                            fontFamily: "Poppins",
-                            fontWeight: FontWeight.bold,
-                            fontSize: 40
-                        ))
-                ),
-                _buildHistory()
-              ],
-            )
-          )
-        )
-    //      SingleChildScrollView(
-    //         child: Column(
-    //   children: <Widget>[
-    //     Container(
-    //       padding: const EdgeInsets.all(20.0),
-    //       child: const Text("History",
-    //           textAlign: TextAlign.center,
-    //           style: TextStyle(
-    //               fontWeight: FontWeight.bold,
-    //               fontFamily: "Poppins",
-    //               fontSize: 35)),
-    //     ),
-    //     Column(
-    //       children: [
-    //         Padding(
-    //           padding: const EdgeInsets.all(12.0),
-    //           child: Center(
-    //             child: Wrap(
-    //               spacing: 20,
-    //               runSpacing: 20.0,
-    //               children: <Widget>[
-    //                 SizedBox(
-    //                     width: 300.0,
-    //                     height: 180.0,
-    //                     child: Card(
-    //                       elevation: 2.0,
-    //                       shape: RoundedRectangleBorder(
-    //                           borderRadius: BorderRadius.circular(8.0)),
-    //                       child: Center(
-    //                           child: Padding(
-    //                               padding: const EdgeInsets.all(8.0),
-    //                               child: Column(
-    //                                 children: const <Widget>[
-    //                                   SizedBox(height: 10.0),
-    //                                   Text("Product 1",
-    //                                       style: TextStyle(
-    //                                           fontFamily: "Poppins",
-    //                                           fontSize: 30.0,
-    //                                           fontWeight: FontWeight.w800)),
-    //                                   SizedBox(height: 10.0),
-    //                                   Text("lorem ipsum lol",
-    //                                       style: TextStyle(
-    //                                           fontFamily: "Poppins",
-    //                                           fontSize: 16.0,
-    //                                           fontWeight: FontWeight.w600))
-    //                                 ],
-    //                               ))),
-    //                     ))
-    //               ],
-    //             ),
-    //           ),
-    //         )
-    //       ],
-    //     )
-    //   ],
-    // )));
-    );
+            physics: BouncingScrollPhysics(),
+            child: Container(
+                padding: EdgeInsets.all(20.0),
+                child: Column(
+                  children: [
+                    Container(
+                        alignment: Alignment.center,
+                        child: Text("History",
+                            style: TextStyle(
+                                fontFamily: "Poppins",
+                                fontWeight: FontWeight.bold,
+                                fontSize: 40))),
+                    _buildHistory()
+                  ],
+                )))
+        //      SingleChildScrollView(
+        //         child: Column(
+        //   children: <Widget>[
+        //     Container(
+        //       padding: const EdgeInsets.all(20.0),
+        //       child: const Text("History",
+        //           textAlign: TextAlign.center,
+        //           style: TextStyle(
+        //               fontWeight: FontWeight.bold,
+        //               fontFamily: "Poppins",
+        //               fontSize: 35)),
+        //     ),
+        //     Column(
+        //       children: [
+        //         Padding(
+        //           padding: const EdgeInsets.all(12.0),
+        //           child: Center(
+        //             child: Wrap(
+        //               spacing: 20,
+        //               runSpacing: 20.0,
+        //               children: <Widget>[
+        //                 SizedBox(
+        //                     width: 300.0,
+        //                     height: 180.0,
+        //                     child: Card(
+        //                       elevation: 2.0,
+        //                       shape: RoundedRectangleBorder(
+        //                           borderRadius: BorderRadius.circular(8.0)),
+        //                       child: Center(
+        //                           child: Padding(
+        //                               padding: const EdgeInsets.all(8.0),
+        //                               child: Column(
+        //                                 children: const <Widget>[
+        //                                   SizedBox(height: 10.0),
+        //                                   Text("Product 1",
+        //                                       style: TextStyle(
+        //                                           fontFamily: "Poppins",
+        //                                           fontSize: 30.0,
+        //                                           fontWeight: FontWeight.w800)),
+        //                                   SizedBox(height: 10.0),
+        //                                   Text("lorem ipsum lol",
+        //                                       style: TextStyle(
+        //                                           fontFamily: "Poppins",
+        //                                           fontSize: 16.0,
+        //                                           fontWeight: FontWeight.w600))
+        //                                 ],
+        //                               ))),
+        //                     ))
+        //               ],
+        //             ),
+        //           ),
+        //         )
+        //       ],
+        //     )
+        //   ],
+        // )));
+        );
   }
 }

@@ -4,8 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-import '../pages/homescreen.dart';
-
 class Authentication {
   static Future<FirebaseApp> initializeFirebase({
     required BuildContext context,

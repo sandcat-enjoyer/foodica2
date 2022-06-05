@@ -1,9 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:Foodica/data/data.dart';
 import 'package:Foodica/pages/login.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 
 class OnboardingScreen extends StatefulWidget {
@@ -18,8 +16,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   int slideIndex = 0;
   PageController? controller;
   late User loggedInUser;
-
-  final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   late bool isLoggedIn = false;
 
   Widget _buildPageIndicator(bool isCurrentPage) {
@@ -35,7 +31,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     mySlides = getSlides();
     controller = PageController();
@@ -178,7 +173,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 }
 
 class SlideTile extends StatelessWidget {
-  String imagePath, title, desc;
+  final String imagePath, title, desc;
 
   SlideTile(
       {Key? key,

@@ -68,8 +68,6 @@ class _InitCalorieGoalState extends State<InitCalorieGoal> {
 
   @override
   Widget build(BuildContext context) {
-    int calorieGoalWeekly = 0;
-
     return Scaffold(
         body: SingleChildScrollView(
       child: Container(
@@ -128,10 +126,10 @@ class _InitCalorieGoalState extends State<InitCalorieGoal> {
                     style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.all(Colors.red)),
                     onPressed: () async {
-                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
                       prefs.setInt("goal", calorieGoalDaily);
-                      print(prefs.getInt("goal"));
-                      Navigator.of(context).push(MaterialPageRoute(
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
                           builder: (context) => HomeScreenPage(user: user)));
                     },
                     child: const Text("Save Calorie Goal")))

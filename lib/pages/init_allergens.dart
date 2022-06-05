@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,6 +25,8 @@ class _InitAllergensState extends State<InitAllergens> {
   late User user;
 
   String allergen = "";
+  List<String> allergens = [];
+
   int? calorieGoal;
 
   @override
@@ -37,44 +38,6 @@ class _InitAllergensState extends State<InitAllergens> {
   @override
   void dispose() {
     super.dispose();
-  }
-
-  _determineAllergenToSave() {
-    //this still needs to be adjusted for multiple allergens but for now just one
-    //so this code kinda sucks and isn't very pretty lol
-    if (gluten == true) {
-      setState(() {
-        allergen = "gluten";
-      });
-    }
-    else if (eggs == true) {
-      setState(() {
-        allergen = "eggs";
-      });
-    }
-
-    else if (milk == true) {
-      setState(() {
-        allergen = "milk";
-      });
-    }
-    else if (peanuts == true) {
-      setState(() {
-        allergen = "peanuts";
-      });
-    }
-    else if (soy == true) {
-      setState(() {
-        allergen = "soy";
-      });
-    }
-    _saveAllergenToMemory();
-  }
-
-  _saveAllergenToMemory() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString("allergen", allergen);
-    print(prefs.getString("allergen"));
   }
 
   @override
@@ -169,22 +132,41 @@ class _InitAllergensState extends State<InitAllergens> {
                     SizedBox(height: 100.0),
                     TextButton(
                         onPressed: () async {
-                          _determineAllergenToSave();
-                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                          if (gluten == true) {
+                            allergens.add("gluten");
+                          }
+                          if (milk == true) {
+                            allergens.add("milk");
+                          }
+                          if (eggs == true) {
+                            allergens.add("eggs");
+                          }
+                          if (soy == true) {
+                            allergens.add("soy");
+                          }
+                          if (peanuts == true) {
+                            allergens.add("peanuts");
+                          }
+                          print(allergens);
+                          SharedPreferences.getInstance().then((prefs) =>
+                              {prefs.setStringList("allergens", allergens)});
+                          SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
                           setState(() {
                             calorieGoal = prefs.getInt("goal");
                           });
                           print(calorieGoal);
                           if (calorieGoal == null) {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) =>
-                                    InitCalorieGoal(user: user)));
+                            Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        InitCalorieGoal(user: user)));
+                          } else {
+                            Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        HomeScreenPage(user: user)));
                           }
-                          else {
-                            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomeScreenPage(user: user)));
-                          }
-
-
                         },
                         child: const Text("Done",
                             style: TextStyle(

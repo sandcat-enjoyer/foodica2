@@ -3,7 +3,6 @@ import 'package:Foodica/utils/uuid.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:flutter/material.dart';
-import 'package:openfoodfacts/model/Product.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -29,7 +28,6 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage> {
   late Colors fatColor;
   late firebase.User user;
-  late Future<int> _weeklyCalories;
   late Future<int> _dailyCalories;
   Uuid uuid = Uuid();
   final fb = FirebaseDatabase.instance;
@@ -82,6 +80,9 @@ class _DetailPageState extends State<DetailPage> {
     } else {
       showDialog(context: context, builder: (context) {
         return AlertDialog(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(20))
+          ),
           title: Text("Product not found", style: TextStyle(
             fontFamily: "Poppins",
             fontWeight: FontWeight.bold

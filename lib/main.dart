@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'package:Foodica/pages/homescreen.dart';
+import 'dart:ui';
 import 'package:Foodica/pages/init_allergens.dart';
 import 'package:Foodica/pages/onboarding.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,29 +10,27 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  _checkAllergensOnBootup();
   runApp(const MyApp());
 }
 
-String allergen = "";
+bool isAllergensNotEmpty = false;
 
 _loadApp() {
-  _checkAllergensOnBootup();
   if (FirebaseAuth.instance.currentUser != null) {
-    if (allergen != null) {
+    SharedPreferences.getInstance().then((prefs) => {
+          if (prefs.getStringList("allergens")!.isEmpty)
+            {isAllergensNotEmpty = false}
+          else
+            {isAllergensNotEmpty = true}
+        });
+    if (isAllergensNotEmpty = true) {
       return HomeScreenPage(user: FirebaseAuth.instance.currentUser!);
-    }
-    else {
+    } else {
       return InitAllergens(user: FirebaseAuth.instance.currentUser!);
     }
   } else {
     return OnboardingScreen();
   }
-}
-
-_checkAllergensOnBootup() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  allergen = prefs.getString("allergen")!;
 }
 
 class MyApp extends StatelessWidget {

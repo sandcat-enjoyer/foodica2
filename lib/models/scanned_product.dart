@@ -1,5 +1,3 @@
-import 'package:Foodica/models/scanned_product.dart';
-
 class ScannedProduct {
   String? productID;
   ProductDetail? productDetail;
