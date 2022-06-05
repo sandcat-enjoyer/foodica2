@@ -1,4 +1,3 @@
-import 'package:Foodica/pages/productdetail.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
