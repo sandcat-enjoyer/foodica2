@@ -243,12 +243,24 @@ class _HistoryPageState extends State<HistoryPage> {
                                                   SizedBox(height: 0),
                                               Text(
                                                 _checkIfCategoryIsEmpty(),
+                                                textAlign: TextAlign.center,
                                                 style: TextStyle(
                                                     fontFamily: "Poppins",
                                                     fontSize: 18,
                                                     fontWeight:
                                                         FontWeight.w500),
                                               ),
+                                              SizedBox(height: 10),
+                                              Text(
+                                                  "Brand: " +
+                                                      productList[position]
+                                                          .productDetail!
+                                                          .brand!,
+                                                  style: TextStyle(
+                                                      fontFamily: "Poppins",
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.w500)),
                                               SizedBox(height: 10),
                                               Text(
                                                   "Scanned on: " +

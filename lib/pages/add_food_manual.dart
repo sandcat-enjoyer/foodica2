@@ -5,6 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/scanned_product.dart';
 import '../utils/uuid.dart';
@@ -31,6 +32,8 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
   String imagePath = "";
   String calories = "";
   String fat = "";
+  int? dailyCalories;
+  int? weeklyCalories;
   String salt = "";
   String saturatedFat = "";
   String sugar = "";
@@ -68,6 +71,8 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
     super.initState();
     user = widget._user;
     _getProductInfo();
+    _getDailyCalories();
+    _getWeeklyCalories();
   }
 
   @override
@@ -138,11 +143,50 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
         .catchError((error) => print("Error: " + error));
   }
 
+  _getDailyCalories() {
+    SharedPreferences.getInstance().then((prefs) => {
+          setState(() {
+            dailyCalories = prefs.getInt("daily");
+          })
+        });
+  }
+
+  _getWeeklyCalories() {
+    SharedPreferences.getInstance().then((prefs) => {
+          setState(() {
+            weeklyCalories = prefs.getInt("weekly") ?? 0;
+          })
+        });
+  }
+
+  _addToDailyCalories() {
+    SharedPreferences.getInstance().then((prefs) {
+      int newCalories = dailyCalories! + int.parse(calories);
+      prefs.setInt("daily", newCalories);
+    });
+  }
+
+  _addToWeeklyCalories() {
+    SharedPreferences.getInstance().then((prefs) {
+      int newWeeklyCalories = weeklyCalories! + int.parse(calories);
+      print(newWeeklyCalories);
+      prefs.setInt("weekly", newWeeklyCalories);
+    });
+  }
+
+  _saveLastScannedProductName() {
+    SharedPreferences.getInstance().then((prefs) {
+      print(productName);
+      prefs.setString("productname", productName);
+    });
+  }
+
   _checkIfImageExists() {
     if (photo != null) {
       return Image.file(photo!, width: 200);
     } else {
-      return const Text("Image will appear here");
+      return const Text("Image will appear here",
+          style: TextStyle(fontFamily: "Poppins"));
     }
   }
 
@@ -152,10 +196,14 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
         floatingActionButton: FloatingActionButton(
             onPressed: () {
               _saveProductToFirebase();
+              _addToDailyCalories();
+              _saveLastScannedProductName();
+              _addToWeeklyCalories();
               Navigator.pop(context);
             },
             child: const Icon(Icons.save)),
         appBar: AppBar(
+            centerTitle: true,
             title: const Text("Foodica",
                 style: TextStyle(
                     fontFamily: "Poppins", fontWeight: FontWeight.bold))),
@@ -178,6 +226,7 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                       controller: productNameController,
                       decoration: const InputDecoration(
                           border: OutlineInputBorder(),
+                          hintStyle: TextStyle(fontFamily: "Poppins"),
                           hintText: "Name of Food"),
                       onChanged: (value) => {productName = value.trim()}),
                 ),
@@ -187,7 +236,9 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                     child: TextField(
                       controller: brandController,
                       decoration: const InputDecoration(
-                          border: OutlineInputBorder(), hintText: "Brand"),
+                          hintStyle: TextStyle(fontFamily: "Poppins"),
+                          border: OutlineInputBorder(),
+                          hintText: "Brand"),
                       onChanged: (value) {
                         brand = value.trim();
                       },
@@ -198,7 +249,9 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                     child: TextField(
                       controller: categoryController,
                       decoration: const InputDecoration(
-                          border: OutlineInputBorder(), hintText: "Category"),
+                          hintStyle: TextStyle(fontFamily: "Poppins"),
+                          border: OutlineInputBorder(),
+                          hintText: "Category"),
                       onChanged: (value) {
                         category = value.trim();
                       },
@@ -254,13 +307,15 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                                 ));
                           });
                     },
-                    child: const Text("Take picture")),
+                    child: const Text("Take picture",
+                        style: TextStyle(fontFamily: "Poppins"))),
                 const SizedBox(height: 10),
                 SizedBox(
                     width: 350,
                     child: TextField(
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
+                        hintStyle: TextStyle(fontFamily: "Poppins"),
                         border: OutlineInputBorder(),
                         hintText: "Amount of Calories (in Kcal)",
                       ),
@@ -276,6 +331,7 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                     child: TextField(
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
+                          hintStyle: TextStyle(fontFamily: "Poppins"),
                           border: OutlineInputBorder(),
                           hintText: "Amount of Fat (in Grams)"),
                       onChanged: (value) {
@@ -288,6 +344,7 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                     child: TextField(
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
+                          hintStyle: TextStyle(fontFamily: "Poppins"),
                           border: OutlineInputBorder(),
                           hintText: "Amount of Salt (in Grams)"),
                       onChanged: (value) {
@@ -300,6 +357,7 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                     child: TextField(
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
+                          hintStyle: TextStyle(fontFamily: "Poppins"),
                           border: OutlineInputBorder(),
                           hintText: "Amount of Saturated Fats (in Grams)"),
                       onChanged: (value) {
@@ -312,6 +370,7 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                     child: TextField(
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
+                          hintStyle: TextStyle(fontFamily: "Poppins"),
                           border: OutlineInputBorder(),
                           hintText: "Amount of Sugars (in Grams)"),
                       onChanged: (value) {

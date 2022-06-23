@@ -29,6 +29,7 @@ class _DetailPageState extends State<DetailPage> {
   late Colors fatColor;
   late firebase.User user;
   late Future<int> _dailyCalories;
+  late Future<int> _weeklyCalories;
   Uuid uuid = Uuid();
   final fb = FirebaseDatabase.instance;
   //need a new way for this but i can only find solutions using a deprecated method
@@ -37,7 +38,7 @@ class _DetailPageState extends State<DetailPage> {
               "https://foodica-9743c-default-rtdb.europe-west1.firebasedatabase.app")
       .ref();
   int _dailyCaloriesInt = 0;
-  int _productCalories = 0;
+  int? weeklyCaloriesInt;
   List<String> allergens = [];
   Product scannedProduct = Product();
 
@@ -52,8 +53,12 @@ class _DetailPageState extends State<DetailPage> {
     super.initState();
     user = widget._user;
     _dailyCalories = _prefs.then((SharedPreferences prefs) {
-      _dailyCaloriesInt = prefs.getInt("daily")!;
+      _dailyCaloriesInt = prefs.getInt("daily") ?? 0;
       return prefs.getInt("daily") ?? 0;
+    });
+    _weeklyCalories = _prefs.then((SharedPreferences prefs) {
+      weeklyCaloriesInt = prefs.getInt("weekly") ?? 0;
+      return prefs.getInt("weekly") ?? 0;
     });
     getProduct();
   }
@@ -73,7 +78,6 @@ class _DetailPageState extends State<DetailPage> {
             allergens.add(element);
           });
           productIsLoaded = true;
-          _saveCaloriesToMemory();
         });
       });
     } else {
@@ -115,7 +119,14 @@ class _DetailPageState extends State<DetailPage> {
     if (widget.isFromScan != false) {
       if (scannedProduct.productName != null) {
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setInt("daily", (_dailyCaloriesInt + _productCalories));
+        await prefs.setInt(
+            "daily",
+            (_dailyCaloriesInt +
+                scannedProduct.nutriments!.energyKcal!.round()));
+        await prefs.setInt(
+            "weekly",
+            weeklyCaloriesInt! +
+                scannedProduct.nutriments!.energyKcal!.round());
         await prefs.setString("productname", scannedProduct.productName!);
       }
     }
@@ -582,6 +593,7 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   _pushToDatabase() {
+    _saveCaloriesToMemory();
     final productRef =
         databaseReference.child("users/" + user.uid + "/products");
     if (widget.isFromScan == true) {
@@ -698,7 +710,8 @@ class _DetailPageState extends State<DetailPage> {
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: true,
-          title: const Text("Product Details",
+          centerTitle: true,
+          title: const Text("Foodica",
               style: TextStyle(
                   fontFamily: "Poppins", fontWeight: FontWeight.bold)),
         ),

@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:Foodica/pages/init_allergens.dart';
+import 'package:Foodica/providers/authentication_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import "package:flutter/material.dart";
 import 'package:Foodica/utils/authentication.dart';
+import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:provider/provider.dart';
 import 'homescreen.dart';
 import 'register.dart';
 
@@ -16,8 +21,10 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _isSigningIn = false;
+  bool loggedInWithApple = false;
   String email = "";
   String password = "";
+  User? user;
 
   Route _toRegisterPage() {
     return PageRouteBuilder(
@@ -47,6 +54,37 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  _checkPlatform(BuildContext context) {
+    if (Platform.isIOS) {
+      return SignInWithAppleButton(
+        style: SignInWithAppleButtonStyle.black,
+        iconAlignment: IconAlignment.center,
+        onPressed: () async {
+          user = await context.read<AuthenticationProvider>().signInWithApple();
+          if (user != null) {
+            SharedPreferences.getInstance().then((value) {
+              value.setBool("signedInWithApple", true);
+              if (value.getStringList("allergens") != null) {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => InitAllergens(
+                        user: FirebaseAuth.instance.currentUser!)));
+              } else {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => HomeScreenPage(
+                        user: FirebaseAuth.instance.currentUser!)));
+              }
+            });
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) =>
+                    InitAllergens(user: FirebaseAuth.instance.currentUser!)));
+          }
+        },
+      );
+    } else {
+      return SizedBox(height: 5);
+    }
   }
 
   @override
@@ -106,14 +144,30 @@ class _LoginPageState extends State<LoginPage> {
                                   .then((result) => {
                                         if (result == null)
                                           {
-                                            Navigator.pushReplacement(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        HomeScreenPage(
-                                                            user: FirebaseAuth
-                                                                .instance
-                                                                .currentUser!)))
+                                            SharedPreferences.getInstance()
+                                                .then((prefs) {
+                                              if (prefs.getStringList(
+                                                      "allergens") ==
+                                                  null) {
+                                                Navigator.pushReplacement(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            InitAllergens(
+                                                                user: FirebaseAuth
+                                                                    .instance
+                                                                    .currentUser!)));
+                                              } else {
+                                                Navigator.pushReplacement(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            HomeScreenPage(
+                                                                user: FirebaseAuth
+                                                                    .instance
+                                                                    .currentUser!)));
+                                              }
+                                            })
                                           }
                                         else
                                           {
@@ -124,7 +178,13 @@ class _LoginPageState extends State<LoginPage> {
                                       })
                             },
                         child: const Text("Login")),
-                    const Text("Or sign in with these options: "),
+                    const Text(
+                      "Or sign in with these options: ",
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 14,
+                      ),
+                    ),
                     const SizedBox(height: 10.0),
                     FutureBuilder(
                         future:
@@ -136,56 +196,74 @@ class _LoginPageState extends State<LoginPage> {
                               ConnectionState.done) {
                             return SizedBox(
                                 child: _isSigningIn
-                                ? const CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                                )
-                                : OutlinedButton(
-                                  style: ButtonStyle(
-                                      backgroundColor:
-                                          MaterialStateProperty.all(Colors.red),
-                                      shape: MaterialStateProperty.all(
-                                          RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(40)))),
-                                  onPressed: () async {
-                                    setState(() {
-                                      _isSigningIn = true;
-                                    });
+                                    ? const CircularProgressIndicator(
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                Colors.red),
+                                      )
+                                    : OutlinedButton(
+                                        style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty.all(
+                                                    Colors.red),
+                                            shape: MaterialStateProperty.all(
+                                                RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            40)))),
+                                        onPressed: () async {
+                                          setState(() {
+                                            _isSigningIn = true;
+                                          });
 
-                                    User? user =
-                                        await Authentication.signInWithGoogle(
-                                            context: context);
-                                    setState(() {
-                                      _isSigningIn = false;
-                                    });
+                                          User? user = await Authentication
+                                              .signInWithGoogle(
+                                                  context: context);
+                                          setState(() {
+                                            _isSigningIn = false;
+                                          });
 
-                                    if (user != null) {
-                                      SharedPreferences prefs = await SharedPreferences.getInstance();
-                                      if (prefs.getString("allergen") != null) {
-                                        Navigator.of(context).pushReplacement(
-                                          MaterialPageRoute(
-                                            builder: (context) => HomeScreenPage(
-                                              user: user,
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                      else {
-                                        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => InitAllergens(user: user)));
-                                      }
-
-                                    }
-                                  },
-                                  child: const Text("Sign In with Google",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontFamily: "Poppins",
-                                          fontWeight: FontWeight.bold)),
-                                ));
+                                          if (user != null) {
+                                            SharedPreferences prefs =
+                                                await SharedPreferences
+                                                    .getInstance();
+                                            if (prefs.getStringList(
+                                                    "allergens") !=
+                                                null) {
+                                              Navigator.of(context)
+                                                  .pushReplacement(
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      HomeScreenPage(
+                                                    user: user,
+                                                  ),
+                                                ),
+                                              );
+                                            } else {
+                                              Navigator.of(context)
+                                                  .pushReplacement(
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              InitAllergens(
+                                                                  user: user)));
+                                            }
+                                          }
+                                        },
+                                        child: const Text("Sign In with Google",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontFamily: "Poppins",
+                                                fontWeight: FontWeight.bold)),
+                                      ));
                           }
                           return const CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.red),);
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.red),
+                          );
                         }),
+                    Column(
+                      children: [_checkPlatform(context)],
+                    ),
                     OutlinedButton(
                         onPressed: () =>
                             {Navigator.of(context).push(_toRegisterPage())},

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TipsDetailPage extends StatefulWidget {
   const TipsDetailPage({Key? key, required User user, required String allergen})
@@ -125,6 +126,24 @@ class _TipsDetailPageState extends State<TipsDetailPage> {
                   ))),
             ],
           )),
+          SizedBox(height: 20),
+          Text("Sourced from HealthXChange",
+              style: TextStyle(fontFamily: "Poppins", fontSize: 18)),
+          SizedBox(height: 10),
+          InkWell(
+              child: Text(
+                "Open Webpage",
+                style: TextStyle(
+                    color: Colors.blue,
+                    fontFamily: "Poppins",
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
+              ),
+              onTap: () {
+                launchUrl(Uri.parse(
+                    "https://www.healthxchange.sg/food-nutrition/food-tips/eight-dietary-tips-gluten-intolerance"));
+              }),
+          SizedBox(height: 50)
         ]);
       case "eggs":
         return Column(children: [
@@ -194,7 +213,29 @@ class _TipsDetailPageState extends State<TipsDetailPage> {
                     ],
                   ))),
             ],
-          ))
+          )),
+          SizedBox(height: 10),
+          Padding(
+            padding: EdgeInsets.all(8),
+            child: Text(
+                "Sourced from American College of Allergy, Asthma & Immunology (ACAAI)",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontFamily: "Poppins", fontSize: 18)),
+          ),
+          SizedBox(height: 10),
+          InkWell(
+            child: Text("Open Webpage",
+                style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                    fontSize: 18)),
+            onTap: () {
+              launchUrl(Uri.parse(
+                  "https://acaai.org/allergies/allergic-conditions/food/egg/"));
+            },
+          ),
+          SizedBox(height: 50)
         ]);
       case "soy":
         return Column(
@@ -266,7 +307,28 @@ class _TipsDetailPageState extends State<TipsDetailPage> {
                       ],
                     ))),
               ],
-            ))
+            )),
+            SizedBox(height: 10),
+            Padding(
+              padding: EdgeInsets.all(8),
+              child: Text("Sourced from WebMD",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontFamily: "Poppins", fontSize: 18)),
+            ),
+            SizedBox(height: 10),
+            InkWell(
+              child: Text("Open Webpage",
+                  style: TextStyle(
+                      fontFamily: "Poppins",
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                      fontSize: 18)),
+              onTap: () {
+                launchUrl(
+                    Uri.parse("https://www.webmd.com/allergies/soy-allergy"));
+              },
+            ),
+            SizedBox(height: 50)
           ],
         );
       case "peanuts":
@@ -305,6 +367,27 @@ class _TipsDetailPageState extends State<TipsDetailPage> {
                   ))),
             ],
           )),
+          SizedBox(height: 10),
+          Padding(
+            padding: EdgeInsets.all(8),
+            child: Text("Sourced from FARE",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontFamily: "Poppins", fontSize: 18)),
+          ),
+          SizedBox(height: 10),
+          InkWell(
+            child: Text("Open Webpage",
+                style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                    fontSize: 18)),
+            onTap: () {
+              launchUrl(Uri.parse(
+                  "https://www.foodallergy.org/living-food-allergies/food-allergy-essentials/common-allergens/peanut"));
+            },
+          ),
+          SizedBox(height: 50)
         ]);
       case "milk":
         return Column(children: [
@@ -376,6 +459,27 @@ class _TipsDetailPageState extends State<TipsDetailPage> {
                   ))),
             ],
           )),
+          SizedBox(height: 10),
+          Padding(
+            padding: EdgeInsets.all(8),
+            child: Text("Sourced from Saint Luke's Health System",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontFamily: "Poppins", fontSize: 18)),
+          ),
+          SizedBox(height: 10),
+          InkWell(
+            child: Text("Open Webpage",
+                style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                    fontSize: 18)),
+            onTap: () {
+              launchUrl(Uri.parse(
+                  "https://www.saintlukeskc.org/health-library/tips-lactose-intolerance"));
+            },
+          ),
+          SizedBox(height: 50)
         ]);
       default:
         return Card(

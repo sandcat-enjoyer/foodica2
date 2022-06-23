@@ -35,19 +35,20 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   Colors? navBackColor;
   String lastProductName = "";
   Color? bgColor;
+  int difference = 0;
   String allergen = "";
   String? today;
   BouncingScrollPhysics bouncingScrollPhysics = BouncingScrollPhysics();
+  DateTime? lastUsed;
 
-  final DateFormat formatter = DateFormat("dd/mm/yyyy");
-
+  final DateFormat formatter = DateFormat("dd/MM/yyyy");
+  DateFormat formatDay = DateFormat("yyyy-MM-dd");
   int? _weeklyCaloriesInt;
   int? _dailyCaloriesInt;
   int? _calorieGoalInt;
 
   _checkIfWeeklyCaloriesIsNull() {
     _getWeeklyCalories();
-    _getCalorieGoal();
     if (_weeklyCaloriesInt == null) {
       return "No Calories Consumed";
     } else {
@@ -86,6 +87,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   }
 
   _checkIfLastScannedProductIsNull() {
+    _getLastScannedProduct();
     if (lastProductName == "") {
       return "None";
     } else {
@@ -97,19 +99,47 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   void initState() {
     super.initState();
     _user = widget._user;
-    setState(() {
-      today = formatter.format(DateTime.now());
+    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _getLastUsedDate();
+        _weeklyCaloriesInt = prefs.getInt("weekly");
+        _dailyCaloriesInt = prefs.getInt("daily");
+        lastProductName = prefs.getString("productname")!;
+        _calorieGoalInt = prefs.getInt("goal");
+      });
     });
-    _getWeeklyCalories();
-    _getDailyCalories();
-    _getLastScannedProduct();
-    _getCalorieGoal();
-    _reloadLocalStorage();
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  _getLastUsedDate() async {
+    SharedPreferences.getInstance().then((value) => {
+          if (value.getString("lastUsed") == null)
+            {
+              lastUsed = DateTime.now(),
+              value.setString("lastUsed", formatDay.format(DateTime.now()))
+            },
+          if (value.getString("lastUsed") != null)
+            {
+              lastUsed = DateTime.parse(value.getString("lastUsed")!),
+              difference = daysBetween(lastUsed!, DateTime.now()),
+              if (difference >= 1)
+                {
+                  value.setInt("daily", 0),
+                  value.setString("lastUsed", formatDay.format(DateTime.now()))
+                }
+            }
+        });
+  }
+
+  int daysBetween(DateTime from, DateTime to) {
+    from = DateTime(from.year, from.month, from.day);
+    to = DateTime(to.year, to.month, to.day);
+    return (to.difference(from).inHours / 24).round();
   }
 
   void _getWeeklyCalories() async {
@@ -143,11 +173,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   void _getCalorieGoal() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _calorieGoalInt = prefs.getInt("goal");
-  }
-
-  void _reloadLocalStorage() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.reload();
   }
 
   String _checkProfileName() {
@@ -421,12 +446,30 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
       }
     }
 
+    _setPlaceholderPicture() {
+      if (_user.photoURL == null) {
+        return CircleAvatar(
+          child: Text(
+            _user.displayName!.substring(0, 1),
+            style: TextStyle(fontFamily: "Poppins", fontSize: 36),
+          ),
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+        );
+      } else {
+        CachedNetworkImage(
+          imageUrl: _checkPhotoURL(),
+        );
+      }
+    }
+
     return Scaffold(
         floatingActionButton: _determineIfOnHomeScreen(),
         drawer: Drawer(
           child: ListView(
             // Important: Remove any padding from the ListView.
             padding: EdgeInsets.zero,
+
             physics: bouncingScrollPhysics,
             children: [
               UserAccountsDrawerHeader(
@@ -434,18 +477,18 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                     style: const TextStyle(fontFamily: "Poppins")),
                 accountName: Text(_checkProfileName(),
                     style: const TextStyle(fontFamily: "Poppins")),
-                currentAccountPicture: ClipOval(
-                    child: CachedNetworkImage(
-                  imageUrl: _checkPhotoURL(),
-                )),
+                currentAccountPicture:
+                    ClipOval(child: _setPlaceholderPicture()),
                 decoration: const BoxDecoration(color: Colors.black),
               ),
               ListTile(
                 title: RichText(
                   text: TextSpan(children: [
-                    const WidgetSpan(child: Icon(Icons.home, size: 22)),
+                    const WidgetSpan(
+                        child: Icon(Icons.home, size: 22),
+                        alignment: PlaceholderAlignment.middle),
                     TextSpan(
-                        text: "Home",
+                        text: " Home",
                         style: TextStyle(
                           fontFamily: "Poppins",
                           color: _setNavTextColor(),
@@ -462,9 +505,11 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
               ListTile(
                 title: RichText(
                   text: TextSpan(children: [
-                    const WidgetSpan(child: Icon(Icons.history, size: 22)),
+                    const WidgetSpan(
+                        child: Icon(Icons.history, size: 22),
+                        alignment: PlaceholderAlignment.middle),
                     TextSpan(
-                        text: "History",
+                        text: " History",
                         style: TextStyle(
                           fontFamily: "Poppins",
                           color: _setNavTextColor(),
@@ -481,9 +526,11 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
               ListTile(
                 title: RichText(
                   text: TextSpan(children: [
-                    const WidgetSpan(child: Icon(Icons.lightbulb, size: 22)),
+                    const WidgetSpan(
+                        child: Icon(Icons.lightbulb, size: 22),
+                        alignment: PlaceholderAlignment.middle),
                     TextSpan(
-                        text: "Tips",
+                        text: " Tips",
                         style: TextStyle(
                           fontFamily: "Poppins",
                           color: _setNavTextColor(),
@@ -500,9 +547,11 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
               ListTile(
                 title: RichText(
                   text: TextSpan(children: [
-                    const WidgetSpan(child: Icon(Icons.settings, size: 22)),
+                    const WidgetSpan(
+                        child: Icon(Icons.settings, size: 22),
+                        alignment: PlaceholderAlignment.middle),
                     TextSpan(
-                        text: "Settings",
+                        text: " Settings",
                         style: TextStyle(
                           fontFamily: "Poppins",
                           color: _setNavTextColor(),
@@ -526,6 +575,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                 onPressed: () => Scaffold.of(context).openDrawer(),
                 icon: const Icon(Icons.menu)),
           ),
+          centerTitle: true,
           title: const Text("Foodica",
               style: TextStyle(
                 fontFamily: "Poppins",

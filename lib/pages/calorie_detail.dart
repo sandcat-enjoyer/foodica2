@@ -395,6 +395,7 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
           SizedBox(height: 10),
           Icon(
             Icons.warning_outlined,
+            color: Colors.yellow.shade600,
             size: 72,
           ),
           Center(
@@ -611,7 +612,8 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
     products.clear();
     return Scaffold(
         appBar: AppBar(
-            title: const Text("Details",
+            centerTitle: true,
+            title: const Text("Foodica",
                 style: TextStyle(
                     fontFamily: "Poppins", fontWeight: FontWeight.bold)),
             actions: [
