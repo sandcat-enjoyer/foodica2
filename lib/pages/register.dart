@@ -56,6 +56,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           keyboardType: TextInputType.emailAddress,
                           decoration: const InputDecoration(
                             labelText: "Email",
+                            labelStyle: TextStyle(fontFamily: "Poppins"),
                             border: OutlineInputBorder(),
                             hintText: 'Enter an e-mail address',
                           ),
@@ -71,8 +72,10 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: TextField(
                         obscureText: true,
                         decoration: const InputDecoration(
+                          labelText: "Password",
+                          labelStyle: TextStyle(fontFamily: "Poppins"),
                           border: OutlineInputBorder(),
-                          hintText: 'Password',
+                          hintText: 'Enter a password',
                         ),
                         onChanged: (value) => {
                           setState(() {
@@ -83,6 +86,11 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     const SizedBox(height: 20.0),
                     OutlinedButton(
+                        style: ButtonStyle(
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(10))))),
                         onPressed: () async => {
                               Authentication()
                                   .signUp(email: email, password: password)
@@ -106,7 +114,19 @@ class _RegisterPageState extends State<RegisterPage> {
                                           }
                                       })
                             },
-                        child: const Text("Register")),
+                        child: const Text("Create New Account",
+                            style: TextStyle(
+                                fontFamily: "Poppins",
+                                fontWeight: FontWeight.bold))),
+                    SizedBox(height: 10),
+                    OutlinedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text("Back",
+                            style: TextStyle(
+                                fontFamily: "Poppins",
+                                fontWeight: FontWeight.bold)))
                   ],
                 ))));
   }

@@ -145,9 +145,18 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
 
   _getDailyCalories() {
     SharedPreferences.getInstance().then((prefs) => {
-          setState(() {
-            dailyCalories = prefs.getInt("daily");
-          })
+          if (prefs.getInt("daily") == null)
+            {
+              setState(() {
+                dailyCalories = 0;
+              })
+            }
+          else
+            {
+              setState(() {
+                dailyCalories = prefs.getInt("daily");
+              })
+            }
         });
   }
 
@@ -185,8 +194,7 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
     if (photo != null) {
       return Image.file(photo!, width: 200);
     } else {
-      return const Text("Image will appear here",
-          style: TextStyle(fontFamily: "Poppins"));
+      return SizedBox(height: 5);
     }
   }
 
@@ -225,7 +233,9 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                   child: TextField(
                       controller: productNameController,
                       decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0))),
                           hintStyle: TextStyle(fontFamily: "Poppins"),
                           hintText: "Name of Food"),
                       onChanged: (value) => {productName = value.trim()}),
@@ -237,7 +247,9 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                       controller: brandController,
                       decoration: const InputDecoration(
                           hintStyle: TextStyle(fontFamily: "Poppins"),
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0))),
                           hintText: "Brand"),
                       onChanged: (value) {
                         brand = value.trim();
@@ -250,7 +262,9 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                       controller: categoryController,
                       decoration: const InputDecoration(
                           hintStyle: TextStyle(fontFamily: "Poppins"),
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0))),
                           hintText: "Category"),
                       onChanged: (value) {
                         category = value.trim();
@@ -307,7 +321,7 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                                 ));
                           });
                     },
-                    child: const Text("Take picture",
+                    child: const Text("Add Picture",
                         style: TextStyle(fontFamily: "Poppins"))),
                 const SizedBox(height: 10),
                 SizedBox(
@@ -316,7 +330,9 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
                         hintStyle: TextStyle(fontFamily: "Poppins"),
-                        border: OutlineInputBorder(),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10.0))),
                         hintText: "Amount of Calories (in Kcal)",
                       ),
                       onChanged: (value) {
@@ -332,7 +348,9 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
                           hintStyle: TextStyle(fontFamily: "Poppins"),
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0))),
                           hintText: "Amount of Fat (in Grams)"),
                       onChanged: (value) {
                         fat = value.trim();
@@ -345,7 +363,9 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
                           hintStyle: TextStyle(fontFamily: "Poppins"),
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0))),
                           hintText: "Amount of Salt (in Grams)"),
                       onChanged: (value) {
                         salt = value.trim();
@@ -358,7 +378,9 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
                           hintStyle: TextStyle(fontFamily: "Poppins"),
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0))),
                           hintText: "Amount of Saturated Fats (in Grams)"),
                       onChanged: (value) {
                         saturatedFat = value.trim();
@@ -371,7 +393,9 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
                           hintStyle: TextStyle(fontFamily: "Poppins"),
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0))),
                           hintText: "Amount of Sugars (in Grams)"),
                       onChanged: (value) {
                         sugar = value.trim();

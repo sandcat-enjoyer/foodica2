@@ -105,7 +105,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
         _getLastUsedDate();
         _weeklyCaloriesInt = prefs.getInt("weekly");
         _dailyCaloriesInt = prefs.getInt("daily");
-        lastProductName = prefs.getString("productname")!;
+        _getLastScannedProduct();
         _calorieGoalInt = prefs.getInt("goal");
       });
     });
@@ -165,7 +165,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
       if (prefs.getString("productname") == null) {
         lastProductName = "";
       } else {
-        lastProductName = prefs.getString("productname")!;
+        lastProductName = prefs.getString("productname") ?? "";
       }
     });
   }
@@ -180,14 +180,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
       return "";
     } else {
       return _user.displayName!;
-    }
-  }
-
-  String _checkPhotoURL() {
-    if (_user.photoURL == null) {
-      return "https://via.placeholder.com/300";
-    } else {
-      return _user.photoURL!;
     }
   }
 
@@ -457,8 +449,8 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
           foregroundColor: Colors.black,
         );
       } else {
-        CachedNetworkImage(
-          imageUrl: _checkPhotoURL(),
+        return CachedNetworkImage(
+          imageUrl: _user.photoURL!,
         );
       }
     }
@@ -469,7 +461,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
           child: ListView(
             // Important: Remove any padding from the ListView.
             padding: EdgeInsets.zero,
-
             physics: bouncingScrollPhysics,
             children: [
               UserAccountsDrawerHeader(

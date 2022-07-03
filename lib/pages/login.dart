@@ -111,9 +111,13 @@ class _LoginPageState extends State<LoginPage> {
                       width: 400,
                       child: TextField(
                         decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          hintText: 'Email',
-                        ),
+                            labelText: "Email",
+                            labelStyle: TextStyle(fontFamily: "Poppins"),
+                            border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                            hintText: 'Enter your email address',
+                            hintStyle: TextStyle(fontFamily: "Poppins")),
                         onChanged: (value) => {
                           setState(() {
                             email = value.trim();
@@ -127,9 +131,13 @@ class _LoginPageState extends State<LoginPage> {
                       child: TextField(
                         obscureText: true,
                         decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          hintText: 'Password',
-                        ),
+                            labelText: "Password",
+                            labelStyle: TextStyle(fontFamily: "Poppins"),
+                            border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                            hintText: 'Enter your password',
+                            hintStyle: TextStyle(fontFamily: "Poppins")),
                         onChanged: (value) => {
                           setState(() => {password = value.trim()})
                         },
@@ -177,15 +185,27 @@ class _LoginPageState extends State<LoginPage> {
                                           }
                                       })
                             },
-                        child: const Text("Login")),
+                        child: const Text("Log in",
+                            style: TextStyle(
+                              fontFamily: "Poppins",
+                              fontWeight: FontWeight.bold,
+                            )),
+                        style: ButtonStyle(
+                            padding: MaterialStateProperty.all<EdgeInsets>(
+                                EdgeInsets.all(10)),
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(10)))))),
+                    SizedBox(height: 10),
                     const Text(
                       "Or sign in with these options: ",
                       style: TextStyle(
-                        fontFamily: "Poppins",
-                        fontSize: 14,
-                      ),
+                          fontFamily: "Poppins",
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(height: 10.0),
+                    const SizedBox(height: 5.0),
                     FutureBuilder(
                         future:
                             Authentication.initializeFirebase(context: context),
@@ -210,7 +230,7 @@ class _LoginPageState extends State<LoginPage> {
                                                 RoundedRectangleBorder(
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                            40)))),
+                                                            10)))),
                                         onPressed: () async {
                                           setState(() {
                                             _isSigningIn = true;
@@ -265,9 +285,17 @@ class _LoginPageState extends State<LoginPage> {
                       children: [_checkPlatform(context)],
                     ),
                     OutlinedButton(
+                        style: ButtonStyle(
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(10))))),
                         onPressed: () =>
                             {Navigator.of(context).push(_toRegisterPage())},
-                        child: const Text("Create New Account"))
+                        child: const Text("Create New Account",
+                            style: TextStyle(
+                                fontFamily: "Poppins",
+                                fontWeight: FontWeight.bold)))
                   ],
                 ))));
   }

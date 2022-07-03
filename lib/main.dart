@@ -22,7 +22,7 @@ bool isAllergensNotEmpty = false;
 _loadApp() {
   if (FirebaseAuth.instance.currentUser != null) {
     SharedPreferences.getInstance().then((prefs) => {
-          if (prefs.getStringList("allergens")!.isEmpty)
+          if (prefs.getStringList("allergens") == null)
             {isAllergensNotEmpty = false}
           else
             {isAllergensNotEmpty = true}

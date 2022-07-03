@@ -59,7 +59,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   _getAllergens() {
     SharedPreferences.getInstance().then((prefs) => {
-          allergens = prefs.getStringList("allergens")!,
+          allergens = prefs.getStringList("allergens") ?? [],
           if (allergens.contains("gluten"))
             {
               setState(() {
