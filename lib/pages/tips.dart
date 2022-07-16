@@ -21,7 +21,7 @@ class _TipsPageState extends State<TipsPage> {
   _getAllergens() {
     SharedPreferences.getInstance().then((prefs) => {
           setState(() {
-            allergens = prefs.getStringList("allergens")!;
+            allergens = prefs.getStringList("allergens") ?? [];
           })
         });
   }
@@ -38,26 +38,44 @@ class _TipsPageState extends State<TipsPage> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        body: ListView(shrinkWrap: true, children: [
-      Column(
+  _checkSystemThemeMode() {
+    var brightness = MediaQuery.of(context).platformBrightness;
+    bool isDarkMode = brightness == Brightness.dark;
+    if (isDarkMode) {
+      return Color.fromARGB(255, 66, 66, 66);
+    } else {
+      return Colors.white70;
+    }
+  }
+
+  _checkIfNoAllergensSelected() {
+    if (allergens.isEmpty) {
+      return Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(20.0),
-            child: Text("Tips",
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontFamily: "Poppins",
-                    fontSize: 35)),
+          Icon(Icons.warning, color: Colors.yellow, size: 96),
+          Text("No allergens selected",
+              style: TextStyle(
+                  fontFamily: "Poppins",
+                  fontWeight: FontWeight.bold,
+                  fontSize: 30)),
+          Padding(
+            padding: EdgeInsets.all(10),
+            child: Text(
+              "Select allergens in the Settings menu if you wish to view any tips.",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontFamily: "Poppins", fontSize: 18),
+            ),
           ),
-          const SizedBox(height: 8.0),
-          ListView.builder(
-            shrinkWrap: true,
-            itemCount: allergens.length,
-            itemBuilder: (context, index) {
-              return Column(
+        ],
+      );
+    } else {
+      return ListView.builder(
+        shrinkWrap: true,
+        itemCount: allergens.length,
+        itemBuilder: (context, index) {
+          return Padding(
+              padding: EdgeInsets.all(10),
+              child: Column(
                 children: [
                   ListTile(
                     onTap: () {
@@ -71,15 +89,34 @@ class _TipsPageState extends State<TipsPage> {
                             fontWeight: FontWeight.bold,
                             fontSize: 20)),
                     subtitle: Text("Tips for " + allergens[index] + " allergy"),
-                    tileColor: Colors.white,
+                    tileColor: _checkSystemThemeMode(),
                     shape: RoundedRectangleBorder(
+                        side: BorderSide(color: Colors.black, width: 0.01),
                         borderRadius: BorderRadius.circular(20)),
                   ),
                   SizedBox(height: 10)
                 ],
-              );
-            },
+              ));
+        },
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: ListView(shrinkWrap: true, children: [
+      Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(15.0),
+            child: Text("Tips",
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontFamily: "Poppins",
+                    fontSize: 35)),
           ),
+          _checkIfNoAllergensSelected()
         ],
       )
     ]));

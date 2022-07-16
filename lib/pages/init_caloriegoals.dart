@@ -124,7 +124,8 @@ class _InitCalorieGoalState extends State<InitCalorieGoal> {
                 alignment: Alignment.center,
                 child: ElevatedButton(
                     style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.red)),
+                        backgroundColor:
+                            MaterialStateProperty.all(Colors.redAccent)),
                     onPressed: () async {
                       SharedPreferences prefs =
                           await SharedPreferences.getInstance();

@@ -1,5 +1,8 @@
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.foodica">
+    
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
         android:label="Foodica"
@@ -17,6 +20,10 @@
         <data android:path="callback" />
     </intent-filter>
 </activity>
+<activity
+        android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+        android:theme="@style/ProxyTheme"
+        tools:replace="android:theme" />
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -25,6 +32,7 @@
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
+        
             <!-- Specifies an Android theme to apply to this Activity as soon as
                  the Android process has started. This theme is visible to the user
                  while the Flutter UI initializes. After that, this theme continues
@@ -33,6 +41,7 @@
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
               />
+            <meta-data android:name="io.flutter.embedding.android.ProxyTheme" android:resource="@style/ProxyTheme"/>
             <!-- Displays an Android View that continues showing the launch screen
                  Drawable until Flutter paints its first frame, then this splash
                  screen fades out. A splash screen is useful to avoid any visual

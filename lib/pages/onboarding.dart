@@ -122,8 +122,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       barrierDismissible: false,
                       builder: (context) {
                         return const Center(
-                            child:
-                                CircularProgressIndicator(color: Colors.red));
+                            child: CircularProgressIndicator(
+                                color: Colors.redAccent));
                       });
                   await Future.delayed(const Duration(seconds: 2), () {});
                   navigateToLogin();

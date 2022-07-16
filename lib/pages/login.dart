@@ -219,13 +219,13 @@ class _LoginPageState extends State<LoginPage> {
                                     ? const CircularProgressIndicator(
                                         valueColor:
                                             AlwaysStoppedAnimation<Color>(
-                                                Colors.red),
+                                                Colors.redAccent),
                                       )
                                     : OutlinedButton(
                                         style: ButtonStyle(
                                             backgroundColor:
                                                 MaterialStateProperty.all(
-                                                    Colors.red),
+                                                    Colors.redAccent),
                                             shape: MaterialStateProperty.all(
                                                 RoundedRectangleBorder(
                                                     borderRadius:
@@ -278,7 +278,7 @@ class _LoginPageState extends State<LoginPage> {
                           }
                           return const CircularProgressIndicator(
                             valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.red),
+                                AlwaysStoppedAnimation<Color>(Colors.redAccent),
                           );
                         }),
                     Column(

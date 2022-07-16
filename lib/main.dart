@@ -1,4 +1,5 @@
 import 'package:Foodica/pages/homescreen.dart';
+import 'package:Foodica/pages/init_caloriegoals.dart';
 import 'package:Foodica/providers/authentication_provider.dart';
 import 'dart:ui';
 import 'package:flutter/services.dart';
@@ -18,19 +19,28 @@ Future main() async {
 }
 
 bool isAllergensNotEmpty = false;
+bool isDailyCaloriesNotEmpty = false;
 
 _loadApp() {
   if (FirebaseAuth.instance.currentUser != null) {
-    SharedPreferences.getInstance().then((prefs) => {
-          if (prefs.getStringList("allergens") == null)
-            {isAllergensNotEmpty = false}
-          else
-            {isAllergensNotEmpty = true}
-        });
-    if (isAllergensNotEmpty = true) {
-      return HomeScreenPage(user: FirebaseAuth.instance.currentUser!);
+    SharedPreferences.getInstance().then((prefs) {
+      print(prefs.getInt("daily"));
+      isAllergensNotEmpty =
+          prefs.getStringList("allergens") == null ? false : true;
+      isDailyCaloriesNotEmpty = prefs.getInt("daily") == null ? false : true;
+      if (prefs.getBool("firstTimeBoot") == true) {
+        FirebaseAuth.instance.signOut();
+        prefs.setBool("firstTimeBoot", false);
+      }
+    });
+    if (isAllergensNotEmpty = false) {
+      return InitAllergens(
+        user: FirebaseAuth.instance.currentUser!,
+      );
+    } else if (isDailyCaloriesNotEmpty = false) {
+      return InitCalorieGoal(user: FirebaseAuth.instance.currentUser!);
     } else {
-      return InitAllergens(user: FirebaseAuth.instance.currentUser!);
+      return HomeScreenPage(user: FirebaseAuth.instance.currentUser!);
     }
   } else {
     return OnboardingScreen();
@@ -59,19 +69,20 @@ class MyApp extends StatelessWidget {
               brightness: Brightness.light,
               primaryColor: Colors.black,
               //fix this deprecation
-              accentColor: Colors.red,
+              accentColor: Colors.redAccent,
               floatingActionButtonTheme: const FloatingActionButtonThemeData(
-                  backgroundColor: Colors.red),
+                  backgroundColor: Colors.redAccent),
               appBarTheme: const AppBarTheme(
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.black)),
           themeMode: ThemeMode.system,
           darkTheme: ThemeData(
               brightness: Brightness.dark,
-              accentColor: Colors.red,
+              accentColor: Colors.redAccent,
               backgroundColor: const Color.fromARGB(255, 0, 0, 0),
               floatingActionButtonTheme: const FloatingActionButtonThemeData(
-                  backgroundColor: Colors.red, foregroundColor: Colors.white)),
+                  backgroundColor: Colors.redAccent,
+                  foregroundColor: Colors.white)),
           debugShowCheckedModeBanner: false,
         ));
   }

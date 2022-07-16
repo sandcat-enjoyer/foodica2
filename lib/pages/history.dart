@@ -181,152 +181,181 @@ class _HistoryPageState extends State<HistoryPage> {
               });
             }
 
-            return ListView.builder(
-                itemCount: productList.length,
-                shrinkWrap: true,
-                controller: scrollController,
-                itemBuilder: (BuildContext context, int position) {
-                  Widget? _checkImageUrl() {
-                    if (productList[position].productDetail?.image == "" ||
-                        productList[position].productDetail?.image == "0") {
-                      return null;
-                    } else {
-                      return CachedNetworkImage(
-                        imageUrl: productList[position].productDetail!.image!,
-                        width: 100,
-                      );
+            if (productList.isEmpty) {
+              return Column(
+                children: [
+                  SizedBox(height: 10),
+                  Icon(
+                    Icons.warning,
+                    color: Colors.yellow,
+                    size: 96,
+                  ),
+                  Text(
+                    "No products scanned",
+                    style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Text(
+                      "Start scanning products to see them appear on this screen.",
+                      style: TextStyle(fontFamily: "Poppins", fontSize: 18),
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                ],
+              );
+            } else {
+              return ListView.builder(
+                  itemCount: productList.length,
+                  shrinkWrap: true,
+                  controller: scrollController,
+                  itemBuilder: (BuildContext context, int position) {
+                    Widget? _checkImageUrl() {
+                      if (productList[position].productDetail?.image == "" ||
+                          productList[position].productDetail?.image == "0") {
+                        return null;
+                      } else {
+                        return CachedNetworkImage(
+                          imageUrl: productList[position].productDetail!.image!,
+                          width: 100,
+                        );
+                      }
                     }
-                  }
 
-                  _checkIfCategoryIsEmpty() {
-                    if (productList[position].productDetail!.category == "") {
-                      return "Category: Unknown";
-                    } else {
-                      return "Category: " +
-                          productList[position].productDetail!.category!;
+                    _checkIfCategoryIsEmpty() {
+                      if (productList[position].productDetail!.category == "") {
+                        return "Category: Unknown";
+                      } else {
+                        return "Category: " +
+                            productList[position].productDetail!.category!;
+                      }
                     }
-                  }
 
-                  return Container(
-                      child: Column(
-                    children: [
-                      Center(
-                        child: Wrap(
-                          spacing: 20,
-                          runSpacing: 20.0,
-                          children: <Widget>[
-                            SizedBox(
-                                width: 350.0,
-                                child: Card(
-                                  elevation: 2.0,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0)),
-                                  child: Center(
-                                      child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Column(
-                                            children: <Widget>[
-                                              SizedBox(height: 10.0),
-                                              Text(
-                                                  productList[position]
-                                                          .productDetail
-                                                          ?.productname ??
-                                                      "",
+                    return Container(
+                        child: Column(
+                      children: [
+                        Center(
+                          child: Wrap(
+                            spacing: 20,
+                            runSpacing: 20.0,
+                            children: <Widget>[
+                              SizedBox(
+                                  width: 350.0,
+                                  child: Card(
+                                    elevation: 2.0,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0)),
+                                    child: Center(
+                                        child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              children: <Widget>[
+                                                SizedBox(height: 10.0),
+                                                Text(
+                                                    productList[position]
+                                                            .productDetail
+                                                            ?.productname ??
+                                                        "",
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                        fontFamily: "Poppins",
+                                                        fontSize: 20.0,
+                                                        fontWeight:
+                                                            FontWeight.w800)),
+                                                SizedBox(height: 10.0),
+                                                _checkImageUrl() ??
+                                                    SizedBox(height: 0),
+                                                Text(
+                                                  _checkIfCategoryIsEmpty(),
                                                   textAlign: TextAlign.center,
                                                   style: TextStyle(
                                                       fontFamily: "Poppins",
-                                                      fontSize: 20.0,
-                                                      fontWeight:
-                                                          FontWeight.w800)),
-                                              SizedBox(height: 10.0),
-                                              _checkImageUrl() ??
-                                                  SizedBox(height: 0),
-                                              Text(
-                                                _checkIfCategoryIsEmpty(),
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                    fontFamily: "Poppins",
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.w500),
-                                              ),
-                                              SizedBox(height: 10),
-                                              Text(
-                                                  "Brand: " +
-                                                      productList[position]
-                                                          .productDetail!
-                                                          .brand!,
-                                                  style: TextStyle(
-                                                      fontFamily: "Poppins",
                                                       fontSize: 18,
                                                       fontWeight:
-                                                          FontWeight.w500)),
-                                              SizedBox(height: 10),
-                                              Text(
-                                                  "Scanned on: " +
-                                                      formatter
-                                                          .format(productList[
-                                                                  position]
-                                                              .productDetail!
-                                                              .scanTime!)
-                                                          .toString(),
-                                                  style: TextStyle(
-                                                      fontFamily: "Poppins",
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.w500)),
-                                              SizedBox(height: 10),
-                                              // TextButton(onPressed: () {
-                                              //   debugPrint(productList[position].productDetail!.code ?? "Not Found");
-                                              //   Navigator.of(context).push(MaterialPageRoute(builder: (context) => DetailPage(barcode: productList[position].productDetail!.code ?? "", user: user, isFromScan: false,)));
-                                              // }, child: Text("More information", style: TextStyle(fontFamily: "Poppins", fontWeight: FontWeight.bold))),
-                                              // TextButton(
-                                              //   onPressed: () {
-                                              //     showDialog(context: context, builder: (context) {
-                                              //       return AlertDialog(
-                                              //         shape: const RoundedRectangleBorder(
-                                              //           borderRadius: BorderRadius.all(Radius.circular(20))
-                                              //         ),
-                                              //         title: const Text("Delete Product",
-                                              //         style: TextStyle(
-                                              //           fontFamily: "Poppins",
-                                              //           fontWeight: FontWeight.bold
-                                              //         )),
-                                              //         content: StatefulBuilder(
-                                              //           builder: (context, SBsetState) {
-                                              //             return Text("Are you sure you want to delete this product from your history?");
-                                              //           },
-                                              //         ),
-                                              //         actions: [
-                                              //           TextButton(onPressed: () {
-                                              //             Navigator.pop(context);
+                                                          FontWeight.w500),
+                                                ),
+                                                SizedBox(height: 10),
+                                                Text(
+                                                    "Brand: " +
+                                                        productList[position]
+                                                            .productDetail!
+                                                            .brand!,
+                                                    style: TextStyle(
+                                                        fontFamily: "Poppins",
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w500)),
+                                                SizedBox(height: 10),
+                                                Text(
+                                                    "Scanned on: " +
+                                                        formatter
+                                                            .format(productList[
+                                                                    position]
+                                                                .productDetail!
+                                                                .scanTime!)
+                                                            .toString(),
+                                                    style: TextStyle(
+                                                        fontFamily: "Poppins",
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w500)),
+                                                SizedBox(height: 10),
+                                                // TextButton(onPressed: () {
+                                                //   debugPrint(productList[position].productDetail!.code ?? "Not Found");
+                                                //   Navigator.of(context).push(MaterialPageRoute(builder: (context) => DetailPage(barcode: productList[position].productDetail!.code ?? "", user: user, isFromScan: false,)));
+                                                // }, child: Text("More information", style: TextStyle(fontFamily: "Poppins", fontWeight: FontWeight.bold))),
+                                                // TextButton(
+                                                //   onPressed: () {
+                                                //     showDialog(context: context, builder: (context) {
+                                                //       return AlertDialog(
+                                                //         shape: const RoundedRectangleBorder(
+                                                //           borderRadius: BorderRadius.all(Radius.circular(20))
+                                                //         ),
+                                                //         title: const Text("Delete Product",
+                                                //         style: TextStyle(
+                                                //           fontFamily: "Poppins",
+                                                //           fontWeight: FontWeight.bold
+                                                //         )),
+                                                //         content: StatefulBuilder(
+                                                //           builder: (context, SBsetState) {
+                                                //             return Text("Are you sure you want to delete this product from your history?");
+                                                //           },
+                                                //         ),
+                                                //         actions: [
+                                                //           TextButton(onPressed: () {
+                                                //             Navigator.pop(context);
 
-                                              //           }, child: Text("Delete", style: TextStyle(fontFamily: "Poppins", color: Colors.red))),
-                                              //           TextButton(onPressed: () {
-                                              //             Navigator.pop(context);
-                                              //           }, child: Text("Cancel", style: TextStyle(fontFamily: "Poppins")))
-                                              //         ],
+                                                //           }, child: Text("Delete", style: TextStyle(fontFamily: "Poppins", color: Colors.red))),
+                                                //           TextButton(onPressed: () {
+                                                //             Navigator.pop(context);
+                                                //           }, child: Text("Cancel", style: TextStyle(fontFamily: "Poppins")))
+                                                //         ],
 
-                                              //       );
-                                              //     });
-                                              //   },
-                                              //   child: Text("Delete Product", style: TextStyle(
-                                              //     fontFamily: "Poppins", color: Colors.red
-                                              //   ))
-                                              // )
-                                            ],
-                                          ))),
-                                )),
-                            SizedBox(height: 5),
-                          ],
+                                                //       );
+                                                //     });
+                                                //   },
+                                                //   child: Text("Delete Product", style: TextStyle(
+                                                //     fontFamily: "Poppins", color: Colors.red
+                                                //   ))
+                                                // )
+                                              ],
+                                            ))),
+                                  )),
+                              SizedBox(height: 5),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ));
-                });
+                      ],
+                    ));
+                  });
+            }
           } else {
             return const Center(
-                child: CircularProgressIndicator(color: Colors.red));
+                child: CircularProgressIndicator(color: Colors.redAccent));
           }
         });
   }

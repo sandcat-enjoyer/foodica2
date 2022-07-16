@@ -99,7 +99,7 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   void initState() {
     super.initState();
     _user = widget._user;
-    WidgetsBinding.instance!.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       setState(() {
         _getLastUsedDate();
@@ -467,10 +467,11 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                 accountEmail: Text(_user.email!,
                     style: const TextStyle(fontFamily: "Poppins")),
                 accountName: Text(_checkProfileName(),
-                    style: const TextStyle(fontFamily: "Poppins")),
+                    style: const TextStyle(
+                        fontFamily: "Poppins", fontWeight: FontWeight.bold)),
                 currentAccountPicture:
                     ClipOval(child: _setPlaceholderPicture()),
-                decoration: const BoxDecoration(color: Colors.black),
+                decoration: const BoxDecoration(color: Colors.redAccent),
               ),
               ListTile(
                 title: RichText(
