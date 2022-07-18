@@ -9,6 +9,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_framework/responsive_framework.dart';
+import 'package:responsive_framework/utils/scroll_behavior.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future main() async {
@@ -63,7 +65,19 @@ class MyApp extends StatelessWidget {
               },
               initialData: null)
         ],
+      
         child: MaterialApp(
+          builder: (context, child) => ResponsiveWrapper.builder(
+            BouncingScrollWrapper.builder(context, child!),
+            maxWidth: 1000,
+            minWidth: 450,
+            defaultScale: true,
+            breakpoints: [
+              const ResponsiveBreakpoint.resize(450, name: MOBILE),
+              const ResponsiveBreakpoint.autoScale(800, name: TABLET),
+              const ResponsiveBreakpoint.autoScale(1000, name: TABLET),
+            ]
+          ),
           home: _loadApp(),
           theme: ThemeData(
               brightness: Brightness.light,

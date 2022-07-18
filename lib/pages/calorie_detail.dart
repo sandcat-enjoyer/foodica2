@@ -145,16 +145,17 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
                                             fontSize: 22))),
                                 _buildChart(),
                                 Container(
+                                 
                                     child: Center(
                                         child: Wrap(
                                   runSpacing: 20.0,
                                   children: <Widget>[
-                                    Row(
+                                    Center(
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Center(
                                           child: Container(
-                                            width: 350.0,
-                                            height: 200.0,
                                             alignment: Alignment.center,
                                             child: Card(
                                               elevation: 2.0,
@@ -206,11 +207,12 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
                                         )
                                       ],
                                     ),
+                                    ),
                                     Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Container(
-                                          width: 160.0,
-                                          height: 200.0,
+                                          width: 200.0,
                                           alignment: Alignment.centerLeft,
                                           child: Card(
                                             elevation: 2.0,
@@ -259,8 +261,7 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
                                         ),
                                         SizedBox(width: 10),
                                         Container(
-                                          width: 160.0,
-                                          height: 200.0,
+                                          width: 200.0,
                                           alignment: Alignment.centerRight,
                                           child: Card(
                                             elevation: 2.0,
@@ -311,9 +312,10 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
                                     ),
                                     SizedBox(height: 10),
                                     Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Container(
-                                          width: 160.0,
+                                          width: 200.0,
                                           height: 200,
                                           alignment: Alignment.centerRight,
                                           child: Card(
@@ -365,7 +367,7 @@ class _CalorieDetailPageState extends State<CalorieDetailPage> {
                                         ),
                                         SizedBox(width: 10),
                                         Container(
-                                          width: 160.0,
+                                          width: 200.0,
                                           height: 200.0,
                                           alignment: Alignment.centerRight,
                                           child: Card(
