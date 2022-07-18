@@ -64,19 +64,7 @@ class MyApp extends StatelessWidget {
               },
               initialData: null)
         ],
-      
         child: MaterialApp(
-          builder: (context, child) => ResponsiveWrapper.builder(
-            BouncingScrollWrapper.builder(context, child!),
-            maxWidth: 1000,
-            minWidth: 450,
-            defaultScale: true,
-            breakpoints: [
-              const ResponsiveBreakpoint.resize(450, name: MOBILE),
-              const ResponsiveBreakpoint.autoScale(800, name: TABLET),
-              const ResponsiveBreakpoint.autoScale(1000, name: TABLET),
-            ]
-          ),
           home: _loadApp(),
           theme: ThemeData(
               brightness: Brightness.light,
