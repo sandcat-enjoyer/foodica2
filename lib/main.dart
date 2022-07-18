@@ -27,9 +27,8 @@ _loadApp() {
   if (FirebaseAuth.instance.currentUser != null) {
     SharedPreferences.getInstance().then((prefs) {
       print(prefs.getInt("daily"));
-      isAllergensNotEmpty =
-          prefs.getStringList("allergens") == null ? false : true;
-      isDailyCaloriesNotEmpty = prefs.getInt("daily") == null ? false : true;
+      isAllergensNotEmpty = prefs.getStringList("allergens") != null;
+      isDailyCaloriesNotEmpty = prefs.getInt("daily") != null;
       if (prefs.getBool("firstTimeBoot") == true) {
         FirebaseAuth.instance.signOut();
         prefs.setBool("firstTimeBoot", false);
