@@ -10,7 +10,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
-import 'package:responsive_framework/utils/scroll_behavior.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future main() async {
@@ -26,10 +25,14 @@ bool isDailyCaloriesNotEmpty = false;
 _loadApp() {
   if (FirebaseAuth.instance.currentUser != null) {
     SharedPreferences.getInstance().then((prefs) {
-      print(prefs.getInt("daily"));
+      print("test" + prefs.getInt("daily").toString());
+      if (prefs.getInt("daily") == null) {
+        prefs.setInt("daily", 0);
+      }
       isAllergensNotEmpty = prefs.getStringList("allergens") != null;
       isDailyCaloriesNotEmpty = prefs.getInt("daily") != null;
-      if (prefs.getBool("firstTimeBoot") == true) {
+      print(isDailyCaloriesNotEmpty);
+      if (prefs.getBool("firstTimeBoot") == true || prefs.getBool("firstTimeBoot") == null) {
         FirebaseAuth.instance.signOut();
         prefs.setBool("firstTimeBoot", false);
       }

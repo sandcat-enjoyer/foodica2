@@ -197,12 +197,12 @@ class _LoginPageState extends State<LoginPage> {
                                 RoundedRectangleBorder(
                                     borderRadius: BorderRadius.all(
                                         Radius.circular(10)))))),
-                    SizedBox(height: 10),
+                    SizedBox(height: 20),
                     const Text(
                       "Or sign in with these options: ",
                       style: TextStyle(
                           fontFamily: "Poppins",
-                          fontSize: 14,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 5.0),
@@ -282,9 +282,16 @@ class _LoginPageState extends State<LoginPage> {
                           );
                         }),
                     Column(
-                      children: [_checkPlatform(context)],
+                      children: [
+                        Container(
+                          width: 250,
+                          child:  _checkPlatform(context),
+                        )
+                       
+                        ],
                     ),
                     OutlinedButton(
+                      
                         style: ButtonStyle(
                             shape: MaterialStateProperty.all(
                                 RoundedRectangleBorder(
