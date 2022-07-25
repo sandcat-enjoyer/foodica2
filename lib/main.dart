@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:Foodica/pages/homescreen.dart';
 import 'package:Foodica/pages/init_caloriegoals.dart';
 import 'package:Foodica/providers/authentication_provider.dart';
+import 'package:Foodica/utils/FlutterWidgetData.dart';
 import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:Foodica/pages/init_allergens.dart';
@@ -11,10 +14,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_widgetkit/flutter_widgetkit.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  WidgetKit.setItem("widgetData", jsonEncode("text"), "group.julesdebbaut.foodica");
+  WidgetKit.reloadAllTimelines();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) => {runApp(const MyApp())});
 }

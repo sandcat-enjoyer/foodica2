@@ -77,7 +77,8 @@ class _TipsPageState extends State<TipsPage> {
               padding: EdgeInsets.all(10),
               child: Column(
                 children: [
-                  ListTile(
+                  SizedBox(width: 500, child: ListTile(
+                    
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => TipsDetailPage(
@@ -93,7 +94,7 @@ class _TipsPageState extends State<TipsPage> {
                     shape: RoundedRectangleBorder(
                         side: BorderSide(color: Colors.black, width: 0.01),
                         borderRadius: BorderRadius.circular(20)),
-                  ),
+                  ),),
                   SizedBox(height: 10)
                 ],
               ));
