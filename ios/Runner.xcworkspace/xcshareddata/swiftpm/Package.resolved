@@ -3,10 +3,10 @@
     {
       "identity" : "swiftuicharts",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/AfrazCodes/SwiftUICharts",
+      "location" : "https://github.com/willdale/SwiftUICharts",
       "state" : {
-        "revision" : "6cacb77e8d3e0a9ed1d09ce9a19ba057c95ce529",
-        "version" : "0.5.2"
+        "revision" : "7b50b531c36f30d41b5208f7dbc63df245936849",
+        "version" : "2.9.9"
       }
     }
   ],

@@ -62,26 +62,32 @@ struct SimpleEntry: TimelineEntry {
     let flutterData: FlutterData?
 }
 
+private func makeData() -> PieChartData {
+    let data = PieDataSet(
+    dataPoints: [
+        PieChartDataPoint(value: 7, description: "Fat", colour: .red),
+                        PieChartDataPoint(value: 2, description: "Sugar",   colour: .blue),
+                        PieChartDataPoint(value: 9, description: "Salt", colour: .green),
+                        PieChartDataPoint(value: 6, description: "Saturated Fat",  colour: .green)
+    ], legendTitle: "Foodica"
+    )
+    
+    return PieChartData(dataSets: data, metadata: ChartMetadata(title: "Calories consumed", subtitle: ""), chartStyle: PieChartStyle(infoBoxPlacement: .header))
+}
+
 struct CalorieWidgetEntryView : View {
     var entry: Provider.Entry
-    
+    var data: PieChartData = makeData()
     private var FlutterDataView: some View {
         VStack {
-            let salt = Legend(color: .green, label: "Salt", order: 1)
-            let sugar = Legend(color: .blue, label: "Sugar", order: 2)
-            let saturatedFat = Legend(color: .orange, label: "Saturated Fat", order: 3)
-            let fat = Legend(color: .red, label: "Fat", order: 4)
-
-            let points: [DataPoint] = [
-                .init(value: 70, label: "", legend: salt),
-                .init(value: 50, label: "", legend: sugar),
-                .init(value: 30, label: "", legend: saturatedFat),
-                .init(value: 90, label: "", legend: fat)
-            ]
-            
-            BarChartView(dataPoints: points)
+            PieChart(chartData: data)
+                .touchOverlay(chartData: data)
+                .legends(chartData: data, columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())])
+                .frame(minWidth: 150, maxWidth: 300, minHeight: 150, idealHeight: 200, maxHeight: 300, alignment: .center)
         }
     }
+    
+    
     
     private var NoDataView: some View {
         Text("No data found.")
@@ -116,3 +122,4 @@ struct CalorieWidget_Previews: PreviewProvider {
             .previewContext(WidgetPreviewContext(family: .systemSmall))
     }
 }
+
