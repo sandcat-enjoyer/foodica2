@@ -19,7 +19,7 @@ import 'package:flutter_widgetkit/flutter_widgetkit.dart';
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  WidgetKit.setItem("widgetData", jsonEncode("text"), "group.julesdebbaut.foodica");
+  WidgetKit.setItem("widgetData", jsonEncode(FlutterWidgetData("text")), "group.julesdebbaut.foodica");
   WidgetKit.reloadAllTimelines();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) => {runApp(const MyApp())});

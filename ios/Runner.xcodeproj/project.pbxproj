@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -20,6 +20,8 @@
 		533286DC2871F50600D49DDA /* Entitlements.plist in Resources */ = {isa = PBXBuildFile; fileRef = 533286DB2871F50500D49DDA /* Entitlements.plist */; };
 		5385C2362860FFE50079B7E6 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5385C2352860FFE50079B7E6 /* GoogleService-Info.plist */; };
 		53E75FE427F8853C000F13D3 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53E75FE327F8853C000F13D3 /* File.swift */; };
+		53F80835288FDC2F009727F2 /* SwiftUICharts in Frameworks */ = {isa = PBXBuildFile; productRef = 53F80834288FDC2F009727F2 /* SwiftUICharts */; };
+		53F80837288FDE98009727F2 /* SwiftUICharts in Frameworks */ = {isa = PBXBuildFile; productRef = 53F80836288FDE98009727F2 /* SwiftUICharts */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
@@ -97,6 +99,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				53F80837288FDE98009727F2 /* SwiftUICharts in Frameworks */,
 				531FE5332886B55A0097993D /* SwiftUI.framework in Frameworks */,
 				531FE5312886B55A0097993D /* WidgetKit.framework in Frameworks */,
 			);
@@ -107,6 +110,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3BC7FEA204791C8C97573312 /* Pods_Runner.framework in Frameworks */,
+				53F80835288FDC2F009727F2 /* SwiftUICharts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -212,6 +216,9 @@
 			dependencies = (
 			);
 			name = CalorieWidgetExtension;
+			packageProductDependencies = (
+				53F80836288FDE98009727F2 /* SwiftUICharts */,
+			);
 			productName = CalorieWidgetExtension;
 			productReference = 531FE52F2886B55A0097993D /* CalorieWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
@@ -236,6 +243,9 @@
 				531FE53E2886B55C0097993D /* PBXTargetDependency */,
 			);
 			name = Runner;
+			packageProductDependencies = (
+				53F80834288FDC2F009727F2 /* SwiftUICharts */,
+			);
 			productName = Runner;
 			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
 			productType = "com.apple.product-type.application";
@@ -268,6 +278,9 @@
 				Base,
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
+			packageReferences = (
+				53F80833288FDC2F009727F2 /* XCRemoteSwiftPackageReference "SwiftUICharts" */,
+			);
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -825,6 +838,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		53F80833288FDC2F009727F2 /* XCRemoteSwiftPackageReference "SwiftUICharts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AfrazCodes/SwiftUICharts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.5.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		53F80834288FDC2F009727F2 /* SwiftUICharts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 53F80833288FDC2F009727F2 /* XCRemoteSwiftPackageReference "SwiftUICharts" */;
+			productName = SwiftUICharts;
+		};
+		53F80836288FDE98009727F2 /* SwiftUICharts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 53F80833288FDC2F009727F2 /* XCRemoteSwiftPackageReference "SwiftUICharts" */;
+			productName = SwiftUICharts;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 97C146E61CF9000F007C117D /* Project object */;
 }
