@@ -66,24 +66,50 @@ private func makeData() -> PieChartData {
     let data = PieDataSet(
     dataPoints: [
         PieChartDataPoint(value: 7, description: "Fat", colour: .red),
-                        PieChartDataPoint(value: 2, description: "Sugar",   colour: .blue),
+        PieChartDataPoint(value: 9, description: "Sugar",   colour: .blue),
                         PieChartDataPoint(value: 9, description: "Salt", colour: .green),
                         PieChartDataPoint(value: 6, description: "Saturated Fat",  colour: .green)
     ], legendTitle: "Foodica"
     )
     
-    return PieChartData(dataSets: data, metadata: ChartMetadata(title: "Calories consumed", subtitle: ""), chartStyle: PieChartStyle(infoBoxPlacement: .header))
+    return PieChartData(dataSets: data, metadata: ChartMetadata(title: "Calories consumed", subtitle: "Foodica"), chartStyle: PieChartStyle(infoBoxPlacement: .header, globalAnimation: Animation.easeInOut))
 }
 
 struct CalorieWidgetEntryView : View {
     var entry: Provider.Entry
     var data: PieChartData = makeData()
+    @Environment(\.widgetFamily) var family
+    
+    @ViewBuilder
     private var FlutterDataView: some View {
         VStack {
-            PieChart(chartData: data)
-                .touchOverlay(chartData: data)
-                .legends(chartData: data, columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())])
-                .frame(minWidth: 150, maxWidth: 300, minHeight: 150, idealHeight: 200, maxHeight: 300, alignment: .center)
+            switch family {
+            case .systemSmall:
+                PieChart(chartData: data)
+                    .touchOverlay(chartData: data)
+                    .frame(minWidth: 150, maxWidth: 150, minHeight: 150, idealHeight: 150, maxHeight: 150, alignment: .center)
+            case .systemMedium:
+                PieChart(chartData: data)
+                    .touchOverlay(chartData: data)
+                    .legends(chartData: data, columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())])
+                    .frame(minWidth: 150, maxWidth: 300, minHeight: 150, idealHeight: 200, maxHeight: 300, alignment: .center)
+            case .systemLarge:
+                PieChart(chartData: data)
+                    .touchOverlay(chartData: data)
+                    .legends(chartData: data, columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())])
+                    .frame(minWidth: 150, maxWidth: 300, minHeight: 150, idealHeight: 200, maxHeight: 300, alignment: .center)
+            case .systemExtraLarge:
+                PieChart(chartData: data)
+                    .touchOverlay(chartData: data)
+                    .legends(chartData: data, columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())])
+                    .frame(minWidth: 150, maxWidth: 300, minHeight: 150, idealHeight: 200, maxHeight: 300, alignment: .center)
+            default:
+                PieChart(chartData: data)
+                    .touchOverlay(chartData: data)
+                    .legends(chartData: data, columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())])
+                    .frame(minWidth: 150, maxWidth: 300, minHeight: 150, idealHeight: 200, maxHeight: 300, alignment: .center)
+            }
+            
         }
     }
     
