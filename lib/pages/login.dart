@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:Foodica/pages/init_allergens.dart';
 import 'package:Foodica/providers/authentication_provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import "package:flutter/material.dart";
 import 'package:Foodica/utils/authentication.dart';
@@ -58,30 +59,35 @@ class _LoginPageState extends State<LoginPage> {
 
   _checkPlatform(BuildContext context) {
     if (Platform.isIOS) {
-      return SignInWithAppleButton(
-        style: SignInWithAppleButtonStyle.black,
-        iconAlignment: IconAlignment.center,
-        onPressed: () async {
-          user = await context.read<AuthenticationProvider>().signInWithApple();
-          if (user != null) {
-            SharedPreferences.getInstance().then((value) {
-              value.setBool("signedInWithApple", true);
-              if (value.getStringList("allergens") != null) {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
+      return Container(
+          width: 205,
+          height: 60,
+          child: SignInWithAppleButton(
+            style: SignInWithAppleButtonStyle.black,
+            iconAlignment: IconAlignment.center,
+            onPressed: () async {
+              user = await context
+                  .read<AuthenticationProvider>()
+                  .signInWithApple();
+              if (user != null) {
+                SharedPreferences.getInstance().then((value) {
+                  value.setBool("signedInWithApple", true);
+                  if (value.getStringList("allergens") != null) {
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                        builder: (context) => InitAllergens(
+                            user: FirebaseAuth.instance.currentUser!)));
+                  } else {
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                        builder: (context) => HomeScreenPage(
+                            user: FirebaseAuth.instance.currentUser!)));
+                  }
+                });
+                Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => InitAllergens(
                         user: FirebaseAuth.instance.currentUser!)));
-              } else {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => HomeScreenPage(
-                        user: FirebaseAuth.instance.currentUser!)));
               }
-            });
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) =>
-                    InitAllergens(user: FirebaseAuth.instance.currentUser!)));
-          }
-        },
-      );
+            },
+          ));
     } else {
       return SizedBox(height: 5);
     }
@@ -144,68 +150,82 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     const SizedBox(height: 20.0),
-                    OutlinedButton(
-                        onPressed: () => {
-                              Authentication()
-                                  .signInWithEmail(
-                                      email: email, password: password)
-                                  .then((result) => {
-                                        if (result == null)
-                                          {
-                                            SharedPreferences.getInstance()
-                                                .then((prefs) {
-                                              if (prefs.getStringList(
-                                                      "allergens") ==
-                                                  null) {
-                                                Navigator.pushReplacement(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            InitAllergens(
-                                                                user: FirebaseAuth
-                                                                    .instance
-                                                                    .currentUser!)));
-                                              } else {
-                                                Navigator.pushReplacement(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            HomeScreenPage(
-                                                                user: FirebaseAuth
-                                                                    .instance
-                                                                    .currentUser!)));
-                                              }
-                                            })
-                                          }
-                                        else
-                                          {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(SnackBar(
-                                                    content: Text(result)))
-                                          }
-                                      })
-                            },
-                        child: const Text("Log in",
-                            style: TextStyle(
-                              fontFamily: "Poppins",
-                              fontWeight: FontWeight.bold,
-                            )),
-                        style: ButtonStyle(
-                            padding: MaterialStateProperty.all<EdgeInsets>(
-                                EdgeInsets.all(10)),
-                            shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(10)))))),
+                    Container(
+                      width: 200,
+                      height: 45,
+                      child: TextButton(
+                          onPressed: () => {
+                                Authentication()
+                                    .signInWithEmail(
+                                        email: email, password: password)
+                                    .then((result) => {
+                                          if (result == null)
+                                            {
+                                              SharedPreferences.getInstance()
+                                                  .then((prefs) {
+                                                if (prefs.getStringList(
+                                                        "allergens") ==
+                                                    null) {
+                                                  Navigator.pushReplacement(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              InitAllergens(
+                                                                  user: FirebaseAuth
+                                                                      .instance
+                                                                      .currentUser!)));
+                                                } else {
+                                                  Navigator.pushReplacement(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              HomeScreenPage(
+                                                                  user: FirebaseAuth
+                                                                      .instance
+                                                                      .currentUser!)));
+                                                }
+                                              })
+                                            }
+                                          else
+                                            {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(SnackBar(
+                                                      content: Text(result)))
+                                            }
+                                        })
+                              },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.login_rounded),
+                              SizedBox(width: 5),
+                              Text("Log in",
+                                  style: TextStyle(
+                                      fontFamily: "Poppins",
+                                      fontWeight: FontWeight.bold))
+                            ],
+                          ),
+                          style: ButtonStyle(
+                              padding: MaterialStateProperty.all<EdgeInsets>(
+                                  EdgeInsets.all(10)),
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.red),
+                              foregroundColor:
+                                  MaterialStateProperty.all(Colors.white),
+                              shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(7)))))),
+                    ),
                     SizedBox(height: 20),
                     const Text(
                       "Or sign in with these options: ",
                       style: TextStyle(
                           fontFamily: "Poppins",
-                          fontSize: 16,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(height: 5.0),
+                    const SizedBox(height: 10.0),
                     FutureBuilder(
                         future:
                             Authentication.initializeFirebase(context: context),
@@ -221,59 +241,79 @@ class _LoginPageState extends State<LoginPage> {
                                             AlwaysStoppedAnimation<Color>(
                                                 Colors.redAccent),
                                       )
-                                    : OutlinedButton(
-                                        style: ButtonStyle(
-                                            backgroundColor:
-                                                MaterialStateProperty.all(
-                                                    Colors.redAccent),
-                                            shape: MaterialStateProperty.all(
-                                                RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10)))),
-                                        onPressed: () async {
-                                          setState(() {
-                                            _isSigningIn = true;
-                                          });
+                                    : Container(
+                                        height: 50,
+                                        child: OutlinedButton(
+                                          style: ButtonStyle(
+                                              backgroundColor:
+                                                  MaterialStateProperty.all(
+                                                      Colors.white),
+                                              shape: MaterialStateProperty.all(
+                                                  RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              7)))),
+                                          onPressed: () async {
+                                            setState(() {
+                                              _isSigningIn = true;
+                                            });
 
-                                          User? user = await Authentication
-                                              .signInWithGoogle(
-                                                  context: context);
-                                          setState(() {
-                                            _isSigningIn = false;
-                                          });
+                                            User? user = await Authentication
+                                                .signInWithGoogle(
+                                                    context: context);
+                                            setState(() {
+                                              _isSigningIn = false;
+                                            });
 
-                                          if (user != null) {
-                                            SharedPreferences prefs =
-                                                await SharedPreferences
-                                                    .getInstance();
-                                            if (prefs.getStringList(
-                                                    "allergens") !=
-                                                null) {
-                                              Navigator.of(context)
-                                                  .pushReplacement(
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      HomeScreenPage(
-                                                    user: user,
+                                            if (user != null) {
+                                              SharedPreferences prefs =
+                                                  await SharedPreferences
+                                                      .getInstance();
+                                              if (prefs.getStringList(
+                                                      "allergens") !=
+                                                  null) {
+                                                Navigator.of(context)
+                                                    .pushReplacement(
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        HomeScreenPage(
+                                                      user: user,
+                                                    ),
                                                   ),
-                                                ),
-                                              );
-                                            } else {
-                                              Navigator.of(context)
-                                                  .pushReplacement(
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              InitAllergens(
-                                                                  user: user)));
+                                                );
+                                              } else {
+                                                Navigator.of(context)
+                                                    .pushReplacement(
+                                                        MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                InitAllergens(
+                                                                    user:
+                                                                        user)));
+                                              }
                                             }
-                                          }
-                                        },
-                                        child: const Text("Sign In with Google",
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontFamily: "Poppins",
-                                                fontWeight: FontWeight.bold)),
+                                          },
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Container(
+                                                child: CachedNetworkImage(
+                                                    imageUrl:
+                                                        'http://pngimg.com/uploads/google/google_PNG19635.png',
+                                                    width: 30,
+                                                    fit: BoxFit.cover),
+                                              ),
+                                              SizedBox(width: 5),
+                                              const Text("Sign In with Google",
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontFamily: "Poppins",
+                                                      fontWeight:
+                                                          FontWeight.bold))
+                                            ],
+                                          ),
+                                        ),
                                       ));
                           }
                           return const CircularProgressIndicator(
@@ -281,6 +321,7 @@ class _LoginPageState extends State<LoginPage> {
                                 AlwaysStoppedAnimation<Color>(Colors.redAccent),
                           );
                         }),
+                    SizedBox(height: 10),
                     Column(
                       children: [
                         Container(
@@ -290,13 +331,14 @@ class _LoginPageState extends State<LoginPage> {
                        
                         ],
                     ),
+                    SizedBox(height: 40),
                     OutlinedButton(
                       
                         style: ButtonStyle(
                             shape: MaterialStateProperty.all(
                                 RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(10))))),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8))))),
                         onPressed: () =>
                             {Navigator.of(context).push(_toRegisterPage())},
                         child: const Text("Create New Account",
