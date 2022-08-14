@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:Foodica/pages/homescreen.dart';
 import 'package:Foodica/pages/init_caloriegoals.dart';
 import 'package:Foodica/providers/authentication_provider.dart';
+import 'package:Foodica/utils/FlutterWidgetData.dart';
 import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:Foodica/pages/init_allergens.dart';
@@ -10,12 +13,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
-import 'package:responsive_framework/utils/scroll_behavior.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_widgetkit/flutter_widgetkit.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  WidgetKit.setItem("widgetData", jsonEncode(FlutterWidgetData("text")), "group.julesdebbaut.foodica");
+  WidgetKit.reloadAllTimelines();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) => {runApp(const MyApp())});
 }
@@ -26,10 +31,14 @@ bool isDailyCaloriesNotEmpty = false;
 _loadApp() {
   if (FirebaseAuth.instance.currentUser != null) {
     SharedPreferences.getInstance().then((prefs) {
-      print(prefs.getInt("daily"));
+      print("test" + prefs.getInt("daily").toString());
+      if (prefs.getInt("daily") == null) {
+        prefs.setInt("daily", 0);
+      }
       isAllergensNotEmpty = prefs.getStringList("allergens") != null;
       isDailyCaloriesNotEmpty = prefs.getInt("daily") != null;
-      if (prefs.getBool("firstTimeBoot") == true) {
+      print(isDailyCaloriesNotEmpty);
+      if (prefs.getBool("firstTimeBoot") == true || prefs.getBool("firstTimeBoot") == null) {
         FirebaseAuth.instance.signOut();
         prefs.setBool("firstTimeBoot", false);
       }

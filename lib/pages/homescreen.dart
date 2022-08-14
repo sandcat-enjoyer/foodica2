@@ -48,7 +48,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   int? _calorieGoalInt;
 
   _checkIfWeeklyCaloriesIsNull() {
-    _getWeeklyCalories();
     if (_weeklyCaloriesInt == null) {
       return "No Calories Consumed";
     } else {
@@ -74,8 +73,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   }
 
   _checkIfDailyCaloriesIsNull() {
-    _getDailyCalories();
-    _getCalorieGoal();
     if (_dailyCaloriesInt == null) {
       return "0/" + _calorieGoalInt.toString() + "Kcal";
     } else {
@@ -87,7 +84,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
   }
 
   _checkIfLastScannedProductIsNull() {
-    _getLastScannedProduct();
     if (lastProductName == "") {
       return "None";
     } else {
@@ -100,13 +96,8 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
     super.initState();
     _user = widget._user;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
       setState(() {
-        _getLastUsedDate();
-        _weeklyCaloriesInt = prefs.getInt("weekly");
-        _dailyCaloriesInt = prefs.getInt("daily");
-        _getLastScannedProduct();
-        _calorieGoalInt = prefs.getInt("goal");
+        _getData();
       });
     });
   }
@@ -116,25 +107,33 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
     super.dispose();
   }
 
-  _getLastUsedDate() async {
-    SharedPreferences.getInstance().then((value) => {
-          if (value.getString("lastUsed") == null)
+ _getData() {
+  SharedPreferences.getInstance().then((value) {
+      if (value.getString("lastUsed") == null)
             {
-              lastUsed = DateTime.now(),
-              value.setString("lastUsed", formatDay.format(DateTime.now()))
-            },
+              lastUsed = DateTime.now();
+              value.setString("lastUsed", formatDay.format(DateTime.now()));
+            };
           if (value.getString("lastUsed") != null)
             {
-              lastUsed = DateTime.parse(value.getString("lastUsed")!),
-              difference = daysBetween(lastUsed!, DateTime.now()),
+              lastUsed = DateTime.parse(value.getString("lastUsed")!);
+              difference = daysBetween(lastUsed!, DateTime.now());
               if (difference >= 1)
                 {
-                  value.setInt("daily", 0),
-                  value.setString("lastUsed", formatDay.format(DateTime.now()))
+                  value.setInt("daily", 0);
+                  value.setString("lastUsed", formatDay.format(DateTime.now()));
                 }
-            }
-        });
-  }
+            };
+      _weeklyCaloriesInt = value.getInt("weekly");
+      _dailyCaloriesInt = value.getInt("daily");
+      _calorieGoalInt = value.getInt("goal");
+      if (value.getString("productname") == null) {
+        lastProductName = "";
+      } else {
+        lastProductName = value.getString("productname") ?? "";
+      }
+  });
+ }  
 
   int daysBetween(DateTime from, DateTime to) {
     from = DateTime(from.year, from.month, from.day);
@@ -142,38 +141,6 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
     return (to.difference(from).inHours / 24).round();
   }
 
-  void _getWeeklyCalories() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.reload();
-    setState(() {
-      _weeklyCaloriesInt = prefs.getInt("weekly");
-    });
-  }
-
-  void _getDailyCalories() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.reload();
-    setState(() {
-      _dailyCaloriesInt = prefs.getInt("daily");
-    });
-  }
-
-  void _getLastScannedProduct() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.reload();
-    setState(() {
-      if (prefs.getString("productname") == null) {
-        lastProductName = "";
-      } else {
-        lastProductName = prefs.getString("productname") ?? "";
-      }
-    });
-  }
-
-  void _getCalorieGoal() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    _calorieGoalInt = prefs.getInt("goal");
-  }
 
   String _checkProfileName() {
     if (_user.displayName == null) {
@@ -574,6 +541,16 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                 fontWeight: FontWeight.bold,
               )),
         ),
-        body: _buildHomeScreen());
+        body: WillPopScope(
+          onWillPop: () async {
+            if (Navigator.of(context).userGestureInProgress) {
+              return false;
+            }
+            else {
+              return true;
+            }
+          },
+          child: _buildHomeScreen()!,
+        ));
   }
 }

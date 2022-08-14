@@ -164,7 +164,10 @@ class _SettingsPageState extends State<SettingsPage> {
                         .remove()
                         .then((value) => {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text("History Deleted"))),
+                                  SnackBar(content: Text("History Deleted", style: TextStyle(
+                                    fontFamily: "Poppins",
+                                    fontWeight: FontWeight.bold
+                                  )))),
                               Navigator.of(context).pop()
                             });
                   },

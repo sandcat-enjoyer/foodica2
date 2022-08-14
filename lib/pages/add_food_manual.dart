@@ -117,6 +117,7 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
     }
   }
 
+
   _saveProductToFirebase() {
     final productRef =
         databaseReference.child("/users/" + user.uid + "/products/");
@@ -203,11 +204,40 @@ class _ManualFoodPageState extends State<ManualFoodPage> {
     return Scaffold(
         floatingActionButton: FloatingActionButton(
             onPressed: () {
-              _saveProductToFirebase();
+              if (productName == "" || category == "" || calories == "" || fat == "" || salt == "" || saturatedFat == "" || sugar == "") {
+                showDialog(context: context, builder: (context) {
+                  return AlertDialog(
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20.0))
+                    ),
+                    title: const Text("Not all values filled in"),
+                    content: const SizedBox(
+                      width: 400,
+                      child: Text("One or more values have not been filled in. Fill in these values and try saving again.")
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text("OK"),
+                      )
+                    ],
+                  );
+                });
+              }
+              else {
+                _saveProductToFirebase();
               _addToDailyCalories();
               _saveLastScannedProductName();
               _addToWeeklyCalories();
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Product added", style: TextStyle(
+                fontFamily: "Poppins",
+                fontWeight: FontWeight.bold
+              ))));
               Navigator.pop(context);
+              }
+              
             },
             child: const Icon(Icons.save)),
         appBar: AppBar(

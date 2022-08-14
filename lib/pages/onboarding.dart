@@ -168,7 +168,7 @@ class SlideTile extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Image.asset(imagePath),
+          Image.asset(imagePath, height: 400,),
           const SizedBox(
             height: 20,
           ),

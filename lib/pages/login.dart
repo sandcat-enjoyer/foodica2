@@ -323,10 +323,17 @@ class _LoginPageState extends State<LoginPage> {
                         }),
                     SizedBox(height: 10),
                     Column(
-                      children: [_checkPlatform(context)],
+                      children: [
+                        Container(
+                          width: 250,
+                          child:  _checkPlatform(context),
+                        )
+                       
+                        ],
                     ),
                     SizedBox(height: 40),
                     OutlinedButton(
+                      
                         style: ButtonStyle(
                             shape: MaterialStateProperty.all(
                                 RoundedRectangleBorder(
