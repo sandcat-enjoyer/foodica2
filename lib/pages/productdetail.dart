@@ -67,7 +67,9 @@ class _DetailPageState extends State<DetailPage> {
     var barcode = widget.barcode;
 
     ProductQueryConfiguration configuration = ProductQueryConfiguration(barcode,
-        language: OpenFoodFactsLanguage.ENGLISH, fields: [ProductField.ALL]);
+        version: ProductQueryVersion.v3,
+        language: OpenFoodFactsLanguage.ENGLISH,
+        fields: [ProductField.ALL]);
     ProductResult result = await OpenFoodAPIClient.getProduct(configuration);
 
     if (result.status == 1) {
@@ -122,19 +124,28 @@ class _DetailPageState extends State<DetailPage> {
         await prefs.setInt(
             "daily",
             (_dailyCaloriesInt +
-                scannedProduct.nutriments!.energyKcal!.round()));
+                scannedProduct.nutriments!
+                    .getValue(Nutrient.energyKCal, PerSize.serving)!
+                    .round()));
         await prefs.setInt(
             "weekly",
             weeklyCaloriesInt! +
-                scannedProduct.nutriments!.energyKcal!.round());
+                scannedProduct.nutriments!
+                    .getValue(Nutrient.energyKCal, PerSize.serving)!
+                    .round());
         await prefs.setString("productname", scannedProduct.productName!);
       }
     }
   }
 
   _checkCalories() {
-    if (scannedProduct.nutriments?.energyKcal != null) {
-      return scannedProduct.nutriments!.energyKcal!.toStringAsFixed(2) + "Kcal";
+    if (scannedProduct.nutriments!
+            .getValue(Nutrient.energyKCal, PerSize.serving) !=
+        null) {
+      return scannedProduct.nutriments!
+              .getValue(Nutrient.energyKCal, PerSize.serving)!
+              .toStringAsFixed(2) +
+          "Kcal";
     } else {
       return "Not Found";
     }
@@ -188,8 +199,12 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   _checkFat() {
-    if (scannedProduct.nutriments?.fat != null) {
-      return scannedProduct.nutriments!.fat!.toStringAsFixed(2) + "g";
+    if (scannedProduct.nutriments?.getValue(Nutrient.fat, PerSize.serving) !=
+        null) {
+      return scannedProduct.nutriments!
+              .getValue(Nutrient.fat, PerSize.serving)!
+              .toStringAsFixed(2) +
+          "g";
     } else {
       return "Not Found";
     }
@@ -243,8 +258,13 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   _checkSaturatedFat() {
-    if (scannedProduct.nutriments?.saturatedFat != null) {
-      return scannedProduct.nutriments!.fat!.toStringAsFixed(2) + "g";
+    if (scannedProduct.nutriments
+            ?.getValue(Nutrient.saturatedFat, PerSize.serving) !=
+        null) {
+      return scannedProduct.nutriments!
+              .getValue(Nutrient.saturatedFat, PerSize.serving)!
+              .toStringAsFixed(2) +
+          "g";
     } else {
       return "Not Found";
     }
@@ -298,8 +318,12 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   _checkSalt() {
-    if (scannedProduct.nutriments?.salt != null) {
-      return scannedProduct.nutriments!.salt!.toStringAsFixed(2) + "g";
+    if (scannedProduct.nutriments?.getValue(Nutrient.salt, PerSize.serving) !=
+        null) {
+      return scannedProduct.nutriments!
+              .getValue(Nutrient.salt, PerSize.serving)!
+              .toStringAsFixed(2) +
+          "g";
     } else {
       return "Not Found";
     }
@@ -370,8 +394,12 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   _checkSugar() {
-    if (scannedProduct.nutriments?.sugars != null) {
-      return scannedProduct.nutriments!.sugars!.toStringAsFixed(2) + "g";
+    if (scannedProduct.nutriments?.getValue(Nutrient.sugars, PerSize.serving) !=
+        null) {
+      return scannedProduct.nutriments!
+              .getValue(Nutrient.sugars, PerSize.serving)!
+              .toStringAsFixed(2) +
+          "g";
     } else {
       return "Not Found";
     }
@@ -407,17 +435,31 @@ class _DetailPageState extends State<DetailPage> {
                           code: scannedProduct.barcode,
                           productname: scannedProduct.productName ?? "",
                           brand: scannedProduct.brands ?? "",
-                          calories: scannedProduct.nutriments!.energyKcal100g
+                          calories: scannedProduct.nutriments!
+                              .getValue(
+                                  Nutrient.energyKCal, PerSize.oneHundredGrams)
                               .toString(),
-                          fat: scannedProduct.nutriments?.fat.toString() ?? "0",
-                          salt:
-                              scannedProduct.nutriments?.salt.toString() ?? "0",
-                          sugar: scannedProduct.nutriments?.sugars.toString() ??
+                          fat: scannedProduct.nutriments
+                                  ?.getValue(
+                                      Nutrient.fat, PerSize.oneHundredGrams)
+                                  .toString() ??
+                              "0",
+                          salt: scannedProduct.nutriments
+                                  ?.getValue(
+                                      Nutrient.salt, PerSize.oneHundredGrams)
+                                  .toString() ??
+                              "0",
+                          sugar: scannedProduct.nutriments
+                                  ?.getValue(
+                                      Nutrient.sugars, PerSize.oneHundredGrams)
+                                  .toString() ??
                               "0",
                           image: scannedProduct.imagePackagingUrl ?? "",
                           scanTime: DateTime.now(),
                           allergens: scannedProduct.allergens!.names,
-                          saturatedFat: scannedProduct.nutriments?.saturatedFat
+                          saturatedFat: scannedProduct.nutriments
+                                  ?.getValue(Nutrient.saturatedFat,
+                                      PerSize.oneHundredGrams)
                                   .toString() ??
                               "",
                           category: scannedProduct.categories ?? "",
@@ -607,13 +649,23 @@ class _DetailPageState extends State<DetailPage> {
                 "productname": scannedProduct.productName ?? "",
                 'brand': scannedProduct.brands ?? "",
                 'category': scannedProduct.categories ?? "",
-                'calories': scannedProduct.nutriments?.energyKcal ?? 0,
+                'calories': scannedProduct.nutriments
+                        ?.getValue(Nutrient.energyKCal, PerSize.serving) ??
+                    0,
                 'image': scannedProduct.imagePackagingUrl ?? 0,
                 'allergens': scannedProduct.allergens?.names ?? [""],
-                'fat': scannedProduct.nutriments?.fat ?? 0,
-                'saturatedFat': scannedProduct.nutriments?.saturatedFat ?? 0,
-                'salt': scannedProduct.nutriments?.salt ?? 0,
-                'sugar': scannedProduct.nutriments?.sugars ?? 0,
+                'fat': scannedProduct.nutriments
+                        ?.getValue(Nutrient.fat, PerSize.serving) ??
+                    0,
+                'saturatedFat': scannedProduct.nutriments
+                        ?.getValue(Nutrient.saturatedFat, PerSize.serving) ??
+                    0,
+                'salt': scannedProduct.nutriments
+                        ?.getValue(Nutrient.salt, PerSize.serving) ??
+                    0,
+                'sugar': scannedProduct.nutriments
+                        ?.getValue(Nutrient.sugars, PerSize.serving) ??
+                    0,
                 "scanTime": DateTime.now().toString()
               },
             })
@@ -628,11 +680,21 @@ class _DetailPageState extends State<DetailPage> {
       return const Center(child: CircularProgressIndicator());
     } else {
       Future.delayed(Duration.zero, () {
-        if (scannedProduct.nutriments?.energyKcal100g == null ||
-            scannedProduct.nutriments?.saturatedFat == null ||
-            scannedProduct.nutriments?.fat == null ||
-            scannedProduct.nutriments?.salt == null ||
-            scannedProduct.nutriments?.sugars == null) {
+        if (scannedProduct.nutriments
+                    ?.getValue(Nutrient.energyKCal, PerSize.oneHundredGrams) ==
+                null ||
+            scannedProduct.nutriments
+                    ?.getValue(Nutrient.saturatedFat, PerSize.serving) ==
+                null ||
+            scannedProduct.nutriments
+                    ?.getValue(Nutrient.fat, PerSize.serving) ==
+                null ||
+            scannedProduct.nutriments
+                    ?.getValue(Nutrient.salt, PerSize.serving) ==
+                null ||
+            scannedProduct.nutriments
+                    ?.getValue(Nutrient.sugars, PerSize.serving) ==
+                null) {
           _manuallyAddDetailsPopUp();
         }
       });

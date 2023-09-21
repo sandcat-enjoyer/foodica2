@@ -117,15 +117,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               )
             : InkWell(
                 onTap: () async {
-                  showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (context) {
-                        return const Center(
-                            child: CircularProgressIndicator(
-                                color: Colors.redAccent));
-                      });
-                  await Future.delayed(const Duration(seconds: 2), () {});
                   navigateToLogin();
                 },
                 child: Container(
@@ -168,7 +159,10 @@ class SlideTile extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Image.asset(imagePath, height: 400,),
+          Image.asset(
+            imagePath,
+            height: 400,
+          ),
           const SizedBox(
             height: 20,
           ),

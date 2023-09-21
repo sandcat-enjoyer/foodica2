@@ -19,8 +19,9 @@ import 'package:flutter_widgetkit/flutter_widgetkit.dart';
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  WidgetKit.setItem("widgetData", jsonEncode(FlutterWidgetData("text")), "group.julesdebbaut.foodica");
-  WidgetKit.reloadAllTimelines();
+  //WidgetKit.setItem("widgetData", jsonEncode(FlutterWidgetData("text")),
+  //  "group.julesdebbaut.foodica");
+  //WidgetKit.reloadAllTimelines();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) => {runApp(const MyApp())});
 }
@@ -38,7 +39,8 @@ _loadApp() {
       isAllergensNotEmpty = prefs.getStringList("allergens") != null;
       isDailyCaloriesNotEmpty = prefs.getInt("daily") != null;
       print(isDailyCaloriesNotEmpty);
-      if (prefs.getBool("firstTimeBoot") == true || prefs.getBool("firstTimeBoot") == null) {
+      if (prefs.getBool("firstTimeBoot") == true ||
+          prefs.getBool("firstTimeBoot") == null) {
         FirebaseAuth.instance.signOut();
         prefs.setBool("firstTimeBoot", false);
       }
@@ -79,7 +81,7 @@ class MyApp extends StatelessWidget {
               brightness: Brightness.light,
               primaryColor: Colors.black,
               //fix this deprecation
-              accentColor: Colors.redAccent,
+              //accentColor: Colors.redAccent,
               floatingActionButtonTheme: const FloatingActionButtonThemeData(
                   backgroundColor: Colors.redAccent),
               appBarTheme: const AppBarTheme(
@@ -88,7 +90,7 @@ class MyApp extends StatelessWidget {
           themeMode: ThemeMode.system,
           darkTheme: ThemeData(
               brightness: Brightness.dark,
-              accentColor: Colors.redAccent,
+              //accentColor: Colors.redAccent,
               backgroundColor: const Color.fromARGB(255, 0, 0, 0),
               floatingActionButtonTheme: const FloatingActionButtonThemeData(
                   backgroundColor: Colors.redAccent,
