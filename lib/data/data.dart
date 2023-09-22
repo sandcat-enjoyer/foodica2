@@ -34,12 +34,12 @@ class SliderModel {
 List<SliderModel> getSlides() {
   List<SliderModel> slides = <SliderModel>[];
   SliderModel slide1 = new SliderModel(
-      title: "Welcome",
-      desc: "Welcome to Foodica, your personal helper for tracking allergies.",
+      title: "Welcome to Foodica",
+      desc: "Your personal helper for tracking allergies.",
       imageAssetPath: "assets/start-1.png");
   slides.add(slide1);
   SliderModel slide2 = new SliderModel(
-      title: "What does the app do?",
+      title: "What can I do?",
       desc:
           "Foodica helps you keep track of the types of food you eat and decides for you what you can or can't eat. All the foods you add to the app will be kept in the History tab.",
       imageAssetPath: "assets/start-2.png");

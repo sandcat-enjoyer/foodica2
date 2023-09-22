@@ -97,6 +97,116 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: SingleChildScrollView(
+      child: Container(
+        child: Column(
+          children: <Widget>[
+            Container(
+              height: 400,
+              decoration: BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage('assets/background.png'),
+                      fit: BoxFit.fill)),
+              child: Stack(
+                children: <Widget>[
+                  Positioned(
+                    left: 30,
+                    width: 80,
+                    height: 200,
+                    child: Container(
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: AssetImage('assets/light-1.png'))),
+                    ),
+                  ),
+                  Positioned(
+                    left: 140,
+                    width: 80,
+                    height: 150,
+                    child: Container(
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: AssetImage('assets/light-2.png'))),
+                    ),
+                  ),
+                  Positioned(
+                      right: 40,
+                      top: 40,
+                      width: 80,
+                      height: 150,
+                      child: Container(
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                                image: AssetImage('assets/clock.png'))),
+                      )),
+                  Positioned(
+                      child: Container(
+                    margin: EdgeInsets.only(top: 50),
+                    child: Center(
+                      child: Text(
+                        "Login",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ))
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(30.0),
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Color.fromRGBO(143, 148, 251, .2),
+                              blurRadius: 20.0,
+                              offset: Offset(0, 10))
+                        ]),
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          padding: EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                              border: Border(
+                                  bottom:
+                                      BorderSide(color: Colors.grey[100]!))),
+                          child: TextField(
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Email or Phone number",
+                                hintStyle: TextStyle(color: Colors.grey[400])),
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(8.0),
+                          child: TextField(
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Password",
+                                hintStyle: TextStyle(color: Colors.grey[400])),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    height: 30,
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    ));
+  } /* SingleChildScrollView(
             child: Container(
                 alignment: Alignment.center,
                 padding: const EdgeInsets.all(20.0),
@@ -109,7 +219,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const Text("Sign In",
                         style: TextStyle(
-                            fontFamily: "Poppins",
+                            fontFamily: "Inter Tight",
                             fontSize: 36.0,
                             fontWeight: FontWeight.bold)),
                     const SizedBox(height: 30.0),
@@ -118,12 +228,12 @@ class _LoginPageState extends State<LoginPage> {
                       child: TextField(
                         decoration: const InputDecoration(
                             labelText: "Email",
-                            labelStyle: TextStyle(fontFamily: "Poppins"),
+                            labelStyle: TextStyle(fontFamily: "Inter Tight"),
                             border: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(10))),
                             hintText: 'Enter your email address',
-                            hintStyle: TextStyle(fontFamily: "Poppins")),
+                            hintStyle: TextStyle(fontFamily: "Inter Tight")),
                         onChanged: (value) => {
                           setState(() {
                             email = value.trim();
@@ -138,12 +248,12 @@ class _LoginPageState extends State<LoginPage> {
                         obscureText: true,
                         decoration: const InputDecoration(
                             labelText: "Password",
-                            labelStyle: TextStyle(fontFamily: "Poppins"),
+                            labelStyle: TextStyle(fontFamily: "Inter Tight"),
                             border: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(10))),
                             hintText: 'Enter your password',
-                            hintStyle: TextStyle(fontFamily: "Poppins")),
+                            hintStyle: TextStyle(fontFamily: "Inter Tight")),
                         onChanged: (value) => {
                           setState(() => {password = value.trim()})
                         },
@@ -201,7 +311,7 @@ class _LoginPageState extends State<LoginPage> {
                               SizedBox(width: 5),
                               Text("Log in",
                                   style: TextStyle(
-                                      fontFamily: "Poppins",
+                                      fontFamily: "Inter Tight",
                                       fontWeight: FontWeight.bold))
                             ],
                           ),
@@ -221,7 +331,7 @@ class _LoginPageState extends State<LoginPage> {
                     const Text(
                       "Or sign in with these options: ",
                       style: TextStyle(
-                          fontFamily: "Poppins",
+                          fontFamily: "Inter Tight",
                           fontSize: 18,
                           fontWeight: FontWeight.bold),
                     ),
@@ -308,7 +418,7 @@ class _LoginPageState extends State<LoginPage> {
                                               const Text("Sign In with Google",
                                                   style: TextStyle(
                                                       color: Colors.black,
-                                                      fontFamily: "Poppins",
+                                                      fontFamily: "Inter Tight",
                                                       fontWeight:
                                                           FontWeight.bold))
                                             ],
@@ -326,14 +436,12 @@ class _LoginPageState extends State<LoginPage> {
                       children: [
                         Container(
                           width: 250,
-                          child:  _checkPlatform(context),
+                          child: _checkPlatform(context),
                         )
-                       
-                        ],
+                      ],
                     ),
                     SizedBox(height: 40),
                     OutlinedButton(
-                      
                         style: ButtonStyle(
                             shape: MaterialStateProperty.all(
                                 RoundedRectangleBorder(
@@ -343,9 +451,8 @@ class _LoginPageState extends State<LoginPage> {
                             {Navigator.of(context).push(_toRegisterPage())},
                         child: const Text("Create New Account",
                             style: TextStyle(
-                                fontFamily: "Poppins",
+                                fontFamily: "Inter Tight",
                                 fontWeight: FontWeight.bold)))
                   ],
-                ))));
-  }
+                ))) */
 }

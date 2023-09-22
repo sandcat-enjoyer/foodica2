@@ -78,18 +78,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ? Container(
                 margin: const EdgeInsets.symmetric(vertical: 16),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
-                    TextButton(
+                    IconButton(
                       onPressed: () {
-                        controller!.animateToPage(2,
-                            duration: const Duration(milliseconds: 150),
+                        controller!.animateToPage(slideIndex - 1,
+                            duration: const Duration(milliseconds: 250),
                             curve: Curves.easeInOut);
                       },
-                      child: const Text(
-                        "Skip",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600, fontFamily: "Poppins"),
+                      icon: Icon(
+                        Icons.arrow_back_rounded,
+                        size: 32,
                       ),
                     ),
                     Row(
@@ -100,16 +99,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               : _buildPageIndicator(false),
                       ],
                     ),
-                    TextButton(
+                    IconButton(
                       onPressed: () {
                         controller!.animateToPage(slideIndex + 1,
                             duration: const Duration(milliseconds: 250),
                             curve: Curves.easeInOut);
                       },
-                      child: const Text(
-                        "Next",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600, fontFamily: "Poppins"),
+                      icon: Icon(
+                        Icons.arrow_forward_rounded,
+                        size: 32,
                       ),
                     ),
                   ],
@@ -127,7 +125,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontFamily: "Poppins",
+                          fontFamily: "Inter Tight",
                           fontSize: 18)),
                 ),
               ),
@@ -170,9 +168,9 @@ class SlideTile extends StatelessWidget {
             title,
             textAlign: TextAlign.center,
             style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 30,
-                fontFamily: "Poppins"),
+                fontWeight: FontWeight.w700,
+                fontSize: 35,
+                fontFamily: "Inter Tight"),
           ),
           const SizedBox(
             height: 20,
@@ -180,9 +178,9 @@ class SlideTile extends StatelessWidget {
           Text(desc,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w400,
                   fontSize: 16,
-                  fontFamily: "Poppins"))
+                  fontFamily: "Inter Tight"))
         ],
       ),
     );
