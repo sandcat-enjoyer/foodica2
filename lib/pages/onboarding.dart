@@ -119,7 +119,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
                 child: Container(
                   height: Platform.isIOS ? 70 : 60,
-                  color: Colors.blue,
+                  color: Colors.red,
                   alignment: Alignment.center,
                   child: const Text("Get Started",
                       style: TextStyle(

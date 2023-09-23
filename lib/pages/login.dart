@@ -109,44 +109,25 @@ class _LoginPageState extends State<LoginPage> {
               child: Stack(
                 children: <Widget>[
                   Positioned(
-                    left: 30,
-                    width: 80,
-                    height: 200,
-                    child: Container(
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage('assets/light-1.png'))),
-                    ),
-                  ),
-                  Positioned(
-                    left: 140,
-                    width: 80,
-                    height: 150,
-                    child: Container(
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage('assets/light-2.png'))),
-                    ),
-                  ),
-                  Positioned(
-                      right: 40,
+                      right: MediaQuery.of(context).size.width * 0.4,
                       top: 40,
                       width: 80,
-                      height: 150,
+                      height: 200,
                       child: Container(
                         decoration: BoxDecoration(
                             image: DecorationImage(
-                                image: AssetImage('assets/clock.png'))),
+                                image: AssetImage('assets/splash_icon.png'))),
                       )),
                   Positioned(
                       child: Container(
                     margin: EdgeInsets.only(top: 50),
                     child: Center(
                       child: Text(
-                        "Login",
+                        "Sign In",
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 40,
+                            fontFamily: "Inter Tight",
                             fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -162,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
                     padding: EdgeInsets.all(5),
                     decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
                               color: Color.fromRGBO(143, 148, 251, .2),
@@ -179,10 +160,26 @@ class _LoginPageState extends State<LoginPage> {
                                       BorderSide(color: Colors.grey[100]!))),
                           child: TextField(
                             decoration: InputDecoration(
+                                labelStyle:
+                                    TextStyle(fontFamily: "Inter Tight"),
+                                border: InputBorder.none,
+                                hintText: 'Enter your email address',
+                                hintStyle: TextStyle(
+                                    fontFamily: "Inter Tight",
+                                    color: Colors.grey[400])),
+                            onChanged: (value) => {
+                              setState(() {
+                                email = value.trim();
+                              })
+                            },
+                          ), /* TextField(
+                            decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: "Email or Phone number",
-                                hintStyle: TextStyle(color: Colors.grey[400])),
-                          ),
+                                hintStyle: TextStyle(
+                                    color: Colors.grey[400],
+                                    fontFamily: "Inter Tight")),
+                          ), */
                         ),
                         Container(
                           padding: EdgeInsets.all(8.0),
@@ -190,15 +187,177 @@ class _LoginPageState extends State<LoginPage> {
                             decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: "Password",
-                                hintStyle: TextStyle(color: Colors.grey[400])),
+                                hintStyle: TextStyle(
+                                    color: Colors.grey[400],
+                                    fontFamily: "Inter Tight")),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
                   SizedBox(
                     height: 30,
                   ),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.5,
+                    height: 50,
+                    child: ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                                Color.fromARGB(255, 211, 74, 74)),
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ))),
+                        onPressed: () => {
+                              Authentication()
+                                  .signInWithEmail(
+                                      email: email, password: password)
+                                  .then((result) => {
+                                        if (result == null)
+                                          {
+                                            SharedPreferences.getInstance()
+                                                .then((prefs) {
+                                              if (prefs.getStringList(
+                                                      "allergens") ==
+                                                  null) {
+                                                Navigator.pushReplacement(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            InitAllergens(
+                                                                user: FirebaseAuth
+                                                                    .instance
+                                                                    .currentUser!)));
+                                              } else {
+                                                Navigator.pushReplacement(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            HomeScreenPage(
+                                                                user: FirebaseAuth
+                                                                    .instance
+                                                                    .currentUser!)));
+                                              }
+                                            })
+                                          }
+                                        else
+                                          {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                                    content: Text(result)))
+                                          }
+                                      })
+                            },
+                        child: Text("Log in")),
+                  ),
+                  SizedBox(height: 30),
+                  FutureBuilder(
+                      future:
+                          Authentication.initializeFirebase(context: context),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return const Text("Error initializing Firebase");
+                        } else if (snapshot.connectionState ==
+                            ConnectionState.done) {
+                          return SizedBox(
+                              child: _isSigningIn
+                                  ? const CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.redAccent),
+                                    )
+                                  : Container(
+                                      height: 50,
+                                      child: OutlinedButton(
+                                        style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty.all(
+                                                    Colors.white),
+                                            shape: MaterialStateProperty.all(
+                                                RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            7)))),
+                                        onPressed: () async {
+                                          setState(() {
+                                            _isSigningIn = true;
+                                          });
+
+                                          User? user = await Authentication
+                                              .signInWithGoogle(
+                                                  context: context);
+                                          setState(() {
+                                            _isSigningIn = false;
+                                          });
+
+                                          if (user != null) {
+                                            SharedPreferences prefs =
+                                                await SharedPreferences
+                                                    .getInstance();
+                                            if (prefs.getStringList(
+                                                    "allergens") !=
+                                                null) {
+                                              Navigator.of(context)
+                                                  .pushReplacement(
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      HomeScreenPage(
+                                                    user: user,
+                                                  ),
+                                                ),
+                                              );
+                                            } else {
+                                              Navigator.of(context)
+                                                  .pushReplacement(
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              InitAllergens(
+                                                                  user: user)));
+                                            }
+                                          }
+                                        },
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              child: CachedNetworkImage(
+                                                  imageUrl:
+                                                      'http://pngimg.com/uploads/google/google_PNG19635.png',
+                                                  width: 30,
+                                                  fit: BoxFit.cover),
+                                            ),
+                                            SizedBox(width: 5),
+                                            const Text("Sign In with Google",
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontFamily: "Inter Tight",
+                                                    fontWeight:
+                                                        FontWeight.bold))
+                                          ],
+                                        ),
+                                      ),
+                                    ));
+                        }
+                        return const CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.redAccent),
+                        );
+                      }),
+                  SizedBox(height: 20),
+                  OutlinedButton(
+                      style: ButtonStyle(
+                          shape: MaterialStateProperty.all(
+                              RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8))))),
+                      onPressed: () =>
+                          {Navigator.of(context).push(_toRegisterPage())},
+                      child: const Text("Create New Account",
+                          style: TextStyle(
+                              fontFamily: "Inter Tight",
+                              fontWeight: FontWeight.bold)))
                 ],
               ),
             )
