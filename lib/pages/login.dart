@@ -142,11 +142,11 @@ class _LoginPageState extends State<LoginPage> {
                   Container(
                     padding: EdgeInsets.all(5),
                     decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Color.fromARGB(255, 46, 46, 46),
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                              color: Color.fromRGBO(143, 148, 251, .2),
+                              color: Color.fromRGBO(43, 19, 19, .5),
                               blurRadius: 20.0,
                               offset: Offset(0, 10))
                         ]),
@@ -156,8 +156,8 @@ class _LoginPageState extends State<LoginPage> {
                           padding: EdgeInsets.all(8.0),
                           decoration: BoxDecoration(
                               border: Border(
-                                  bottom:
-                                      BorderSide(color: Colors.grey[100]!))),
+                                  bottom: BorderSide(
+                                      color: Color.fromARGB(255, 64, 64, 64)))),
                           child: TextField(
                             decoration: InputDecoration(
                                 labelStyle:
